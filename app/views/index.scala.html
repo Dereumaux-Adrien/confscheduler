@@ -2,7 +2,7 @@
 
 @displayConfListing(conf: Conference) = {
     <div class="conf-listing">
-        <h4>@conf.name <span class="speaker-name">@conf.speaker.fullName</span></h4>
+        <h4>@conf.name <span class="speaker-name">@conf.speaker.fullName</span><span class="time-to-conf"> in @conf.timeFromNow</span></h4>
         <p>@conf.abstr</p>
     </div>
 }
