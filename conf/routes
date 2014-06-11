@@ -4,8 +4,9 @@
 
 # Home page
 GET     /                           controllers.Application.index
-GET     /add                        controllers.Application.addConf
-GET     /conf/:id                   controllers.Application.viewConf(id: Long)
+GET     /conf/new                   controllers.ConferenceController.addConf
+GET     /conf/:id                   controllers.ConferenceController.viewConf(id: Long)
+GET     /conf                       controllers.ConferenceController.listConfs
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

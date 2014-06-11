@@ -10,5 +10,6 @@ libraryDependencies ++= Seq(
   jdbc,
   anorm,
   cache,
-  ws
+  ws,
+  "com.github.nscala-time" %% "nscala-time" % "1.2.0"
 )

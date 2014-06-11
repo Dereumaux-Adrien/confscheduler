@@ -1,15 +1,18 @@
 package models
+import com.github.nscala_time.time.Imports._
 
 case class Conference (
-    id     : Long,
-    name   : String,
-    abstr  : String,
-    speaker: String
+    id       : Long,
+    name     : String,
+    abstr    : String,
+    speaker  : Speaker,
+    startDate: DateTime,
+    length   : Duration
 )
 
 object Conference {
-    val confs = Set(Conference(0, "Les oiseaux chantent", "La vie est belle, et c'est super cool de s'appeller Michel", "Michel Sardou"), 
-        Conference(1, "test conf 2", "test abstr 2", "Patrick Bruel"))
+    val confs = Set(Conference(0, "Les oiseaux chantent", "La vie est belle, et c'est super cool de s'appeller Michel", Speaker.find(0).get, DateTime.now + 2.week, 1.hour), 
+        Conference(1, "test conf 2", "test abstr 2", Speaker.find(1).get, DateTime.now + 1.week, 2.hour))
 
     def findAll = confs.toList.sortBy(_.id)
 
