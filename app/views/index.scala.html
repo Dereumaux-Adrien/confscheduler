@@ -1,0 +1,14 @@
+@(confs: List[Conference])
+
+@displayConfListing(conf: Conference) = {
+    <div class="conf-listing">
+        <h4>@conf.name <span class="speaker-name">@conf.speaker</span></h4>
+        <p>@conf.abstr</p>
+    </div>
+}
+
+@main("Index") {
+    @for(conf <- confs) {
+        @displayConfListing(conf)
+    }
+}

@@ -1,0 +1,17 @@
+.main {
+    background-color: #FAFAFA;
+    padding-bottom: 10px;
+}
+
+.conf-listing {
+    background-color: #F1F1F1;
+    padding: 3px 15px 3px 15px;
+    border-radius: 3px;
+    margin-top: 5px;
+}
+
+.speaker-name {
+    font-size:11pt;
+    font-style: italic;
+    color: #888;
+}
