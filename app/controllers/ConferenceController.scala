@@ -4,32 +4,23 @@ import play.api._
 import play.api.mvc._
 import com.github.nscala_time.time.Imports._
 
-abstract class CalendarPeriod
-case class Weekly() extends CalendarPeriod
-case class Monthly() extends CalendarPeriod
-
-
 object ConferenceController extends Controller {
-  def addConf = Action {
-    Ok(views.html.addConf())
+  def addConf = Action { request =>
+    Ok(views.html.addConf(request))
   }
 
-  def viewConf(id: Long) = Action {
+  def viewConf(id: Long) = Action { request =>
     models.Conference.find(id) match {
-        case Some(c) => Ok(views.html.conf(c))
+        case Some(c) => Ok(views.html.conf(c)(request))
         case None    => NotFound
     }
   }
 
-  def listConfs = Action {
-    Ok(views.html.index(models.Conference.findAll.sortBy(_.startDate)))
+  def listConfs = Action { request =>
+    Ok(views.html.index(models.Conference.findAll.sortBy(_.startDate))(request))
   }
 
-  def calendar(period: CalendarPeriod) = Action {
-    Ok(views.html.weeklyCalendar())
+  def calendar = Action { request => 
+    Ok(views.html.calendar(request))
   }
-
-  def weeklyCalendar = calendar(Weekly())
-
-  def monthlyCalendar = calendar(Monthly())
 }

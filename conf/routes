@@ -7,8 +7,7 @@ GET     /                           controllers.Application.index
 GET     /conf/new                   controllers.ConferenceController.addConf
 GET     /conf/:id                   controllers.ConferenceController.viewConf(id: Long)
 GET     /conf                       controllers.ConferenceController.listConfs
-GET     /calendar/weekly            controllers.ConferenceController.weeklyCalendar
-GET     /calendar/monthly           controllers.ConferenceController.monthlyCalendar
+GET     /calendar                   controllers.ConferenceController.calendar
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

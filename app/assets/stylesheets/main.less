@@ -1,0 +1,44 @@
+@main-background-color: #FAFAFA;
+@main-contrast-color  : #F1F1F1;
+@speaker-name-color   : #888;
+
+.main {
+    background-color: @main-background-color;
+    padding-bottom: 10px;
+
+    #calendar {
+        margin-top: 10px;
+    }
+
+    .topMenu {
+        .active {
+            background-color: @main-contrast-color;
+        }
+    }
+
+    .conf-listing {
+        background-color: @main-contrast-color;
+        padding: 3px 15px 3px 15px;
+        border-radius: 3px;
+        margin-top: 5px;
+    }
+
+    .speaker-name {
+        font-size:11pt;
+        font-style: italic;
+        color: @speaker-name-color;
+    }
+
+    .time-to-conf {
+        font-size:11pt;
+        font-style: italic;
+        color: @speaker-name-color;
+        float: right;
+    }
+}
+
+
+
+
+
+

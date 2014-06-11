@@ -1,5 +1,16 @@
-<ul class="nav nav-tabs nav-justified">
-  <li><a href="@routes.Application.index()">Conferences List</a></li>
-  <li><a href="@routes.ConferenceController.weeklyCalendar">Calendar</a></li>
-  <li><a href="@routes.ConferenceController.addConf()">Add a conference</a></li>
+@(implicit request: play.api.mvc.Request[Any])
+
+@activeLi(text: String, pattern: String, route: play.api.mvc.Call)(implicit request: play.api.mvc.Request[Any]) = {
+    @if(request.uri.endsWith(pattern)) {
+        <li><a href="@route" class="active">@text</a></li>
+    } else {
+        <li><a href="@route">@text</a></li>
+    }
+}
+
+<ul class="nav nav-pills topMenu">
+  @activeLi("Upcoming Conferences",        "/conf",     routes.ConferenceController.listConfs)
+  @activeLi("Public Conferences Calendar", "/calendar", routes.ConferenceController.calendar)
+  @activeLi("Add a conference",            "/conf/new", routes.ConferenceController.addConf)
+  <li class="pull-right"><a href="#">Login</a></li>
 </ul>
