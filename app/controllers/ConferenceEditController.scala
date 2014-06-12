@@ -4,7 +4,8 @@ import play.api.mvc._
 import jp.t2v.lab.play2.auth.AuthElement
 import play.api.data.Form
 import play.api.data.Forms._
-import models.{User, Contributor, Conference}
+import models._
+import play.api.mvc.Result
 
 object ConferenceEditController extends Controller with AuthElement with AuthConfigImpl {
   val conferenceForm = Form {
@@ -12,17 +13,20 @@ object ConferenceEditController extends Controller with AuthElement with AuthCon
   }
 
   def addConf() = StackAction(AuthorityKey -> Contributor) { implicit request =>
-      Ok(views.html.addConf(conferenceForm)(request, logged = true))
+      Ok(views.html.confViews.addConf(conferenceForm)(request, logged = true))
   }
 
   def create() = StackAction(AuthorityKey -> Contributor) { implicit request =>
     conferenceForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(views.html.addConf(conferenceForm)(request, logged = true)),
+      formWithErrors => BadRequest(views.html.confViews.addConf(conferenceForm)(request, logged = true)),
       conf           => createConfWithUser(conf, loggedIn)
     )
   }
 
   private def createConfWithUser(conf: Conference, user: User): Result = {
-    Redirect(routes.ConferenceViewController.listConfs())
+    user.role match {
+      case Administrator | Moderator => ???
+      case _                         => ???
+    }
   }
 }
