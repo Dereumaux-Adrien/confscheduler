@@ -1,11 +1,12 @@
 package controllers
 
-import play.api._
 import play.api.mvc._
 import com.github.nscala_time.time.Imports._
+import jp.t2v.lab.play2.auth.AuthElement
+import models.Contributor
 
-object ConferenceController extends Controller {
-  def addConf = Action { request =>
+object ConferenceController extends Controller with AuthElement with AuthConfigImpl {
+  def addConf = StackAction(AuthorityKey -> Contributor) { request =>
     Ok(views.html.addConf(request))
   }
 
