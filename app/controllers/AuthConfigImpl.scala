@@ -19,7 +19,7 @@ trait AuthConfigImpl extends AuthConfig {
 
   val sessionTimeoutInSeconds: Int = 3600
 
-  def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] = Future{LoggedUser.findById(id)}
+  def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] = Future{User.findById(id)}
 
   def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
     Future.successful(Redirect(routes.ConferenceViewController.listConfs()))
@@ -34,15 +34,12 @@ trait AuthConfigImpl extends AuthConfig {
     Future.successful(Forbidden("no permission"))
 
   def authorize(user: User, authority: Authority)(implicit ctx: ExecutionContext): Future[Boolean] = Future.successful {
-    user match {
-      case LoggedUser(_,_,_,_,_,role) => (role, authority) match {
+    (user.role, authority) match {
         case (Administrator, _)         => true
         case (Moderator, Moderator)     => true
         case (Moderator, Contributor)   => true
         case (Contributor, Contributor) => true
         case _                          => false
-      }
-      case GuestUser() => false
     }
   }
 

@@ -6,14 +6,14 @@ import play.api.mvc._
 import scala.concurrent.ExecutionContext
 import ExecutionContext.Implicits.global
 
-import models.LoggedUser
+import models.User
 
 import jp.t2v.lab.play2.auth.LoginLogout
 import scala.concurrent.Future
 
 object LoginController extends Controller with LoginLogout with AuthConfigImpl {
   val loginForm = Form {
-    mapping("email" -> email, "password" -> text)(LoggedUser.authenticate)(_.map(u => (u.email, "")))
+    mapping("email" -> email, "password" -> text)(User.authenticate)(_.map(u => (u.email, "")))
       .verifying("Invalid email or password", result => result.isDefined)
   }
 

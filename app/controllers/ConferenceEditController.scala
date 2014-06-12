@@ -4,7 +4,7 @@ import play.api.mvc._
 import jp.t2v.lab.play2.auth.AuthElement
 import play.api.data.Form
 import play.api.data.Forms._
-import models.{Contributor, Conference}
+import models.{User, Contributor, Conference}
 
 object ConferenceEditController extends Controller with AuthElement with AuthConfigImpl {
   val conferenceForm = Form {
