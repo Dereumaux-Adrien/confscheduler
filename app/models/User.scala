@@ -15,5 +15,7 @@ object LoggedUser {
 
   def findById(id: Long): Option[LoggedUser] = fixtures.find(_.id == id)
 
-  def findByEmail(email: String): Option[User] = fixtures.find(_.email == email)
+  def findByEmail(email: String): Option[LoggedUser] = fixtures.find(_.email == email)
+
+  def authenticate(email: String, password: String): Option[LoggedUser] = findByEmail(email).filter(_.hashedPass == password)
 }
