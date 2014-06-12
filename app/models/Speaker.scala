@@ -13,9 +13,9 @@ case class Speaker (
 }
 
 object Speaker {
-    val fixtures = Set(
+  val fixtures = Set(
         Speaker(0, "Jaques", "Monod", "Pr", "Nobel Prizes Winners", "Institut Pasteur", "jaques-monod-is-a-good@gmail.com"),
         Speaker(1, "François", "Jacob", "Pr", "Nobel Prizes Winners", "Institut Pasteur", "jaques-monod-is-a-bad@gmail.com"))
 
-    def find(id: Long) = fixtures.find(_.id == id)
+    def findById(id: Long) = fixtures.find(_.id == id)
 }

@@ -9,10 +9,10 @@
 }
 
 <ul class="nav nav-pills topMenu">
-  @activeLi("Upcoming Conferences",        "/conf",     routes.ConferenceController.listConfs)
-  @activeLi("Public Conferences Calendar", "/calendar", routes.ConferenceController.calendar)
+  @activeLi("Upcoming Conferences",        "/conf",     routes.ConferenceViewController.listConfs)
+  @activeLi("Public Conferences Calendar", "/calendar", routes.ConferenceViewController.calendar)
   @if(logged) {
-    @activeLi("Add a conference",            "/conf/new", routes.ConferenceController.addConf)
+    @activeLi("Add a conference",            "/conf/new", routes.ConferenceEditController.addConf)
     <li class="pull-right"><a href="@routes.LoginController.logout">Logout</a></li>
   } else {
     <li class="pull-right"><a href="@routes.LoginController.login">Login</a></li>

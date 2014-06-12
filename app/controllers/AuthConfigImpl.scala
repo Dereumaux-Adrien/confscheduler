@@ -22,10 +22,10 @@ trait AuthConfigImpl extends AuthConfig {
   def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] = Future{LoggedUser.findById(id)}
 
   def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
-    Future.successful(Redirect(routes.ConferenceController.listConfs()))
+    Future.successful(Redirect(routes.ConferenceViewController.listConfs()))
 
   def logoutSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
-    Future.successful(Redirect(routes.ConferenceController.listConfs()))
+    Future.successful(Redirect(routes.ConferenceViewController.listConfs()))
 
   def authenticationFailed(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
     Future.successful(Redirect(routes.LoginController.login()))

@@ -1,5 +1,12 @@
-@(implicit request: play.api.mvc.Request[Any], logged: Boolean)
+@(conferenceForm: Form[Conference])(implicit request: play.api.mvc.Request[Any], logged: Boolean)
 
 @main("Add a new conference") {
-    Test
+    @helper.form(routes.ConferenceEditController.create) {
+        @helper.inputText(conferenceForm("name"))
+        @helper.textarea(conferenceForm("abstract"))
+        @helper.inputText(conferenceForm("speaker"))
+        @helper.inputDate(conferenceForm("Date"))
+        @helper.inputText(conferenceForm("length"))
+        <input type="submit">
+    }
 }

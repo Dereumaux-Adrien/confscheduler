@@ -5,7 +5,7 @@ case object Administrator extends UserRole
 case object Moderator     extends UserRole
 case object Contributor   extends UserRole
 
-abstract class User(displayName: String)
+abstract class User(val displayName: String)
 case class LoggedUser(id: Long, firstName: String, lastName: String, email: String, hashedPass: String, role:UserRole)
   extends User(firstName + " " + lastName)
 case class GuestUser() extends User("guest")
