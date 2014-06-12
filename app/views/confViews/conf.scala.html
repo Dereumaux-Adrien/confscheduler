@@ -1,7 +1,7 @@
 @(conf: Conference)(implicit request: play.api.mvc.Request[Any], logged: Boolean)
 
-@main(conf.name) {
+@main(conf.title) {
     @conf.id
-    @conf.name
+    @conf.title
     @conf.abstr
 }

@@ -19,12 +19,30 @@ class ApplicationSpec extends Specification {
       route(FakeRequest(GET, "/boum")) must beNone
     }
 
-    "render the index page" in new WithApplication{
-      val home = route(FakeRequest(GET, "/")).get
+    "render the upcoming conferences page" in new WithApplication{
+      val conflist = route(FakeRequest(GET, "/conf")).get
 
-      status(home) must equalTo(OK)
-      contentType(home) must beSome.which(_ == "text/html")
-      contentAsString(home) must contain ("Your new application is ready.")
+      status(conflist) must equalTo(OK)
+      contentType(conflist) must beSome.which(_ == "text/html")
+      contentAsString(conflist) must contain ("Upcoming Conferences")
+    }
+
+    "render the calendar page" in new WithApplication{
+      val calendar = route(FakeRequest(GET, "/calendar")).get
+
+      status(calendar) must equalTo(OK)
+      contentType(calendar) must beSome.which(_ == "text/html")
+      contentAsString(calendar) must contain ("Public Conferences Calendar")
+      contentAsString(calendar) must contain ("""<div id="calendar">""")
+    }
+
+    "render the login page" in new WithApplication{
+      val login = route(FakeRequest(GET, "/login")).get
+
+      status(login) must equalTo(OK)
+      contentType(login) must beSome.which(_ == "text/html")
+      contentAsString(login) must contain ("Login")
+      contentAsString(login) must contain ("""<div id="calendar">""")
     }
   }
 }

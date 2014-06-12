@@ -6,11 +6,14 @@ import play.api.data.Form
 import play.api.data.Forms._
 import models._
 import play.api.mvc.Result
+import java.util.Date
 
 object ConferenceEditController extends Controller with AuthElement with AuthConfigImpl {
   val conferenceForm = Form {
-    mapping("name" -> text, "abstract" -> text, "speaker" -> longNumber, "Date" -> date, "length" -> text)(Conference.create)(Conference.toPublicTuple)
+    mapping("name" -> text, "abstract" -> text, "speaker" -> longNumber, "Date" -> date, "length" -> text)(SimpleConference.apply)(SimpleConference.unapply)
   }
+
+  case class SimpleConference(title: String, abstr: String, speakerId: Long, date: Date, length: String)
 
   def addConf() = StackAction(AuthorityKey -> Contributor) { implicit request =>
       Ok(views.html.confViews.addConf(conferenceForm)(request, logged = true))
@@ -23,10 +26,13 @@ object ConferenceEditController extends Controller with AuthElement with AuthCon
     )
   }
 
-  private def createConfWithUser(conf: Conference, user: User): Result = {
+  private def createConfWithUser(conf: SimpleConference, user: User): Result = {
     user.role match {
-      case Administrator | Moderator => ???
-      case _                         => ???
+      case Administrator | Moderator =>
+        val newId = Conference.save(conf)
+        Redirect(routes.ConferenceViewController.viewConf(newId))
+      case _                         => NotImplemented
+
     }
   }
 }

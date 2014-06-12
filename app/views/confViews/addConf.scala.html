@@ -1,4 +1,4 @@
-@(conferenceForm: Form[Conference])(implicit request: play.api.mvc.Request[Any], logged: Boolean)
+@(conferenceForm: Form[ConferenceEditController.SimpleConference])(implicit request: play.api.mvc.Request[Any], logged: Boolean)
 
 @main("Add a new conference") {
     @helper.form(routes.ConferenceEditController.create) {
