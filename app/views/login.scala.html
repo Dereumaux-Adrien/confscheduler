@@ -1,5 +1,9 @@
-@(implicit request: play.api.mvc.Request[Any])
+@(loginForm: Form[Option[LoggedUser]])(implicit request: play.api.mvc.Request[Any])
 
 @main("Log-in") {
-    Login
+    @helper.form(routes.LoginController.authenticate) {
+        @helper.inputText(loginForm("email"))
+        @helper.inputPassword(loginForm("password"))
+        <input type="submit">
+    }
 }

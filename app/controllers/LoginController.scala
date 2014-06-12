@@ -13,6 +13,10 @@ object LoginController extends Controller{
   }
 
   def login = Action { implicit request =>
-    Ok(views.html.login(request))
+    Ok(views.html.login(loginForm))
+  }
+
+  def authenticate = Action { implicit request =>
+    Ok(views.html.login(loginForm))
   }
 }
