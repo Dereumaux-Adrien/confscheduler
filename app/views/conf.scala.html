@@ -1,4 +1,4 @@
-@(conf: Conference)(implicit request: play.api.mvc.Request[Any])
+@(conf: Conference)(implicit request: play.api.mvc.Request[Any], logged: Boolean)
 
 @main(conf.name) {
     @conf.id

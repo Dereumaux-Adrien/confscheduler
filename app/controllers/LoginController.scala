@@ -11,14 +11,14 @@ import models.LoggedUser
 import jp.t2v.lab.play2.auth.LoginLogout
 import scala.concurrent.Future
 
-object LoginController extends Controller with LoginLogout with AuthConfigImpl{
+object LoginController extends Controller with LoginLogout with AuthConfigImpl {
   val loginForm = Form {
     mapping("email" -> email, "password" -> text)(LoggedUser.authenticate)(_.map(u => (u.email, "")))
       .verifying("Invalid email or password", result => result.isDefined)
   }
 
   def login = Action { implicit request =>
-    Ok(views.html.login(loginForm))
+    Ok(views.html.login(loginForm)(request, logged = false))
   }
 
   def logout = Action.async { implicit request =>
@@ -29,7 +29,7 @@ object LoginController extends Controller with LoginLogout with AuthConfigImpl{
 
   def authenticate = Action.async { implicit request =>
     loginForm.bindFromRequest.fold(
-      formWithErrors => Future.successful(BadRequest(views.html.login(formWithErrors))),
+      formWithErrors => Future.successful(BadRequest(views.html.login(formWithErrors)(request, logged = false))),
       user => gotoLoginSucceeded(user.get.id)
     )
   }

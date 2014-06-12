@@ -1,4 +1,4 @@
-@(implicit request: play.api.mvc.Request[Any])
+@(implicit request: play.api.mvc.Request[Any], logged: Boolean)
 
 @activeLi(text: String, pattern: String, route: play.api.mvc.Call)(implicit request: play.api.mvc.Request[Any]) = {
     @if(request.uri.endsWith(pattern)) {
@@ -12,5 +12,9 @@
   @activeLi("Upcoming Conferences",        "/conf",     routes.ConferenceController.listConfs)
   @activeLi("Public Conferences Calendar", "/calendar", routes.ConferenceController.calendar)
   @activeLi("Add a conference",            "/conf/new", routes.ConferenceController.addConf)
-  <li class="pull-right"><a href="@routes.LoginController.login">Login</a></li>
+  @if(logged) {
+    <li class="pull-right"><a href="@routes.LoginController.logout">Logout</a></li>
+  } else {
+    <li class="pull-right"><a href="@routes.LoginController.login">Login</a></li>
+  }
 </ul>

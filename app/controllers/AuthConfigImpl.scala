@@ -12,7 +12,7 @@ import play.api.mvc.Result
 
 trait AuthConfigImpl extends AuthConfig {
   type Id        = Long
-  type User      = LoggedUser
+  type User      = models.User
   type Authority = UserRole
 
   val idTag: ClassTag[Id] = classTag[Id]
@@ -25,7 +25,7 @@ trait AuthConfigImpl extends AuthConfig {
     Future.successful(Redirect(routes.ConferenceController.listConfs()))
 
   def logoutSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
-    Future.successful(Redirect(routes.LoginController.login()))
+    Future.successful(Redirect(routes.ConferenceController.listConfs()))
 
   def authenticationFailed(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
     Future.successful(Redirect(routes.LoginController.login()))
@@ -34,12 +34,15 @@ trait AuthConfigImpl extends AuthConfig {
     Future.successful(Forbidden("no permission"))
 
   def authorize(user: User, authority: Authority)(implicit ctx: ExecutionContext): Future[Boolean] = Future.successful {
-    (user.role, authority) match {
-      case (Administrator, _)         => true
-      case (Moderator, Moderator)     => true
-      case (Moderator, Contributor)   => true
-      case (Contributor, Contributor) => true
-      case _                          => false
+    user match {
+      case LoggedUser(_,_,_,_,_,role) => (role, authority) match {
+        case (Administrator, _)         => true
+        case (Moderator, Moderator)     => true
+        case (Moderator, Contributor)   => true
+        case (Contributor, Contributor) => true
+        case _                          => false
+      }
+      case GuestUser() => false
     }
   }
 

@@ -1,4 +1,4 @@
-@(loginForm: Form[Option[LoggedUser]])(implicit request: play.api.mvc.Request[Any])
+@(loginForm: Form[Option[LoggedUser]])(implicit request: play.api.mvc.Request[Any], logged: Boolean)
 
 @main("Log-in") {
     @helper.form(routes.LoginController.authenticate) {
