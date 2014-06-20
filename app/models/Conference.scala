@@ -3,7 +3,7 @@ import com.github.nscala_time.time.Imports._
 import helpers.DateTimeUtils
 import DateTimeUtils.TimeString
 import scala.collection.mutable
-import controllers.ConferenceEditController.SimpleConference
+import controllers.ConferenceMandatoryAuthController.SimpleConference
 
 case class Conference (
     id       : Long,
