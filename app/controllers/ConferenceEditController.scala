@@ -8,7 +8,8 @@ import play.api.mvc.Result
 import jp.t2v.lab.play2.auth.AuthElement
 
 import models._
-import controllers.DateTimeUtils.TimeString
+import helpers.DateTimeUtils
+import DateTimeUtils.TimeString
 
 import org.joda.time.DateTime
 

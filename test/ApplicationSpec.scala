@@ -42,7 +42,6 @@ class ApplicationSpec extends Specification {
       status(login) must equalTo(OK)
       contentType(login) must beSome.which(_ == "text/html")
       contentAsString(login) must contain ("Login")
-      contentAsString(login) must contain ("""<div id="calendar">""")
     }
   }
 }

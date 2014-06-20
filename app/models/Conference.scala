@@ -1,6 +1,7 @@
 package models
 import com.github.nscala_time.time.Imports._
-import controllers.DateTimeUtils.TimeString
+import helpers.DateTimeUtils
+import DateTimeUtils.TimeString
 import scala.collection.mutable
 import controllers.ConferenceEditController.SimpleConference
 

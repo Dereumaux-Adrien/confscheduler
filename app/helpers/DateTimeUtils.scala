@@ -1,4 +1,4 @@
-package controllers
+package helpers
 
 import org.joda.time.{Period, Duration}
 
