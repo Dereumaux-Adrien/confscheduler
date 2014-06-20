@@ -6,7 +6,7 @@ import com.github.nscala_time.time.Imports._
 
 object ConferenceViewController extends Controller with OptionalAuthElement with AuthConfigImpl {
   def listConfs = StackAction { implicit request =>
-    Ok(views.html.confViews.index(models.Conference.findAll.sortBy(_.startDate))(request, loggedIn.isDefined))
+    Ok(views.html.confViews.index(models.Conference.findAll.filter(_.isInFuture).sortBy(_.startDate))(request, loggedIn.isDefined))
   }
 
   def calendar = StackAction { implicit request =>

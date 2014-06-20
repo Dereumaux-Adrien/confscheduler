@@ -2,7 +2,7 @@
 
 @main("Add a new conference") {
     @helper.form(routes.ConferenceEditController.create) {
-        @helper.inputText(conferenceForm("name"))
+        @helper.inputText(conferenceForm("title"))
         @helper.textarea(conferenceForm("abstract"))
         @helper.inputText(conferenceForm("speaker"))
         @helper.inputDate(conferenceForm("Date"))

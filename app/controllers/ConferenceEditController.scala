@@ -1,19 +1,29 @@
 package controllers
 
 import play.api.mvc._
-import jp.t2v.lab.play2.auth.AuthElement
 import play.api.data.Form
 import play.api.data.Forms._
-import models._
 import play.api.mvc.Result
-import java.util.Date
+
+import jp.t2v.lab.play2.auth.AuthElement
+
+import models._
+import controllers.DateTimeUtils.TimeString
+
+import org.joda.time.DateTime
+
 
 object ConferenceEditController extends Controller with AuthElement with AuthConfigImpl {
   val conferenceForm = Form {
-    mapping("name" -> text, "abstract" -> text, "speaker" -> longNumber, "Date" -> date, "length" -> text)(SimpleConference.apply)(SimpleConference.unapply)
+    mapping(
+      "title" -> nonEmptyText(1, 100),
+      "abstract" -> nonEmptyText(1, 3000),
+      "speaker" -> longNumber.verifying(Speaker.findById(_).isDefined),
+      "Date" -> jodaDate,
+      "length" -> text.verifying(_.isValidDuration))(SimpleConference.apply)(SimpleConference.unapply)
   }
 
-  case class SimpleConference(title: String, abstr: String, speakerId: Long, date: Date, length: String)
+  case class SimpleConference(title: String, abstr: String, speakerId: Long, date: DateTime, length: String)
 
   def addConf() = StackAction(AuthorityKey -> Contributor) { implicit request =>
       Ok(views.html.confViews.addConf(conferenceForm)(request, logged = true))
@@ -21,7 +31,7 @@ object ConferenceEditController extends Controller with AuthElement with AuthCon
 
   def create() = StackAction(AuthorityKey -> Contributor) { implicit request =>
     conferenceForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(views.html.confViews.addConf(conferenceForm)(request, logged = true)),
+      formWithErrors => {println(formWithErrors.errors); BadRequest(views.html.confViews.addConf(formWithErrors)(request, logged = true))},
       conf           => createConfWithUser(conf, loggedIn)
     )
   }
