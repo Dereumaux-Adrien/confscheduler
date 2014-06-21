@@ -36,12 +36,12 @@ class ApplicationSpec extends Specification {
       contentAsString(calendar) must contain ("""<div id="calendar">""")
     }
 
-    "render the login page" in new WithApplication{
+    "render the login page" in new WithApplication {
       val login = route(FakeRequest(GET, "/login")).get
 
       status(login) must equalTo(OK)
       contentType(login) must beSome.which(_ == "text/html")
-      contentAsString(login) must contain ("Login")
+      contentAsString(login) must contain("Login")
     }
   }
 }

@@ -1,4 +1,4 @@
-@(confs: List[Conference])(implicit request: play.api.mvc.Request[Any], logged: Boolean)
+@(confs: List[Conference])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 
 @displayConfListing(conf: Conference) = {
     <div class="conf-listing">

@@ -1,4 +1,4 @@
-@(implicit request: play.api.mvc.Request[Any], logged: Boolean)
+@(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 
 @activeLi(text: String, pattern: String, route: play.api.mvc.Call)(implicit request: play.api.mvc.Request[Any]) = {
     @if(request.uri.endsWith(pattern)) {
@@ -9,10 +9,10 @@
 }
 
 <ul class="nav nav-pills topMenu">
-  @activeLi("Upcoming Conferences",        "/conf",     routes.ConferenceViewController.listConfs)
-  @activeLi("Public Conferences Calendar", "/calendar", routes.ConferenceViewController.calendar)
-  @if(logged) {
-    @activeLi("Add a conference",            "/conf/new", routes.ConferenceEditController.addConf)
+  @activeLi("Upcoming Conferences",        "/conf",     routes.ConferenceOpthAuthController.listConfs)
+  @activeLi("Public Conferences Calendar", "/calendar", routes.ConferenceOpthAuthController.calendar)
+  @if(userRole == Administrator || userRole == Contributor || userRole == Moderator) {
+    @activeLi("Add a conference",            "/conf/new", routes.ConferenceMandatoryAuthController.addConf)
     <li class="pull-right"><a href="@routes.LoginController.logout">Logout</a></li>
   } else {
     <li class="pull-right"><a href="@routes.LoginController.login">Login</a></li>

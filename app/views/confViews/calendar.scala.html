@@ -1,4 +1,4 @@
-@(implicit request: play.api.mvc.Request[Any], logged: Boolean)
+@(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 
 @main("Calendar") {
     <script src="@routes.Assets.at("javascripts/calendar.js")" type="text/javascript"></script>

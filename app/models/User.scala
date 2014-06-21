@@ -4,6 +4,7 @@ sealed trait UserRole
 case object Administrator extends UserRole
 case object Moderator     extends UserRole
 case object Contributor   extends UserRole
+case object Guest         extends UserRole
 
 case class User(id: Long, firstName: String, lastName: String, email: String, hashedPass: String, role:UserRole)
 

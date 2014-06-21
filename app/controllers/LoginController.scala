@@ -6,10 +6,11 @@ import play.api.mvc._
 import scala.concurrent.ExecutionContext
 import ExecutionContext.Implicits.global
 
-import models.User
+import models.{Guest, UserRole, User}
 
 import jp.t2v.lab.play2.auth.LoginLogout
 import scala.concurrent.Future
+import jp.t2v.lab.play2.stackc.RequestWithAttributes
 
 object LoginController extends Controller with LoginLogout with AuthConfigImpl {
   val loginForm = Form {
@@ -18,7 +19,7 @@ object LoginController extends Controller with LoginLogout with AuthConfigImpl {
   }
 
   def login = Action { implicit request =>
-    Ok(views.html.login(loginForm)(request, logged = false))
+    Ok(views.html.login(loginForm)(request, Guest))
   }
 
   def logout = Action.async { implicit request =>
@@ -29,7 +30,7 @@ object LoginController extends Controller with LoginLogout with AuthConfigImpl {
 
   def authenticate = Action.async { implicit request =>
     loginForm.bindFromRequest.fold(
-      formWithErrors => Future.successful(BadRequest(views.html.login(formWithErrors)(request, logged = false))),
+      formWithErrors => Future.successful(BadRequest(views.html.login(formWithErrors)(request, Guest))),
       user => gotoLoginSucceeded(user.get.id)
     )
   }

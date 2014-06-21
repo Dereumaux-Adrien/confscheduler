@@ -1,4 +1,4 @@
-@(title: String)(content: Html)(implicit request: play.api.mvc.Request[Any], logged: Boolean)
+@(title: String)(content: Html)(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 <!DOCTYPE html>
 
 <html>
@@ -14,7 +14,7 @@
     </head>
     <body>
     <div class="container main">
-        @topMenu(request, logged)
+        @topMenu(request, userRole)
         @content
     </div>
     </body>
