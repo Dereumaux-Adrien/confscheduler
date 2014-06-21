@@ -27,12 +27,12 @@ class LoginSpec extends Specification {
       headers(login) must havePair("Location" -> routes.ConferenceOpthAuthController.listConfs().toString())
     }
 
-    "prevent invalid user from loggin in" in new WithApplication {
+    "prevent invalid user from logging in" in new WithApplication {
       val login = route(FakeRequest(POST, "/login").withFormUrlEncodedBody(invalidUsername, invalidPassword)).get
       status(login) must equalTo(BAD_REQUEST)
     }
 
-    "prevent valid user with invalid password to log in" in new WithApplication {
+    "prevent valid user with invalid password from logging in" in new WithApplication {
       val login = route(FakeRequest(POST, "/login").withFormUrlEncodedBody(validUsername, invalidPassword)).get
       status(login) must equalTo(BAD_REQUEST)
     }
