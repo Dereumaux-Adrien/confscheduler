@@ -11,8 +11,8 @@ import helpers.DateTimeUtils
 import DateTimeUtils.TimeString
 
 import org.joda.time.DateTime
-import MySecurity.Authentication.{MyAuthenticatedRequest, MyAuthenticated}
-import MySecurity.Authorization._
+import MySecurity.Authentication.{MyAuthenticatedRequest, MyAuthenticated, ForcedAuthentication}
+import MySecurity.Authorization.{AuthorizedWith, AuthorizedRequest}
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -27,34 +27,43 @@ object ConferenceController extends Controller {
       "length" -> text.verifying(_.isValidDuration))(SimpleConference.apply)(SimpleConference.unapply)
   }
 
-  def userRole(implicit request: MyAuthenticatedRequest[AnyContent]): UserRole = request.user.flatMap(u => Some(u.role)).getOrElse(Guest)
-  def authorizedUserRole(implicit request: AuthorizedRequest[AnyContent]): UserRole = request.user.get.role
+  def authenticatedUserRole(implicit request: MyAuthenticatedRequest[AnyContent]): Option[UserRole] = request.user.map(_.role)
+  def authorizedUserRole(implicit request: AuthorizedRequest[AnyContent]): UserRole = request.user.map(_.role).get
 
   def listConfs = MyAuthenticated { implicit request =>
-    Ok(views.html.confViews.index(models.Conference.findAll.filter(_.isInFuture).sortBy(_.startDate))(request, userRole))
+    Ok(views.html.confViews.index(models.Conference.findAll.filter(_.isInFuture).sortBy(_.startDate))(request, authenticatedUserRole.getOrElse(Guest)))
   }
 
   def calendar = MyAuthenticated { implicit request =>
-    Ok(views.html.confViews.calendar(request, userRole))
+    Ok(views.html.confViews.calendar(request, authenticatedUserRole.getOrElse(Guest)))
   }
 
   def viewConf(id: Long) = MyAuthenticated { implicit request =>
     models.Conference.find(id) match {
-      case Some(c) => Ok(views.html.confViews.conf(c)(request, userRole))
+      case Some(c) => Ok(views.html.confViews.conf(c)(request, authenticatedUserRole.getOrElse(Guest)))
       case None    => NotFound
     }
   }
 
-  def addConf() = AuthorizedWith(_ => true) { implicit request =>
-    Future(Ok(views.html.confViews.addConf(conferenceForm)(request, authorizedUserRole)))
+  def addConf() = ForcedAuthentication { implicit request =>
+    Future(Ok(views.html.confViews.addConf(conferenceForm)(request, authenticatedUserRole.get)))
   }
 
-  def create() = AuthorizedWith(_ => true) { implicit request =>
+  def create() = ForcedAuthentication { implicit request =>
     Future {
       conferenceForm.bindFromRequest.fold(
-        formWithErrors => BadRequest(views.html.confViews.addConf(formWithErrors)(request, authorizedUserRole)),
+        formWithErrors => BadRequest(views.html.confViews.addConf(formWithErrors)(request, authenticatedUserRole.get)),
         conf           => createConfWithUser(conf, request.user.get)
       )
+    }
+  }
+
+  def allow(id: Long) = AuthorizedWith(_.canAllowConfs) { implicit request =>
+    Future {
+      Conference.find(id) match {
+        case Some(c) => Ok(views.html.confViews.allowConf(c)(request, authorizedUserRole))
+        case None    => Redirect(routes.Application.index())
+      }
     }
   }
 

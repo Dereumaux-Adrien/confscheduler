@@ -7,6 +7,7 @@ GET     /                           controllers.Application.index
 GET     /conf/new                   controllers.ConferenceController.addConf
 POST    /conf/new                   controllers.ConferenceController.create
 GET     /conf/:id                   controllers.ConferenceController.viewConf(id: Long)
+GET     /conf/:id/allow             controllers.ConferenceController.allow(id: Long)
 GET     /conf                       controllers.ConferenceController.listConfs
 
 GET     /calendar                   controllers.ConferenceController.calendar
