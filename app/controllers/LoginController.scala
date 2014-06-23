@@ -14,7 +14,7 @@ import play.api.Play.current
 import play.api.libs.Crypto
 
 object LoginController extends Controller {
-  val rememberMeCookieName     = MySecurity.Authentication.rememberMeCookieName
+  val rememberMeCookieName     = "ConfSched_REMEMBERME"
   val rememberMeCookieLifetime = Some(3600 * 48)
   val rememberMeCookiePath     = "/"
   val rememberMeCookieDomain   = None
@@ -53,9 +53,9 @@ object LoginController extends Controller {
         Redirect(routes.ConferenceController.listConfs()).withSession((sessionName, userId))
       } else {
         val cToken = user.rememberMeToken
-        val rememeberMeCookie = Cookie(rememberMeCookieName, cToken, rememberMeCookieLifetime, rememberMeCookiePath, rememberMeCookieDomain, secureCookie, rememberMeCookieHttpOnly)
+        val rememberMeCookie = Cookie(rememberMeCookieName, cToken, rememberMeCookieLifetime, rememberMeCookiePath, rememberMeCookieDomain, secureCookie, rememberMeCookieHttpOnly)
 
-        Redirect(routes.ConferenceController.listConfs()).withSession((sessionName, userId)).withCookies(rememeberMeCookie)
+        Redirect(routes.ConferenceController.listConfs()).withSession((sessionName, userId)).withCookies(rememberMeCookie)
       }
     }
   }

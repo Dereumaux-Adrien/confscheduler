@@ -6,12 +6,12 @@ import play.api.mvc.Result
 
 import models.User
 import scala.concurrent.Future
-import controllers.routes
+import controllers.{LoginController, routes}
 import play.api.cache.Cache
 import play.api.Play.current
 
 object Authentication {
-  val rememberMeCookieName  = "ConfSched_REMEMBERME"
+  val rememberMeCookieName  = LoginController.rememberMeCookieName
   val unsuccessfulAuthRoute = routes.LoginController.login()
 
   case class MyAuthenticatedRequest[A](user: Option[User], request: Request[A]) extends WrappedRequest[A](request)
