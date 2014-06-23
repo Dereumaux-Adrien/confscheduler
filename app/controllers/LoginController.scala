@@ -11,6 +11,7 @@ import models.{Guest, User}
 import scala.concurrent.Future
 import play.api.cache.Cache
 import play.api.Play.current
+import play.api.libs.Crypto
 
 object LoginController extends Controller {
   val rememberMeCookieName     = MySecurity.Authentication.rememberMeCookieName
@@ -44,10 +45,8 @@ object LoginController extends Controller {
   def doLogin(user: User) = {
     Future {
       val sessionName     = "UID"
-      val userId          = MySecurity.SecurityHelper.UIDGenerator
+      val userId          = Crypto.generateToken
 
-      // We don't need to check if the UID is already defined for some other user in cache, since the
-      // UID is a 40 chars random string, making the probabilty of collision under 1/10^70.
       Cache.set(userId, user)
 
       if(user.rememberMeToken.isEmpty) {
