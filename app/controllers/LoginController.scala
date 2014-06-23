@@ -13,8 +13,15 @@ import play.api.cache.Cache
 import play.api.Play.current
 
 object LoginController extends Controller {
+  val rememberMeCookieName     = MySecurity.Authentication.rememberMeCookieName
+  val rememberMeCookieLifetime = Some(3600 * 48)
+  val rememberMeCookiePath     = "/"
+  val rememberMeCookieDomain   = None
+  val rememberMeCookieHttpOnly = true
+  val secureCookie             = play.api.Play.isProd(play.api.Play.current)
+
   val loginForm = Form {
-    mapping("email" -> email, "password" -> text)(User.authenticate)(_.map(u => (u.email, "")))
+    mapping("email" -> email, "password" -> text, "rememberme" -> boolean)(User.authenticate)(_.map(u => (u.email, "", false)))
       .verifying("Invalid email or password", result => result.isDefined)
   }
 
@@ -23,7 +30,8 @@ object LoginController extends Controller {
   }
 
   def logout = Action { implicit request =>
-    Redirect(routes.Application.index()).withNewSession
+    val removeRememberMe = DiscardingCookie(rememberMeCookieName, rememberMeCookiePath, rememberMeCookieDomain, secureCookie)
+    Redirect(routes.Application.index()).withNewSession.discardingCookies(removeRememberMe)
   }
 
   def authenticate = Action.async { implicit request =>
@@ -34,15 +42,22 @@ object LoginController extends Controller {
   }
 
   def doLogin(user: User) = {
-    val cookieName     = "UID"
-    val userId         = MySecurity.SecurityHelper.UIDGenerator
-
-    // We don't need to check if the UID is already defined for some other user in cache, since the
-    // UID is a 40 chars random string, making the probabilty of collision under 1/10^70.
-    Cache.set(userId, user)
-
     Future {
-      Redirect(routes.ConferenceController.listConfs()).withSession((cookieName, userId))
+      val sessionName     = "UID"
+      val userId          = MySecurity.SecurityHelper.UIDGenerator
+
+      // We don't need to check if the UID is already defined for some other user in cache, since the
+      // UID is a 40 chars random string, making the probabilty of collision under 1/10^70.
+      Cache.set(userId, user)
+
+      if(user.rememberMeToken.isEmpty) {
+        Redirect(routes.ConferenceController.listConfs()).withSession((sessionName, userId))
+      } else {
+        val cToken = user.rememberMeToken
+        val rememeberMeCookie = Cookie(rememberMeCookieName, cToken, rememberMeCookieLifetime, rememberMeCookiePath, rememberMeCookieDomain, secureCookie, rememberMeCookieHttpOnly)
+
+        Redirect(routes.ConferenceController.listConfs()).withSession((sessionName, userId)).withCookies(rememeberMeCookie)
+      }
     }
   }
 }

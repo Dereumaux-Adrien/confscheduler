@@ -4,6 +4,7 @@
     @helper.form(routes.LoginController.authenticate) {
         @helper.inputText(loginForm("email"))
         @helper.inputPassword(loginForm("password"))
+        @helper.checkbox(loginForm("rememberme"))
         <input type="submit">
     }
 }
