@@ -4,12 +4,12 @@
 
 # Home page
 GET     /                           controllers.Application.index
-GET     /conf/new                   controllers.ConferenceMandatoryAuthController.addConf
-POST    /conf/new                   controllers.ConferenceMandatoryAuthController.create
-GET     /conf/:id                   controllers.ConferenceOpthAuthController.viewConf(id: Long)
-GET     /conf                       controllers.ConferenceOpthAuthController.listConfs
+GET     /conf/new                   controllers.ConferenceController.addConf
+POST    /conf/new                   controllers.ConferenceController.create
+GET     /conf/:id                   controllers.ConferenceController.viewConf(id: Long)
+GET     /conf                       controllers.ConferenceController.listConfs
 
-GET     /calendar                   controllers.ConferenceOpthAuthController.calendar
+GET     /calendar                   controllers.ConferenceController.calendar
 
 GET     /login                      controllers.LoginController.login
 POST    /login                      controllers.LoginController.authenticate

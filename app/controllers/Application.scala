@@ -6,6 +6,6 @@ import play.api.mvc._
 object Application extends Controller {
 
   def index = Action {
-    Redirect(routes.ConferenceOpthAuthController.listConfs())
+    Redirect(routes.ConferenceController.listConfs())
   }
 }

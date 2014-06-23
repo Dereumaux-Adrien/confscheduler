@@ -1,7 +1,7 @@
-@(conferenceForm: Form[ConferenceMandatoryAuthController.SimpleConference])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
+@(conferenceForm: Form[ConferenceController.SimpleConference])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 
 @main("Add a new conference") {
-    @helper.form(routes.ConferenceMandatoryAuthController.create) {
+    @helper.form(routes.ConferenceController.create) {
         @helper.inputText(conferenceForm("title"))
         @helper.textarea(conferenceForm("abstract"))
         @helper.inputText(conferenceForm("speaker"))

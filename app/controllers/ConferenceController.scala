@@ -1,43 +1,23 @@
 package controllers
 
-import jp.t2v.lab.play2.auth.OptionalAuthElement
 import com.github.nscala_time.time.Imports._
 import scala.Some
-import play.api.mvc._
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.mvc.Result
-
-import jp.t2v.lab.play2.auth.AuthElement
+import play.api.mvc.{AnyContent, Controller, Result}
 
 import models._
 import helpers.DateTimeUtils
 import DateTimeUtils.TimeString
 
 import org.joda.time.DateTime
-import jp.t2v.lab.play2.stackc.RequestWithAttributes
+import Security.Authentication.{MyAuthenticatedRequest, MyAuthenticated}
+import Security.Authorization._
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-
-object ConferenceOpthAuthController extends Controller with OptionalAuthElement with AuthConfigImpl {
-  def userRole(implicit request: RequestWithAttributes[AnyContent]): UserRole = if(loggedIn.isDefined) loggedIn.get.role else Guest
-
-  def listConfs = StackAction { implicit request =>
-    Ok(views.html.confViews.index(models.Conference.findAll.filter(_.isInFuture).sortBy(_.startDate))(request, userRole))
-  }
-
-  def calendar = StackAction { implicit request =>
-    Ok(views.html.confViews.calendar(request, userRole))
-  }
-
-  def viewConf(id: Long) = StackAction { implicit request =>
-    models.Conference.find(id) match {
-      case Some(c) => Ok(views.html.confViews.conf(c)(request, userRole))
-      case None    => NotFound
-    }
-  }
-}
-
-object ConferenceMandatoryAuthController extends Controller with AuthElement with AuthConfigImpl {
+object ConferenceController extends Controller {
+  case class SimpleConference(title: String, abstr: String, speakerId: Long, date: DateTime, length: String)
   val conferenceForm = Form {
     mapping(
       "title" -> nonEmptyText(1, 100),
@@ -47,24 +27,42 @@ object ConferenceMandatoryAuthController extends Controller with AuthElement wit
       "length" -> text.verifying(_.isValidDuration))(SimpleConference.apply)(SimpleConference.unapply)
   }
 
-  case class SimpleConference(title: String, abstr: String, speakerId: Long, date: DateTime, length: String)
+  def userRole(implicit request: MyAuthenticatedRequest[AnyContent]): UserRole = request.user.flatMap(u => Some(u.role)).getOrElse(Guest)
+  def authorizedUserRole(implicit request: AuthorizedRequest[AnyContent]): UserRole = request.user.get.role
 
-  def addConf() = StackAction(AuthorityKey -> Contributor) { implicit request =>
-    Ok(views.html.confViews.addConf(conferenceForm)(request, loggedIn.role))
+  def listConfs = MyAuthenticated { implicit request =>
+    Ok(views.html.confViews.index(models.Conference.findAll.filter(_.isInFuture).sortBy(_.startDate))(request, userRole))
   }
 
-  def create() = StackAction(AuthorityKey -> Contributor) { implicit request =>
-    conferenceForm.bindFromRequest.fold(
-      formWithErrors => {println(formWithErrors.errors); BadRequest(views.html.confViews.addConf(formWithErrors)(request, loggedIn.role))},
-      conf           => createConfWithUser(conf, loggedIn)
-    )
+  def calendar = MyAuthenticated { implicit request =>
+    Ok(views.html.confViews.calendar(request, userRole))
+  }
+
+  def viewConf(id: Long) = MyAuthenticated { implicit request =>
+    models.Conference.find(id) match {
+      case Some(c) => Ok(views.html.confViews.conf(c)(request, userRole))
+      case None    => NotFound
+    }
+  }
+
+  def addConf() = AuthorizedWith(_ => true) { implicit request =>
+    Future(Ok(views.html.confViews.addConf(conferenceForm)(request, authorizedUserRole)))
+  }
+
+  def create() = AuthorizedWith(_ => true) { implicit request =>
+    Future {
+      conferenceForm.bindFromRequest.fold(
+        formWithErrors => BadRequest(views.html.confViews.addConf(formWithErrors)(request, authorizedUserRole)),
+        conf           => createConfWithUser(conf, request.user.get)
+      )
+    }
   }
 
   private def createConfWithUser(conf: SimpleConference, user: User): Result = {
     user.role match {
       case Administrator | Moderator =>
         val newId = Conference.save(conf)
-        Redirect(routes.ConferenceOpthAuthController.viewConf(newId))
+        Redirect(routes.ConferenceController.viewConf(newId))
       case _                         => NotImplemented
 
     }
