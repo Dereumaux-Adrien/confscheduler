@@ -19,12 +19,12 @@ class LoginSpec extends Specification {
     "allow a valid user to authenticate" in new WithApplication {
       val login = route(FakeRequest(POST, "/login").withFormUrlEncodedBody(validUsername, validPassword)).get
       status(login) must equalTo(SEE_OTHER)
-      cookies(login).get("PLAY2AUTH_SESS_ID") must beSome
+      session(login).get("UID") must beSome
     }
 
-    "redirect to the conf list page after login" in new WithApplication {
+    "redirect to the conf list page after successful login" in new WithApplication {
       val login = route(FakeRequest(POST, "/login").withFormUrlEncodedBody(validUsername, validPassword)).get
-      headers(login) must havePair("Location" -> routes.ConferenceOpthAuthController.listConfs().toString())
+      headers(login) must havePair("Location" -> routes.ConferenceController.listConfs().toString())
     }
 
     "prevent invalid user from logging in" in new WithApplication {

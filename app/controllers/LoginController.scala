@@ -38,7 +38,7 @@ object LoginController extends Controller {
     val userId         = user.email
 
     Future {
-      Redirect(routes.Application.index()).withSession((cookieName, userId))
+      Redirect(routes.ConferenceController.listConfs()).withSession((cookieName, userId))
     }
   }
 }
