@@ -6,11 +6,11 @@ import play.api.mvc._
 import scala.concurrent.ExecutionContext
 import ExecutionContext.Implicits.global
 
-import models.{Guest, UserRole, User}
+import models.{Guest, User}
 
-import jp.t2v.lab.play2.auth.LoginLogout
 import scala.concurrent.Future
-import jp.t2v.lab.play2.stackc.RequestWithAttributes
+import play.api.cache.Cache
+import play.api.Play.current
 
 object LoginController extends Controller {
   val loginForm = Form {
@@ -35,7 +35,11 @@ object LoginController extends Controller {
 
   def doLogin(user: User) = {
     val cookieName     = "UID"
-    val userId         = user.email
+    val userId         = MySecurity.SecurityHelper.UIDGenerator
+
+    // We don't need to check if the UID is already defined for some other user in cache, since the
+    // UID is a 40 chars random string, making the probabilty of collision under 1/10^70.
+    Cache.set(userId, user)
 
     Future {
       Redirect(routes.ConferenceController.listConfs()).withSession((cookieName, userId))

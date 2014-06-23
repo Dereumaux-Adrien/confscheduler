@@ -1,12 +1,12 @@
-package Security
+package MySecurity
 
 import controllers.routes
 import scala.concurrent.Future
 import play.api.mvc.Results._
 import models.User
-import Security.Authentication.MyAuthenticated
-import Security.Authentication.MyAuthenticatedRequest
-import Security.Authentication.ForceAuth
+import MySecurity.Authentication.MyAuthenticated
+import MySecurity.Authentication.MyAuthenticatedRequest
+import MySecurity.Authentication.ForceAuth
 import play.api.mvc._
 import scala.Some
 

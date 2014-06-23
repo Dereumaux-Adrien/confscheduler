@@ -1,4 +1,4 @@
-package Security
+package MySecurity
 
 import play.api.mvc._
 import play.api.mvc.Results._
@@ -7,6 +7,8 @@ import play.api.mvc.Result
 import models.User
 import scala.concurrent.Future
 import controllers.routes
+import play.api.cache.Cache
+import play.api.Play.current
 
 object Authentication {
   val unsuccessfulAuthRoute = routes.LoginController.login()
@@ -15,7 +17,7 @@ object Authentication {
 
   object MyAuthenticated extends ActionBuilder[MyAuthenticatedRequest] with ActionTransformer[Request, MyAuthenticatedRequest]{
     def transform[A](request: Request[A]) = Future.successful {
-      MyAuthenticatedRequest[A](request.session.get("UID").flatMap(User.findByEmail), request)
+      MyAuthenticatedRequest[A](request.session.get("UID").flatMap(Cache.getAs[User]), request)
     }
   }
 

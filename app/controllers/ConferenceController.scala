@@ -11,8 +11,8 @@ import helpers.DateTimeUtils
 import DateTimeUtils.TimeString
 
 import org.joda.time.DateTime
-import Security.Authentication.{MyAuthenticatedRequest, MyAuthenticated}
-import Security.Authorization._
+import MySecurity.Authentication.{MyAuthenticatedRequest, MyAuthenticated}
+import MySecurity.Authorization._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
