@@ -1,20 +1,41 @@
 @(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 
-@activeLi(text: String, pattern: String, route: play.api.mvc.Call)(implicit request: play.api.mvc.Request[Any]) = {
-    @if(request.uri.endsWith(pattern)) {
-        <li><a href="@route" class="active">@text</a></li>
+@activeLi(text: String, route: play.api.mvc.Call, right: Boolean = false)(implicit request: play.api.mvc.Request[Any]) = {
+    @if(request.uri.endsWith(route.toString)) {
+        @if(right) {
+            <li class="pull-right"><a href="@route" class="active">@text</a></li>
+        } else {
+            <li><a href="@route" class="active">@text</a></li>
+        }
     } else {
-        <li><a href="@route">@text</a></li>
+        @if(right) {
+            <li class="pull-right"><a href="@route">@text</a></li>
+        } else {
+            <li><a href="@route">@text</a></li>
+        }
+    }
+}
+
+@genMenu(role: UserRole) = {
+    @if(role == Moderator || role == Administrator) {
+        @activeLi("Accept Conferences", routes.ConferenceController.allowList, true)
+    }
+    @if(role == Moderator) {
+        @activeLi("Add Contributor", routes.ConferenceController.allowList, true)
+    }
+    @if(role == Administrator) {
+        @activeLi("Add User", routes.ConferenceController.allowList, true)
     }
 }
 
 <ul class="nav nav-pills topMenu">
-  @activeLi("Upcoming Conferences",        "/conf",     routes.ConferenceController.listConfs)
-  @activeLi("Public Conferences Calendar", "/calendar", routes.ConferenceController.calendar)
-  @if(userRole == Administrator || userRole == Contributor || userRole == Moderator) {
-    @activeLi("Add a conference",            "/conf/new", routes.ConferenceController.addConf)
+  @activeLi("Upcoming Conferences", routes.ConferenceController.listConfs)
+  @activeLi("Public Conferences Calendar", routes.ConferenceController.calendar)
+  <li class="spacer"> </li>
+  @if(userRole != Guest) {
     <li class="pull-right"><a href="@routes.LoginController.logout">Logout</a></li>
+    @genMenu(userRole)
   } else {
-    <li class="pull-right"><a href="@routes.LoginController.login">Login</a></li>
+    @activeLi("Login", routes.LoginController.login, true)
   }
 </ul>

@@ -4,7 +4,7 @@ import com.github.nscala_time.time.Imports._
 import scala.Some
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.mvc.{AnyContent, Controller, Result}
+import play.api.mvc.{Action, AnyContent, Controller, Result}
 
 import models._
 import helpers.DateTimeUtils
@@ -66,6 +66,8 @@ object ConferenceController extends Controller {
       }
     }
   }
+
+  def allowList = Action { NotImplemented }
 
   private def createConfWithUser(conf: SimpleConference, user: User): Result = {
     user.role match {
