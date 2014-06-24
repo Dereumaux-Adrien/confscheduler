@@ -10,9 +10,15 @@ case object Contributor   extends UserRole
 case object Guest         extends UserRole
 
 case class User(id: Long, firstName: String, lastName: String, email: String, hashedPass: String, role:UserRole, rememberMeToken: String) {
+
   def withRememberMeToken(token: String): User = User(id, firstName, lastName, email, hashedPass, role, token)
 
   def canAllowConfs: Boolean = role == Administrator || role == Moderator
+
+  // This is just a convenience method.
+  def save: Option[User] = User.save(this)
+
+  def destroy: Boolean = User.destroy(this)
 }
 
 object User {
@@ -28,10 +34,18 @@ object User {
     rememberMeCookie.flatMap(c => fixtures.find(_.rememberMeToken == c.value))
   }
 
-  def save(user: User) = {
-    println(fixtures)
+  def count = fixtures.size
+
+  // returns the saved used in an Option or None if saving failed.
+  def save(user: User): Option[User] = {
     fixtures = fixtures.filterNot(_.id == user.id) + user
-    println(fixtures)
+    Some(user)
+  }
+
+  // returns true if the user has been destroyed, false if there was an error
+  def destroy(user: User): Boolean = {
+    fixtures = fixtures.filterNot(_.id == user.id)
+    true
   }
 
   def authenticate(email: String, password: String, rememberMe: Boolean): Option[User] = {
@@ -40,8 +54,7 @@ object User {
     if(rememberMe && user.isDefined) {
       val rememberMeToken = Crypto.generateSignedToken
       val authUser = user.get.withRememberMeToken(rememberMeToken)
-      User.save(authUser)
-      Some(authUser)
+      authUser.save
     } else {
       user
     }
