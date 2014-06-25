@@ -17,14 +17,15 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object ConferenceController extends Controller {
-  case class SimpleConference(title: String, abstr: String, speakerId: Long, date: DateTime, length: String)
+  case class SimpleConference(title: String, abstr: String, speakerId: Long, date: DateTime, length: String, organizerId: Long)
   val conferenceForm = Form {
     mapping(
       "title" -> nonEmptyText(1, 100),
       "abstract" -> nonEmptyText(1, 3000),
       "speaker" -> longNumber.verifying(Speaker.findById(_).isDefined),
       "Date" -> jodaDate,
-      "length" -> text.verifying(_.isValidDuration))(SimpleConference.apply)(SimpleConference.unapply)
+      "length" -> text.verifying(_.isValidDuration),
+      "organizer" -> longNumber.verifying(Lab.findById(_).isDefined))(SimpleConference.apply)(SimpleConference.unapply)
   }
 
   def authenticatedUserRole(implicit request: MyAuthenticatedRequest[AnyContent]): Option[UserRole] = request.user.map(_.role)
