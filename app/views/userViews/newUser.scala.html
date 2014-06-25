@@ -1,0 +1,19 @@
+@(userForm: Form[UserController.SimpleUser], newUserRole: Option[String])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
+@import views.html.helper._
+
+@main("New User") {
+    @helper.form(routes.UserController.create) {
+        @helper.inputText(userForm("firstName"))
+        @helper.inputText(userForm("lastName"))
+        @helper.inputText(userForm("email"))
+        @helper.inputText(userForm("labId"))
+        @helper.inputPassword(userForm("password"))
+        @helper.inputPassword(userForm("repeatPassword"))
+        @if(newUserRole.isDefined && newUserRole.get == "Contributor") {
+            @helper.inputText(userForm("newUserRole"), 'disabled -> true, 'placeholder -> newUserRole.get)
+        } else {
+            @helper.select(userForm("newUserRole"), options(User.loggedUserRoleList))
+        }
+        <input type="submit">
+    }
+}

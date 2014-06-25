@@ -15,6 +15,7 @@ GET     /conf                       controllers.ConferenceController.listConfs
 GET     /calendar                   controllers.ConferenceController.calendar
 
 GET     /user/new                   controllers.UserController.newUser(type: Option[String])
+POST    /user/new                   controllers.UserController.create
 
 GET     /login                      controllers.LoginController.login
 POST    /login                      controllers.LoginController.authenticate

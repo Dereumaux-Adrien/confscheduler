@@ -18,6 +18,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object ConferenceController extends Controller {
   case class SimpleConference(title: String, abstr: String, speakerId: Long, date: DateTime, length: String, organizerId: Long)
+
   val conferenceForm = Form {
     mapping(
       "title" -> nonEmptyText(1, 100),

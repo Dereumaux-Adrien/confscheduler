@@ -1,5 +1,6 @@
 package models
 
+import controllers.UserController.SimpleUser
 import play.api.mvc.Cookie
 import play.api.libs.Crypto
 
@@ -9,7 +10,7 @@ case object Moderator     extends UserRole
 case object Contributor   extends UserRole
 case object Guest         extends UserRole
 
-case class User(
+case class User (
    id: Long,
    firstName: String,
    lastName: String,
@@ -30,9 +31,13 @@ case class User(
 }
 
 object User {
+  val loggedUserRoleList = List("Administrator", "Moderator", "Contributor")
+
   var fixtures = Set(User(0, "Rosalyn", "Franklin", "rosa@gmail.com", Lab.findById(0).get, "123456789", Administrator, ""),
                      User(1, "James", "Watson", "jimmy@gmail.com", Lab.findById(0).get, "987654321", Moderator, ""),
                      User(2, "Thomas", "P", "tom@gmail.com", Lab.findById(1).get, "123456789", Contributor, ""))
+
+  var nextId = 3
 
   def findById(id: Long): Option[User] = fixtures.find(_.id == id)
 
@@ -66,5 +71,23 @@ object User {
     } else {
       user
     }
+  }
+
+
+  def fromSimpleUser(user: SimpleUser): Option[User] = {
+
+
+    val newUserRole = user.newUserRole match {
+      case "Administrator" => Administrator
+      case "Moderator"     => Moderator
+      case "Contributor"   => Contributor
+      case _               => return None
+    }
+
+    val newUserLab = Lab.findById(user.labId).getOrElse(return None)
+
+    val newUser = User(nextId, user.firstName, user.lastName, user.email, newUserLab, user.password, newUserRole, "")
+    nextId += 1
+    Option(newUser)
   }
 }

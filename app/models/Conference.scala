@@ -37,7 +37,7 @@ object Conference {
         Conference(2, "past conference", "test abstra 3", Speaker.findById(1).get, DateTime.now - 1.week, 2.hour, Lab.findById(0).get, true)
   )
 
-  var nextId = 2
+  var nextId = 3
 
   def findAll = confs.toList.sortBy(_.id)
 
