@@ -21,10 +21,10 @@
         @activeLi("Accept Conferences", routes.ConferenceController.allowList, true)
     }
     @if(role == Moderator) {
-        @activeLi("Add Contributor", routes.ConferenceController.newContributor, true)
+        @activeLi("Add Contributor", routes.UserController.newUser(Some("Contributor")), true)
     }
     @if(role == Administrator) {
-        @activeLi("Add User", routes.ConferenceController.newUser, true)
+        @activeLi("Add User",  routes.UserController.newUser(None), true)
     }
 }
 

@@ -4,14 +4,17 @@
 
 # Home page
 GET     /                           controllers.Application.index
+
 GET     /conf/new                   controllers.ConferenceController.addConf
 POST    /conf/new                   controllers.ConferenceController.create
+GET     /conf/allow                 controllers.ConferenceController.allowList
 GET     /conf/:id                   controllers.ConferenceController.viewConf(id: Long)
 GET     /conf/:id/allow             controllers.ConferenceController.allow(id: Long)
 GET     /conf                       controllers.ConferenceController.listConfs
-GET     /conf/allow                 controllers.ConferenceController.allowList
 
 GET     /calendar                   controllers.ConferenceController.calendar
+
+GET     /user/new                   controllers.UserController.newUser(type: Option[String])
 
 GET     /login                      controllers.LoginController.login
 POST    /login                      controllers.LoginController.authenticate
