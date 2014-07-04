@@ -46,7 +46,10 @@ object Conference {
 
   def find(id: Long): Option[Conference] = confs.get(id)
 
-  def findConfsToAllow: List[Conference] = confs.values.filter(_.accepted == false).toList.sortBy(_.startDate)
+  def findConfsAllowableBy(user: User): List[Conference] =
+    confs.values
+    .filter(c => !c.accepted && (user.role == Administrator || user.lab == c.organizedBy))
+    .toList.sortBy(_.startDate)
 
   def findAccepted: List[Conference] = confs.values.filter(_.accepted == true).toList
 

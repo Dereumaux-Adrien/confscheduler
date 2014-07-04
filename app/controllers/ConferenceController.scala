@@ -31,6 +31,7 @@ object ConferenceController extends Controller {
 
   def authenticatedUserRole(implicit request: MyAuthenticatedRequest[AnyContent]): Option[UserRole] = request.user.map(_.role)
   def authorizedUserRole(implicit request: AuthorizedRequest[AnyContent]): UserRole = request.user.map(_.role).get
+  def authorizedUser(implicit request: AuthorizedRequest[AnyContent]): User = request.user.get
 
   def listConfs = MyAuthenticated { implicit request =>
     Ok(views.html.confViews.index(models.Conference.findAccepted.filter(_.isInFuture).sortBy(_.startDate))(request, authenticatedUserRole.getOrElse(Guest)))
@@ -92,7 +93,7 @@ object ConferenceController extends Controller {
   }}
 
   def allowList = AuthorizedWith(_.canAllowConfs) { implicit request => Future {
-    Ok(views.html.confViews.allowConfList(Conference.findConfsToAllow)(request, authorizedUserRole))
+    Ok(views.html.confViews.allowConfList(Conference.findConfsAllowableBy(authorizedUser))(request, authorizedUserRole))
   }}
 
   private def createConfWithUser(conf: SimpleConference, user: User): Result = {
