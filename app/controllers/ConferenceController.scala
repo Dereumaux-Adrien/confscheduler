@@ -75,8 +75,18 @@ object ConferenceController extends Controller {
     )(
       c => {
         val accepted = c.asAccepted
-        println(accepted)
-        Redirect(routes.ConferenceController.viewConf(accepted.save.get.id)).flashing(("success", "Conference successfully accepted"))
+        Redirect(routes.ConferenceController.viewConf(accepted.save.get.id)).flashing(("success", "Conference " + accepted.title + " successfully accepted"))
+      }
+    )
+  }}
+
+  def refuse(id: Long) = AuthorizedWith(_.canAllowConfs) { implicit request => Future {
+    Conference.find(id).fold(
+      Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to refuse an unknown conference"))
+    )(
+      c => {
+        c.destroy
+        Redirect(routes.ConferenceController.listConfs()).flashing(("success", "Conference successfully refused"))
       }
     )
   }}

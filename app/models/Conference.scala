@@ -16,20 +16,22 @@ case class Conference (
     accepted   : Boolean
 ) {
   def timeFromNow: String = {
-        val i = DateTime.now to startDate
-        val p = i.toPeriod
-        val d = i.toDuration
+    val i = DateTime.now to startDate
+    val p = i.toPeriod
+    val d = i.toDuration
 
-        d.getStandardDays + " days, " + p.hours + " hours, " + p.minutes + " minutes."
-    }
+    d.getStandardDays + " days, " + p.hours + " hours, " + p.minutes + " minutes."
+  }
 
-    def asAccepted: Conference = {
-      Conference(id, title, abstr, speaker, startDate, length, organizedBy, accepted = true)
-    }
+  def asAccepted: Conference = {
+    Conference(id, title, abstr, speaker, startDate, length, organizedBy, accepted = true)
+  }
 
-    def isInFuture: Boolean = startDate > DateTime.now
+  def isInFuture: Boolean = startDate > DateTime.now
 
-    def save = Conference.save(this)
+  def save = Conference.save(this)
+
+  def destroy = Conference.destroy(this)
 }
 
 object Conference {
@@ -37,12 +39,16 @@ object Conference {
     (0, Conference(0, "Les oiseaux chantent", "La vie est belle, et c'est super cool de s'appeller Michel", Speaker.findById(0).get, DateTime.now + 2.week, 1.hour, Lab.findById(0).get, true)),
     (1, Conference(1, "test conf 2", "test abstr 2", Speaker.findById(1).get, DateTime.now + 1.week, 2.hour, Lab.findById(0).get, true)),
     (2, Conference(2, "past conference", "test abstra 3", Speaker.findById(1).get, DateTime.now - 1.week, 2.hour, Lab.findById(0).get, true)),
-    (3, Conference(3, "Conference that needs to be allowed", "This needs to be accepted !", Speaker.findById(1).get, DateTime.now + 2.week, 2.hour, Lab.findById(0).get, false))
+    (3, Conference(3, "Conference that needs to be allowed", "This needs to be accepted !", Speaker.findById(1).get, DateTime.now + 3.week, 2.hour, Lab.findById(0).get, false))
   )
 
   def findAll = confs.values.toList.sortBy(_.id)
 
   def find(id: Long): Option[Conference] = confs.get(id)
+
+  def findConfsToAllow: List[Conference] = confs.values.filter(_.accepted == false).toList.sortBy(_.startDate)
+
+  def findAccepted: List[Conference] = confs.values.filter(_.accepted == true).toList
 
   def saveNew(conf: SimpleConference): Long = {
     val nextId = confs.keySet.max + 1
@@ -52,11 +58,9 @@ object Conference {
 
   def save(conf: Conference): Option[Conference] = {confs += ((conf.id, conf)); Option(conf)}
 
+  def destroy(conference: Conference) = confs.remove(conference.id)
+
   def fromSimpleConference(conf: SimpleConference, withId: Long): Conference = {
     Conference(withId, conf.title, conf.abstr, Speaker.findById(conf.speakerId).get, conf.date, conf.length.toDuration, Lab.findById(conf.organizerId).get, false)
   }
-
-  def findConfsToAllow: List[Conference] = confs.values.filter(_.accepted == false).toList.sortBy(_.startDate)
-
-  def findAccepted: List[Conference] = confs.values.filter(_.accepted == true).toList
 }
