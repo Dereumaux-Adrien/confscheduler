@@ -61,16 +61,7 @@ object ConferenceController extends Controller {
     }
   }
 
-  def allow(id: Long) = AuthorizedWith(_.canAllowConfs) { implicit request =>
-    Future {
-      Conference.find(id) match {
-        case Some(c) => Ok(views.html.confViews.allowConf(c)(request, authorizedUserRole))
-        case None    => Redirect(routes.Application.index())
-      }
-    }
-  }
-
-  def accept(id: Long) = AuthorizedWith(_.canAllowConfs) { implicit request => Future {
+  def accept(id: Long) = AuthorizedWith(_.canAllowConf(id)) { implicit request => Future {
     Conference.find(id).fold(
       Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to allow an unknown conference"))
     )(

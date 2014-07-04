@@ -20,6 +20,8 @@ case class User (
    role:UserRole,
    rememberMeToken: String
 ){
+  def canAllowConf(confId: Long): Boolean = Conference.find(id).fold(false)(_.id == lab)
+
   def withRememberMeToken(token: String): User = User(id, firstName, lastName, email, lab, hashedPass, role, token)
 
   def canAllowConfs: Boolean = role == Administrator || role == Moderator

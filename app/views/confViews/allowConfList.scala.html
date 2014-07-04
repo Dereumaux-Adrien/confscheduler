@@ -5,7 +5,7 @@
         <h4>@conf.title <span class="speaker-name">@conf.speaker.fullName</span><span class="time-to-conf"> in @conf.timeFromNow</span></h4>
         <p>@conf.abstr</p>
 
-        <form method="POST" action="@routes.ConferenceController.allow(conf.id)">
+        <form method="POST" action="@routes.ConferenceController.accept(conf.id)">
             <button type="submit" class="btn btn-success">Accept</button>
         </form>
         <form method="POST" action="@routes.ConferenceController.refuse(conf.id)">
