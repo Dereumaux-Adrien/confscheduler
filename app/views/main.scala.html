@@ -15,8 +15,16 @@
     <body>
     <div class="container main">
         @topMenu(request, userRole)
-        @flashing(request.flash)
-        @content
+        <hr>
+        <div class="container">
+            <div class="col-md-2 sideMenu">
+                @sideMenu(request, userRole)
+            </div>
+            <div class="col-md-10 mainPanel">
+                @flashing(request.flash)
+                @content
+            </div>
+        </div>
     </div>
     </body>
 </html>

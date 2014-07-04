@@ -1,0 +1,15 @@
+@(text: String, route: play.api.mvc.Call, right: Boolean = false)(implicit request: play.api.mvc.Request[Any])
+
+@if(request.uri.endsWith(route.toString)) {
+    @if(right) {
+        <li class="pull-right"><a href="@route" class="active">@text</a></li>
+    } else {
+        <li><a href="@route" class="active">@text</a></li>
+    }
+} else {
+    @if(right) {
+        <li class="pull-right"><a href="@route">@text</a></li>
+    } else {
+        <li><a href="@route">@text</a></li>
+    }
+}

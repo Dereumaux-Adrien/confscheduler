@@ -1,50 +1,69 @@
 @main-background-color: #FAFAFA;
 @main-contrast-color  : #F1F1F1;
 @speaker-name-color   : #888;
+@spacing-under-top-hr : 5px;
 
 .main {
     background-color: @main-background-color;
     padding-bottom: 10px;
+
+    hr {
+        margin-bottom: 0px;
+        margin-top:5px;
+    }
+
+    a {
+        color: #333;
+    }
 
     #calendar {
         margin-top: 10px;
     }
 
     .flash {
-        margin-top: 5px;
         .alert {
-            margin-bottom: 0px;
+            margin-bottom: 5px;
             padding: 8px;
         }
     }
 
-    .topMenu {
-        .active {
-            background-color: @main-contrast-color;
-        }
-        .spacer {
-            margin: 20px;
-        }
-    }
-
-    .conf-listing {
+    .active {
         background-color: @main-contrast-color;
-        padding: 3px 15px 3px 15px;
-        border-radius: 3px;
-        margin-top: 5px;
     }
 
-    .speaker-name {
-        font-size:11pt;
-        font-style: italic;
-        color: @speaker-name-color;
+    .topMenu {
+        padding-top: 5px;
     }
 
-    .time-to-conf {
-        font-size:11pt;
-        font-style: italic;
-        color: @speaker-name-color;
-        float: right;
+    .sideMenu {
+        padding-top :@spacing-under-top-hr;
+        padding-left: 0px;
+        padding-right: 5px;
+        border-right: thin solid @main-contrast-color;
+    }
+
+    .mainPanel{
+        padding-top :@spacing-under-top-hr;
+
+        .conf-listing {
+            background-color: @main-contrast-color;
+            padding: 3px 15px 3px 15px;
+            border-radius: 3px;
+            margin-bottom: 5px;
+
+            .speaker-name {
+                font-size:11pt;
+                font-style: italic;
+                color: @speaker-name-color;
+            }
+
+            .time-to-conf {
+                font-size:11pt;
+                font-style: italic;
+                color: @speaker-name-color;
+                float: right;
+            }
+        }
     }
 }
 
