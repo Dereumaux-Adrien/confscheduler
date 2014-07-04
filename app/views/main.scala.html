@@ -15,6 +15,7 @@
     <body>
     <div class="container main">
         @topMenu(request, userRole)
+        @flashing(request.flash)
         @content
     </div>
     </body>
