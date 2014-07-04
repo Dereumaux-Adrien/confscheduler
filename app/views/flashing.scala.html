@@ -1,0 +1,11 @@
+@(flash: Flash)
+
+@if(!flash.isEmpty){
+    <div class="flash">
+        @{if(flash.get("success").isDefined) {
+            <div class="alert alert-success">{flash.get("success").get}</div>
+        } else if(flash.get("error").isDefined) {
+            <div class="alert alert-danger">{flash.get("error").get}</div>
+        }}
+    </div>
+}
