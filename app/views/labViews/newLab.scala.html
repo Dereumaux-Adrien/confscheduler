@@ -1,0 +1,10 @@
+@(userForm: Form[LabController.SimpleLab])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
+@import views.html.helper._
+
+@main("New User") {
+    @helper.form(routes.LabController.create) {
+        @helper.inputText(userForm("acronym"))
+        @helper.inputText(userForm("name"))
+        <input type="submit">
+    }
+}

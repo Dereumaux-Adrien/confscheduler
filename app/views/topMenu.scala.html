@@ -25,6 +25,7 @@
     }
     @if(role == Administrator) {
         @activeLi("Add User",  routes.UserController.newUser(None), true)
+        @activeLi("Add Lab",  routes.LabController.newLab, true)
     }
 }
 
