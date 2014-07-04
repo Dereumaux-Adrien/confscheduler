@@ -1,0 +1,20 @@
+@(confs: List[Conference])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
+
+@displayAllowableConfListing(conf: Conference) = {
+    <div class="conf-listing">
+        <h4>@conf.title <span class="speaker-name">@conf.speaker.fullName</span><span class="time-to-conf"> in @conf.timeFromNow</span></h4>
+        <p>@conf.abstr</p>
+
+        <form method="POST" action="@routes.ConferenceController.allow(conf.id)"><input type="submit" value="Accept"></form>
+    </div>
+}
+
+@main("Allow conferences"){
+    @if(confs.isEmpty) {
+        <h5>No conferences proposals to accept</h5>
+    } else {
+        @for(conf <- confs) {
+            @displayAllowableConfListing(conf)
+        }
+    }
+}

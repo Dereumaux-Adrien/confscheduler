@@ -2,9 +2,11 @@
 
 @genMenu(role: UserRole) = {
     @if(role == Moderator || role == Administrator) {
+        <hr>
         @utils.activeLi("Accept Conferences", routes.ConferenceController.allowList)
     }
     @if(role == Moderator) {
+        <hr>
         @utils.activeLi("Add Contributor", routes.UserController.newUser(Some("Contributor")))
     }
     @if(role == Administrator) {

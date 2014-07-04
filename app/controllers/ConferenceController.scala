@@ -33,7 +33,7 @@ object ConferenceController extends Controller {
   def authorizedUserRole(implicit request: AuthorizedRequest[AnyContent]): UserRole = request.user.map(_.role).get
 
   def listConfs = MyAuthenticated { implicit request =>
-    Ok(views.html.confViews.index(models.Conference.findAll.filter(_.isInFuture).sortBy(_.startDate))(request, authenticatedUserRole.getOrElse(Guest)))
+    Ok(views.html.confViews.index(models.Conference.findAccepted.filter(_.isInFuture).sortBy(_.startDate))(request, authenticatedUserRole.getOrElse(Guest)))
   }
 
   def calendar = MyAuthenticated { implicit request =>
@@ -69,12 +69,26 @@ object ConferenceController extends Controller {
     }
   }
 
-  def allowList = Action { NotImplemented }
+  def accept(id: Long) = AuthorizedWith(_.canAllowConfs) { implicit request => Future {
+    Conference.find(id).fold(
+      Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to allow an unknown conference"))
+    )(
+      c => {
+        val accepted = c.asAccepted
+        println(accepted)
+        Redirect(routes.ConferenceController.viewConf(accepted.save.get.id)).flashing(("success", "Conference successfully accepted"))
+      }
+    )
+  }}
+
+  def allowList = AuthorizedWith(_.canAllowConfs) { implicit request => Future {
+    Ok(views.html.confViews.allowConfList(Conference.findConfsToAllow)(request, authorizedUserRole))
+  }}
 
   private def createConfWithUser(conf: SimpleConference, user: User): Result = {
     user.role match {
       case Administrator | Moderator =>
-        val newId = Conference.save(conf)
+        val newId = Conference.saveNew(conf)
         Redirect(routes.ConferenceController.viewConf(newId))
       case _                         => NotImplemented
 

@@ -10,6 +10,7 @@ POST    /conf/new                   controllers.ConferenceController.create
 GET     /conf/allow                 controllers.ConferenceController.allowList
 GET     /conf/:id                   controllers.ConferenceController.viewConf(id: Long)
 GET     /conf/:id/allow             controllers.ConferenceController.allow(id: Long)
+POST    /conf/:id/allow             controllers.ConferenceController.accept(id: Long)
 GET     /conf                       controllers.ConferenceController.listConfs
 
 GET     /calendar                   controllers.ConferenceController.calendar
