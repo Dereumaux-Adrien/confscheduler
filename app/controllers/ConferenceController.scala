@@ -55,7 +55,7 @@ object ConferenceController extends Controller {
   def create() = ForcedAuthentication { implicit request =>
     Future {
       conferenceForm.bindFromRequest.fold(
-        formWithErrors => BadRequest(views.html.confViews.addConf(formWithErrors)(request, authenticatedUserRole.get)),
+        formWithErrors => {formWithErrors.errors.foreach(println); BadRequest(views.html.confViews.addConf(formWithErrors)(request, authenticatedUserRole.get))},
         conf           => createConfWithUser(conf, request.user.get)
       )
     }

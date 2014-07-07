@@ -1,8 +1,11 @@
 @(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 
 @genMenu(role: UserRole) = {
-    @if(role == Moderator || role == Administrator) {
+    @if(role != Guest) {
         <hr>
+        @utils.activeLi("Add Conference", routes.ConferenceController.addConf)
+    }
+    @if(role == Moderator || role == Administrator) {
         @utils.activeLi("Accept Conferences", routes.ConferenceController.allowList)
     }
     @if(role == Moderator) {
@@ -12,6 +15,8 @@
     @if(role == Administrator) {
         <hr>
         @utils.activeLi("Add User",  routes.UserController.newUser(None))
+    }
+    @if(role == Administrator) {
         <hr>
         @utils.activeLi("Add Lab",  routes.LabController.newLab)
     }
