@@ -26,8 +26,7 @@ object Lab {
     WHERE id = {id}
     """)
 
-  var fixtures = Set(Lab(0, "CIRI", "Centre de truc plutot cools"), Lab(1, "POUET", "Le centre des poetes"))
-  var nextId = 1
+  def fixtures = Set(Lab(0, "CIRI", "Centre de truc plutot cools"), Lab(1, "POUET", "Le centre des poetes"))
 
   def findById(id: Long): Option[Lab] = DB.withConnection { implicit  c =>
     SQL("SELECT * FROM Lab WHERE id = {id}")
@@ -62,16 +61,10 @@ object Lab {
     SQL("DELETE FROM Lab").executeUpdate()
   }
 
-  def seedDB = DB.withConnection {implicit c =>
-    insertQuery.on(
-      "acronym" -> "CIRI",
-      "name"    -> "Centre International Recherche Immunologie"
-    ).executeUpdate()
-
-    insertQuery.on(
-      "acronym" -> "CNRS",
-      "name"    -> "Centre National pour la recherche scientifique"
-    ).executeUpdate()
+  def seedDB(): Unit = DB.withConnection {implicit c =>
+    for(lab <- fixtures) {
+      lab.save
+    }
   }
 
   private val labParser: RowParser[Lab] = {

@@ -14,33 +14,57 @@ case class Speaker (
     organisation : String,
     email        : String
 ) {
-    def fullName: String = title + ". " + firstName + " " + lastName
+  def fullName: String = title + ". " + firstName + " " + lastName
+
+  def save = Speaker.save(this)
 }
 
 object Speaker {
-  private val insertQuery = SQL( """
+  def fixtures = Set(
+    Speaker(0, "Jaques", "Monod", "Pr", "Nobel Prizes Winners", "Institut Pasteur", "jaques-monod-is-a-good@gmail.com"),
+    Speaker(1, "François", "Jacob", "Pr", "Nobel Prizes Winners", "Institut Pasteur", "jaques-monod-is-a-bad@gmail.com")
+  )
+
+  private val insertQuery = SQL("""
         INSERT INTO Speaker(firstName, lastName, title, team, organisation, email)
         VALUES({firstName}, {lastName}, {title}, {team}, {organisation}, {email});
     """)
 
-  def seedDB = DB.withConnection {implicit c =>
-    insertQuery.on(
-        "firstName" -> "Jacques",
-        "lastName"  -> "Monod",
-        "title"     -> "Pr",
-        "team"      -> "Nobel Prizes Winners",
-        "organisation" -> "Institut Pasteur",
-        "email"     -> "jaques-monod-is-a-good@gmail.com"
-      ).executeUpdate()
+  private val updateQuery = SQL("""
+        UPDATE Speaker
+        SET firstName = {firstName}, lastName = {lastName}, title = {title}, team = {team}, organisation = {organisation}, email = {email};
+   """)
 
-    insertQuery.on(
-        "firstName" -> "François",
-        "lastName"  -> "Jacob",
-        "title"     -> "Pr",
-        "team"      -> "Nobel Prizes Winners",
-        "organisation" -> "Institut Pasteur",
-        "email"     -> "jaques-monod-is-a-bad@gmail.com"
-      ).executeUpdate()
+  def seedDB() = DB.withConnection {implicit c =>
+    for(speaker <- fixtures) {
+      speaker.save
+    }
+  }
+
+  def save(speaker: Speaker): Option[Long] = DB.withConnection { implicit c =>
+    if(findById(speaker.id).isDefined) {
+      updateQuery
+        .on(
+          "firstName" -> speaker.firstName,
+          "lastName" -> speaker.lastName,
+          "title"    -> speaker.title,
+          "team"     -> speaker.team,
+          "organisation" -> speaker.organisation,
+          "email"    -> speaker.email
+        ).executeUpdate()
+
+      Option(speaker.id)
+    } else {
+      insertQuery
+        .on(
+          "firstName" -> speaker.firstName,
+          "lastName" -> speaker.lastName,
+          "title"    -> speaker.title,
+          "team"     -> speaker.team,
+          "organisation" -> speaker.organisation,
+          "email"    -> speaker.email
+        ).executeInsert()
+    }
   }
 
   def findById(id: Long): Option[Speaker] = DB.withConnection {implicit c =>
