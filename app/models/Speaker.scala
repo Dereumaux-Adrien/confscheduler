@@ -58,19 +58,6 @@ object Speaker {
     SQL("DELETE FROM Speaker;").executeUpdate()
   }
 
-  def first: Speaker = DB.withConnection {implicit  c =>
-    SQL("SELECT * FROM Speaker")
-      .as(speakerParser *)
-      .head
-  }
-
-  def second: Speaker = DB.withConnection {implicit  c =>
-    SQL("SELECT * FROM Speaker")
-      .as(speakerParser *)
-      .tail
-      .head
-  }
-
   private val speakerParser: RowParser[Speaker] = {
       get[Long]("id") ~
       get[String]("firstName") ~

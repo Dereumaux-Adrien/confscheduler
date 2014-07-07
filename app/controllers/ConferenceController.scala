@@ -45,7 +45,7 @@ object ConferenceController extends Controller {
   }
 
   def viewConf(id: Long) = MyAuthenticated { implicit request =>
-    models.Conference.find(id) match {
+    models.Conference.findById(id) match {
       case Some(c) => Ok(views.html.confViews.conf(c)(request, authenticatedUserRole.getOrElse(Guest)))
       case None    => NotFound
     }
@@ -65,7 +65,7 @@ object ConferenceController extends Controller {
   }
 
   def accept(id: Long) = AuthorizedWith(_.canAllowConf(id)) { implicit request => Future {
-    Conference.find(id).fold(
+    Conference.findById(id).fold(
       Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to allow an unknown conference"))
     )(
       c => {
@@ -76,7 +76,7 @@ object ConferenceController extends Controller {
   }}
 
   def refuse(id: Long) = AuthorizedWith(_.canAllowConfs) { implicit request => Future {
-    Conference.find(id).fold(
+    Conference.findById(id).fold(
       Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to refuse an unknown conference"))
     )(
       c => {
@@ -93,7 +93,7 @@ object ConferenceController extends Controller {
   private def createConfWithUser(conf: SimpleConference, user: User): Result = {
     user.role match {
       case Administrator | Moderator =>
-        val newId = Conference.saveNew(conf)
+        val newId = Conference.save(Conference.fromSimpleConference(conf)).get.id
         Redirect(routes.ConferenceController.viewConf(newId))
       case _                         => NotImplemented
 

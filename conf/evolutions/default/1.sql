@@ -19,7 +19,21 @@ CREATE TABLE Speaker (
     PRIMARY KEY (id)
 );
 
+CREATE TABLE Conference (
+    id        bigint NOT NULL AUTO_INCREMENT,
+    title     VARCHAR(255) NOT NULL,
+    abstr     VARCHAR(255) NOT NULL,
+    speaker   bigint NOT NULL REFERENCES Speaker(id),
+    startDate TIMESTAMP NOT NULL,
+    length    bigint NOT NULL, -- The duration of the conference in ms
+    organizedBy      bigint NOT NULL REFERENCES Lab(id),
+    accepted  boolean,
+    PRIMARY KEY (id)
+);
+
 # --- !Downs
 
+DROP Table Conference;
 DROP TABLE Lab;
 DROP TABLE Speaker;
+
