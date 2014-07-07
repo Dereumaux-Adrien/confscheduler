@@ -35,9 +35,9 @@ case class User (
 object User {
   val loggedUserRoleList = List("Administrator", "Moderator", "Contributor")
 
-  var fixtures = Set(User(0, "Rosalyn", "Franklin", "rosa@gmail.com", Lab.findById(0).get, "123456789", Administrator, ""),
-                     User(1, "James", "Watson", "jimmy@gmail.com", Lab.findById(1).get, "987654321", Moderator, ""),
-                     User(2, "Thomas", "P", "tom@gmail.com", Lab.findById(1).get, "123456789", Contributor, ""))
+  var fixtures = Set(User(0, "Rosalyn", "Franklin", "rosa@gmail.com", Lab.listAll.head, "123456789", Administrator, ""),
+                     User(1, "James", "Watson", "jimmy@gmail.com", Lab.listAll.tail.head, "987654321", Moderator, ""),
+                     User(2, "Thomas", "P", "tom@gmail.com", Lab.listAll.tail.head, "123456789", Contributor, ""))
 
   var nextId = 3
 

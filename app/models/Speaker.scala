@@ -23,7 +23,7 @@ object Speaker {
         VALUES({firstName}, {lastName}, {title}, {team}, {organisation}, {email});
     """)
 
-  def feedDB = DB.withConnection {implicit c =>
+  def seedDB = DB.withConnection {implicit c =>
     insertQuery.on(
         "firstName" -> "Jacques",
         "lastName"  -> "Monod",
@@ -49,12 +49,12 @@ object Speaker {
       .as(speakerParser.singleOpt)
   }
 
-  def listAll = DB.withConnection {implicit c =>
+  def listAll: List[Speaker] = DB.withConnection {implicit c =>
     SQL("SELECT * FROM Speaker;")
       .as(speakerParser *)
   }
 
-  def destroyAll = DB.withConnection {implicit  c =>
+  def destroyAll(): Unit = DB.withConnection {implicit  c =>
     SQL("DELETE FROM Speaker;").executeUpdate()
   }
 

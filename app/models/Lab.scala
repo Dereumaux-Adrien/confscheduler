@@ -1,6 +1,10 @@
 package models
 
+import anorm.SqlParser._
 import controllers.LabController.SimpleLab
+import anorm._
+import play.api.db.DB
+import play.api.Play.current
 
 case class Lab (
   id     : Long,
@@ -11,16 +15,70 @@ case class Lab (
 }
 
 object Lab {
+  private val insertQuery = SQL("""
+      INSERT INTO Lab(acronym, name)
+      VALUES ({acronym}, {name})
+    """)
+
+  private val updateQuery = SQL("""
+    UPDATE Lab
+    SET acronym = {acronym}, name = {name}
+    WHERE id = {id}
+    """)
+
   var fixtures = Set(Lab(0, "CIRI", "Centre de truc plutot cools"), Lab(1, "POUET", "Le centre des poetes"))
   var nextId = 1
 
-  def findById(id: Long): Option[Lab] = fixtures.find(_.id == id)
-
-  def fromSimpleLab(lab: SimpleLab): Option[Lab] = {
-    val result = Lab(nextId, lab.acronym, lab.name)
-    nextId += 1
-    Option(result)
+  def findById(id: Long): Option[Lab] = DB.withConnection { implicit  c =>
+    SQL("SELECT * FROM Lab WHERE id = {id}")
+      .on("id" -> id.toString)
+      .as(labParser.singleOpt)
   }
 
-  def save(lab: Lab) = fixtures = fixtures + lab
+  def fromSimpleLab(lab: SimpleLab): Option[Lab] = {
+    Option(Lab(-1, lab.acronym, lab.name))
+  }
+
+  def save(lab: Lab): Option[Long] = DB.withConnection { implicit c =>
+    if(findById(lab.id).isDefined) {
+      updateQuery
+        .on("acronym" -> lab.acronym, "name" -> lab.name, "id" -> lab.id.toString)
+        .executeUpdate()
+
+      Option(lab.id)
+    } else {
+      insertQuery
+        .on("acronym" -> lab.acronym, "name" -> lab.name)
+        .executeInsert()
+    }
+  }
+
+  def listAll: List[Lab] = DB.withConnection {implicit c =>
+    SQL("SELECT * FROM Lab")
+      .as(labParser *)
+  }
+
+  def destroyAll(): Unit = DB.withConnection {implicit c =>
+    SQL("DELETE FROM Lab").executeUpdate()
+  }
+
+  def seedDB = DB.withConnection {implicit c =>
+    insertQuery.on(
+      "acronym" -> "CIRI",
+      "name"    -> "Centre International Recherche Immunologie"
+    ).executeUpdate()
+
+    insertQuery.on(
+      "acronym" -> "CNRS",
+      "name"    -> "Centre National pour la recherche scientifique"
+    ).executeUpdate()
+  }
+
+  private val labParser: RowParser[Lab] = {
+      get[Long]("id") ~
+      get[String]("acronym") ~
+      get[String]("name")  map {
+      case id ~ acronym ~ name => Lab(id, acronym, name)
+    }
+  }
 }

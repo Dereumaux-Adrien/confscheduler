@@ -38,10 +38,10 @@ case class Conference (
 
 object Conference {
   val confs = mutable.HashMap[Long, Conference](
-    (0, Conference(0, "Les oiseaux chantent", "La vie est belle, et c'est super cool de s'appeller Michel", Speaker.first, DateTime.now + 2.week, 1.hour, Lab.findById(0).get, true)),
-    (1, Conference(1, "test conf 2", "test abstr 2", Speaker.second, DateTime.now + 1.week, 2.hour, Lab.findById(0).get, true)),
-    (2, Conference(2, "past conference", "test abstra 3", Speaker.first, DateTime.now - 1.week, 2.hour, Lab.findById(0).get, true)),
-    (3, Conference(3, "Conference that needs to be allowed", "This needs to be accepted !", Speaker.second, DateTime.now + 3.week, 2.hour, Lab.findById(0).get, false))
+    (0, Conference(0, "Les oiseaux chantent", "La vie est belle, et c'est super cool de s'appeller Michel", Speaker.first, DateTime.now + 2.week, 1.hour, Lab.listAll.head, true)),
+    (1, Conference(1, "test conf 2", "test abstr 2", Speaker.second, DateTime.now + 1.week, 2.hour, Lab.listAll.head, true)),
+    (2, Conference(2, "past conference", "test abstra 3", Speaker.first, DateTime.now - 1.week, 2.hour, Lab.listAll.head, true)),
+    (3, Conference(3, "Conference that needs to be allowed", "This needs to be accepted !", Speaker.second, DateTime.now + 3.week, 2.hour, Lab.listAll.head, false))
   )
 
   def findAll = confs.values.toList.sortBy(_.id)

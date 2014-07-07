@@ -9,7 +9,7 @@ import org.junit.runner._
 class UserTest extends Specification {
   "User" should {
     "be able to save a new User" in {
-      val newUser = User(12356, "T", "P", "badam@gmail.com", Lab.findById(0).get, "987654321", Moderator, "")
+      val newUser = User(12356, "T", "P", "badam@gmail.com", Lab.listAll.head, "987654321", Moderator, "")
       val userNb  = User.count
 
       newUser.save
