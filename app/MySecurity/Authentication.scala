@@ -25,7 +25,11 @@ object Authentication {
 
   object ForceAuth extends ActionFilter[MyAuthenticatedRequest] {
     def filter[A](request: MyAuthenticatedRequest[A]) = Future.successful {
-      if(request.user.isDefined) None else Some(Redirect(unsuccessfulAuthRoute))
+      if(request.method == "POST") {
+        if(request.user.isDefined) None else Some(Forbidden)
+      } else {
+        if(request.user.isDefined) None else Some(Redirect(unsuccessfulAuthRoute))
+      }
     }
   }
 

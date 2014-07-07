@@ -11,7 +11,7 @@ import play.api.mvc._
 import scala.Some
 
 object Authorization {
-  val unsuccessfulAuthorizationRoute = routes.Application.index()
+  val unsuccessfulAuthorizationRoute = routes.ConferenceController.listConfs().toString()
 
   case class AuthorizedRequest[A](f: User => Boolean, request: MyAuthenticatedRequest[A]) extends WrappedRequest[A](request) {
     def user = request.user
@@ -28,7 +28,11 @@ object Authorization {
       if(request.user.isDefined && request.f(request.user.get)) {
         None
       } else {
-        Some(Redirect(unsuccessfulAuthorizationRoute))
+        if(request.method == "POST") {
+          if(request.user.isDefined) None else Some(Unauthorized)
+        } else {
+          if(request.user.isDefined) None else Some(Redirect(unsuccessfulAuthorizationRoute))
+        }
       }
     }
   }
