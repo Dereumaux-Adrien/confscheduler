@@ -11,5 +11,6 @@ libraryDependencies ++= Seq(
   anorm,
   cache,
   ws,
-  "com.github.nscala-time" %% "nscala-time" % "1.2.0"
+  "com.github.nscala-time" %% "nscala-time" % "1.2.0",
+  "com.lambdaworks" % "scrypt" % "1.4.0"
 )

@@ -2,6 +2,7 @@ package models
 
 import anorm.SqlParser._
 import controllers.UserController.SimpleUser
+import MySecurity.ScryptHasher._
 import play.api.db.DB
 import play.api.mvc.Cookie
 import play.api.libs.Crypto
@@ -58,9 +59,9 @@ case class User (
 object User {
   val loggedUserRoleList = List("Administrator", "Moderator", "Contributor")
 
-  def fixtures = Set(User(-1, "Rosalyn", "Franklin", "rosa@gmail.com", Lab.listAll.head, "123456789", Administrator, ""),
-                     User(-1, "James", "Watson", "jimmy@gmail.com", Lab.listAll.tail.head, "987654321", Moderator, ""),
-                     User(-1, "Thomas", "P", "tom@gmail.com", Lab.listAll.tail.head, "123456789", Contributor, ""))
+  def fixtures = Set(User(-1, "Rosalyn", "Franklin", "rosa@gmail.com", Lab.listAll.head, "123456789".scrypt, Administrator, ""),
+                     User(-1, "James", "Watson", "jimmy@gmail.com", Lab.listAll.tail.head, "987654321".scrypt, Moderator, ""),
+                     User(-1, "Thomas", "P", "tom@gmail.com", Lab.listAll.tail.head, "123456789".scrypt, Contributor, ""))
 
   val updateQuery = SQL("""
       UPDATE User
@@ -145,7 +146,7 @@ object User {
   }
 
   def authenticate(email: String, password: String, rememberMe: Boolean): Option[User] = {
-    val user = findByEmail(email).filter(_.hashedPass == password)
+    val user = findByEmail(email).filter(u => checkPasswd(password, u.hashedPass))
 
     if(rememberMe && user.isDefined) {
       val rememberMeToken = Crypto.generateSignedToken
@@ -166,7 +167,7 @@ object User {
 
     val newUserLab = Lab.findById(user.labId).getOrElse(return None)
 
-    val newUser = User(-1, user.firstName, user.lastName, user.email, newUserLab, user.password, newUserRole, "")
+    val newUser = User(-1, user.firstName, user.lastName, user.email, newUserLab, user.password.scrypt, newUserRole, "")
     Option(newUser)
   }
 

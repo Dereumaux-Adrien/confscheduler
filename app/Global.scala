@@ -18,8 +18,6 @@ object Global extends GlobalSettings{
         Conference.seedDB()
         User.seedDB()
         Logger.info("... done")
-
-        Conference.listAll.foreach(c => Logger.info(c.toString))
     }
   }
 }
