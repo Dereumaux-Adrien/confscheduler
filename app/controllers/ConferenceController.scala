@@ -36,8 +36,12 @@ object ConferenceController extends Controller {
   def authorizedUserRole(implicit request: AuthorizedRequest[AnyContent]): UserRole = request.user.map(_.role).get
   def authorizedUser(implicit request: AuthorizedRequest[AnyContent]): User = request.user.get
 
+  def listUpcomingConfs = MyAuthenticated { implicit request =>
+    Ok(views.html.confViews.list(models.Conference.findAccepted.filter(_.isInFuture).sortBy(_.startDate))(request, authenticatedUserRole.getOrElse(Guest)))
+  }
+
   def listConfs = MyAuthenticated { implicit request =>
-    Ok(views.html.confViews.index(models.Conference.findAccepted.filter(_.isInFuture).sortBy(_.startDate))(request, authenticatedUserRole.getOrElse(Guest)))
+    Ok(views.html.confViews.list(models.Conference.findAccepted.sortBy(_.startDate))(request, authenticatedUserRole.getOrElse(Guest)))
   }
 
   def calendar = MyAuthenticated { implicit request =>
@@ -81,7 +85,7 @@ object ConferenceController extends Controller {
     )(
       c => {
         c.destroy
-        Redirect(routes.ConferenceController.listConfs()).flashing(("success", "Conference successfully refused"))
+        Redirect(routes.ConferenceController.listUpcomingConfs()).flashing(("success", "Conference successfully refused"))
       }
     )
   }}

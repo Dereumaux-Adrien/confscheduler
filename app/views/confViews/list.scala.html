@@ -2,7 +2,13 @@
 
 @displayConfListing(conf: Conference) = {
     <div class="conf-listing">
-        <h4>@conf.title <span class="speaker-name">@conf.speaker.fullName</span><span class="time-to-conf"> in @conf.timeFromNow</span></h4>
+        <h4>@conf.title <span class="speaker-name">@conf.speaker.fullName</span>
+        @if(conf.isInFuture){
+            <span class="time-to-conf"> in @conf.timeFromNow</span>
+        } else {
+            <span class="time-to-conf"> was @conf.displayDate</span>
+        }
+        </h4>
         <p>@conf.abstr</p>
     </div>
 }

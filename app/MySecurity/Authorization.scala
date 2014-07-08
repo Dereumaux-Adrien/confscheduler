@@ -11,7 +11,7 @@ import play.api.mvc._
 import scala.Some
 
 object Authorization {
-  val unsuccessfulAuthorizationRoute = routes.ConferenceController.listConfs().toString()
+  val unsuccessfulAuthorizationRoute = routes.ConferenceController.listUpcomingConfs().toString()
 
   case class AuthorizedRequest[A](f: User => Boolean, request: MyAuthenticatedRequest[A]) extends WrappedRequest[A](request) {
     def user = request.user

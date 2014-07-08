@@ -8,10 +8,11 @@ GET     /                           controllers.Application.index
 GET     /conf/new                   controllers.ConferenceController.addConf
 POST    /conf/new                   controllers.ConferenceController.create
 GET     /conf/allow                 controllers.ConferenceController.allowList
+GET     /conf/upcoming              controllers.ConferenceController.listUpcomingConfs
+GET     /conf/all                   controllers.ConferenceController.listConfs
 GET     /conf/:id                   controllers.ConferenceController.viewConf(id: Long)
 POST    /conf/:id/allow             controllers.ConferenceController.accept(id: Long)
 POST    /conf/:id/refuse            controllers.ConferenceController.refuse(id: Long)
-GET     /conf                       controllers.ConferenceController.listConfs
 
 GET     /calendar                   controllers.ConferenceController.calendar
 

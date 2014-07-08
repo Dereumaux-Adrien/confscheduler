@@ -20,6 +20,8 @@ case class Conference (
     organizedBy: Lab,
     accepted   : Boolean
 ) {
+  val formatter = DateTimeFormat.forPattern("YYYY-MM-dd HH:MM")
+
   def timeFromNow: String = {
     val i = DateTime.now to startDate
     val p = i.toPeriod
@@ -27,6 +29,8 @@ case class Conference (
 
     d.getStandardDays + " days, " + p.hours + " hours, " + p.minutes + " minutes."
   }
+
+  def displayDate: String = formatter.print(startDate)
 
   def asAccepted: Conference =
     Conference(id, title, abstr, speaker, startDate, length, organizedBy, accepted = true)
