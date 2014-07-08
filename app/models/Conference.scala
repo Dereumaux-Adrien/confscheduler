@@ -54,10 +54,10 @@ object Conference {
   """)
 
   def fixtures = Set (
-    Conference(0, "Les oiseaux chantent", "La vie est belle, et c'est super cool de s'appeller Michel", Speaker.listAll.head, DateTime.now + 2.week, 1.hour, Lab.listAll.head, true),
-    Conference(1, "test conf 2", "test abstr 2", Speaker.listAll.tail.head, DateTime.now + 1.week, 2.hour, Lab.listAll.head, true),
-    Conference(2, "past conference", "test abstra 3", Speaker.listAll.head, DateTime.now - 1.week, 2.hour, Lab.listAll.head, true),
-    Conference(3, "Conference that needs to be allowed", "This needs to be accepted !", Speaker.listAll.tail.head, DateTime.now + 3.week, 2.hour, Lab.listAll.head, false)
+    Conference(-1, "Les oiseaux chantent", "La vie est belle, et c'est super cool de s'appeller Michel", Speaker.listAll.head, DateTime.now + 2.week, 1.hour, Lab.listAll.head, true),
+    Conference(-1, "test conf 2", "test abstr 2", Speaker.listAll.tail.head, DateTime.now + 1.week, 2.hour, Lab.listAll.head, true),
+    Conference(-1, "past conference", "test abstra 3", Speaker.listAll.head, DateTime.now - 1.week, 2.hour, Lab.listAll.head, true),
+    Conference(-1, "Conference that needs to be allowed", "This needs to be accepted !", Speaker.listAll.tail.head, DateTime.now + 3.week, 2.hour, Lab.listAll.head, false)
   )
 
 

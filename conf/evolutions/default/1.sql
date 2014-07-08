@@ -38,7 +38,7 @@ CREATE TABLE User (
     email     VARCHAR(255) NOT NULL,
     lab       bigint NOT NULL REFERENCES Lab(id),
     hashedPass VARCHAR(255),
-    role      smallint,
+    role      int,
     rememberMeToken VARCHAR(255),
     PRIMARY KEY (id)
 )

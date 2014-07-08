@@ -21,8 +21,8 @@ case class Speaker (
 
 object Speaker {
   def fixtures = Set(
-    Speaker(0, "Jaques", "Monod", "Pr", "Nobel Prizes Winners", "Institut Pasteur", "jaques-monod-is-a-good@gmail.com"),
-    Speaker(1, "François", "Jacob", "Pr", "Nobel Prizes Winners", "Institut Pasteur", "jaques-monod-is-a-bad@gmail.com")
+    Speaker(-1, "Jaques", "Monod", "Pr", "Nobel Prizes Winners", "Institut Pasteur", "jaques-monod-is-a-good@gmail.com"),
+    Speaker(-1, "François", "Jacob", "Pr", "Nobel Prizes Winners", "Institut Pasteur", "jaques-monod-is-a-bad@gmail.com")
   )
 
   private val insertQuery = SQL("""
@@ -32,7 +32,8 @@ object Speaker {
 
   private val updateQuery = SQL("""
         UPDATE Speaker
-        SET firstName = {firstName}, lastName = {lastName}, title = {title}, team = {team}, organisation = {organisation}, email = {email};
+        SET firstName = {firstName}, lastName = {lastName}, title = {title}, team = {team}, organisation = {organisation}, email = {email}
+        WHERE id = {id}
    """)
 
   def seedDB() = DB.withConnection {implicit c =>
@@ -45,6 +46,7 @@ object Speaker {
     if(findById(speaker.id).isDefined) {
       updateQuery
         .on(
+          "id"        -> speaker.id,
           "firstName" -> speaker.firstName,
           "lastName" -> speaker.lastName,
           "title"    -> speaker.title,
