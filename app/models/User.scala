@@ -42,7 +42,7 @@ case class User (
    role:UserRole,
    rememberMeToken: String
 ){
-  def canAllowConf(confId: Long): Boolean = (role == Moderator && Conference.findById(id).fold(false)(_.id == lab.id)) || role == Administrator
+  def canAllowConf(confId: Long): Boolean = (role == Moderator && Conference.findById(confId).exists(_.organizedBy.id == lab.id)) || role == Administrator
 
   def canEdit(confId: Long): Boolean = canAllowConf(confId)
 
@@ -61,9 +61,9 @@ case class User (
 object User {
   val loggedUserRoleList = List("Administrator", "Moderator", "Contributor")
 
-  def fixtures = Set(User(-1, "Rosalyn", "Franklin", "rosa@gmail.com", Lab.listAll.head, "123456789".scrypt, Administrator, ""),
-                     User(-1, "James", "Watson", "jimmy@gmail.com", Lab.listAll.tail.head, "987654321".scrypt, Moderator, ""),
-                     User(-1, "Thomas", "P", "tom@gmail.com", Lab.listAll.tail.head, "123456789".scrypt, Contributor, ""))
+  def fixtures = Set(User(-1, "Rosalyn", "Franklin", "rosa@gmail.com", Lab.listAll(0), "123456789".scrypt, Administrator, ""),
+                     User(-1, "James", "Watson", "jimmy@gmail.com", Lab.listAll(1), "987654321".scrypt, Moderator, ""),
+                     User(-1, "Thomas", "P", "tom@gmail.com", Lab.listAll(1), "123456789".scrypt, Contributor, ""))
 
   val updateQuery = SQL("""
       UPDATE User
