@@ -58,10 +58,10 @@ object Conference {
   """)
 
   def fixtures = Set (
-    Conference(-1, "Les oiseaux chantent", "La vie est belle, et c'est super cool de s'appeller Michel", Speaker.listAll.head, DateTime.now + 2.week, 1.hour, Lab.listAll.head, true),
-    Conference(-1, "test conf 2", "test abstr 2", Speaker.listAll.tail.head, DateTime.now + 1.week, 2.hour, Lab.listAll.head, true),
-    Conference(-1, "past conference", "test abstra 3", Speaker.listAll.head, DateTime.now - 1.week, 2.hour, Lab.listAll.head, true),
-    Conference(-1, "Conference that needs to be allowed", "This needs to be accepted !", Speaker.listAll.tail.head, DateTime.now + 3.week, 2.hour, Lab.listAll.head, false)
+    Conference(-1, "DNA will explain every adult behaviour", "Discover how the new discoveries about lactose regulation in E.Coli will be over-interpreted for generations to come !", Speaker.listAll(0), DateTime.now - 2.week, 1.hour, Lab.listAll.head, true),
+    Conference(-1, "DNA methylations will explain every adult behaviour", "Discover how the new discoveries about DNA expression regulation via histone-methylation will be over-interpreted for generations to come !", Speaker.listAll(2), DateTime.now + 1.week, 2.hour, Lab.listAll.head, true),
+    Conference(-1, "Why Rosalyn Franklin really didn't deserve the Nobel prize", "After all, who wants women in science ? It's not as if they could do important work, like discovering viruses !", Speaker.listAll(1), DateTime.now + 2.week, 2.hour, Lab.listAll.head, true),
+    Conference(-1, "I have a Nobel Prize, so I can say anything I want and people will listen", "We are being lied to ! HIV doesn't cause AIDS, climate change isn't real, and astrology from Elle is a better predictor than epigenetics !", Speaker.listAll(3), DateTime.now + 3.week, 2.hour, Lab.listAll.head, false)
   )
 
 

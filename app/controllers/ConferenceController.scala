@@ -41,7 +41,7 @@ object ConferenceController extends Controller {
   }
 
   def listConfs = MyAuthenticated { implicit request =>
-    Ok(views.html.confViews.list(models.Conference.findAccepted.sortBy(_.startDate))(request, authenticatedUserRole.getOrElse(Guest)))
+    Ok(views.html.confViews.list(models.Conference.findAccepted.sortBy(_.startDate).reverse)(request, authenticatedUserRole.getOrElse(Guest)))
   }
 
   def calendar = MyAuthenticated { implicit request =>

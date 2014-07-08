@@ -21,8 +21,10 @@ case class Speaker (
 
 object Speaker {
   def fixtures = Set(
-    Speaker(-1, "Jaques", "Monod", "Pr", "Nobel Prizes Winners", "Institut Pasteur", "jaques-monod-is-a-good@gmail.com"),
-    Speaker(-1, "François", "Jacob", "Pr", "Nobel Prizes Winners", "Institut Pasteur", "jaques-monod-is-a-bad@gmail.com")
+    Speaker(-1, "Jaques", "Monod", "Pr", "Nobel Prizes Winners", "Institut Pasteur", "jaques-monod-is-a-god@gmail.com"),
+    Speaker(-1, "James", "Watson", "Pr", "Nobel Prizes Winners", "Institut Pasteur", "eugenism-isnt-bad@gmail.com"),
+    Speaker(-1, "Robin", "Holliday", "Pr", "Nobel Prize should-be-winners", "Cambridge University", "love-methylations@gmail.com"),
+    Speaker(-1, "Kary", "Mullis", "Pr", "People we want to take the Nobel Prize back from", "University of California Berkeley", "I-like-wearing-tinfoil-hats@gmail.com")
   )
 
   private val insertQuery = SQL("""
