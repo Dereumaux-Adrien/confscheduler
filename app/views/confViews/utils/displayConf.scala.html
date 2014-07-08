@@ -1,0 +1,20 @@
+@(conf: Conference, canEdit: Boolean)
+
+<div class="conf-listing">
+    <h4>@conf.title <span class="speaker-name">@conf.speaker.fullName</span>
+        @if(conf.isInFuture){
+        <span class="time-to-conf"> in @conf.timeFromNow</span>
+        } else {
+        <span class="time-to-conf"> was @conf.displayDate</span>
+        }
+    </h4>
+    <p>@conf.abstr</p>
+
+    @if(canEdit){
+        <div class="conference-buttons">
+            <form method="POST" action="@routes.ConferenceController.refuse(conf.id)">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+    }
+</div>

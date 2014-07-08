@@ -37,11 +37,19 @@ object ConferenceController extends Controller {
   def authorizedUser(implicit request: AuthorizedRequest[AnyContent]): User = request.user.get
 
   def listUpcomingConfs = MyAuthenticated { implicit request =>
-    Ok(views.html.confViews.list(models.Conference.findAccepted.filter(_.isInFuture).sortBy(_.startDate))(request, authenticatedUserRole.getOrElse(Guest)))
+    val confWithEditRights =
+      Conference.findAccepted.filter(_.isInFuture).sortBy(_.startDate)
+        .map(c => (c, request.user.exists(_.canEdit(c.id))))
+
+    Ok(views.html.confViews.list(confWithEditRights)(request, authenticatedUserRole.getOrElse(Guest)))
   }
 
   def listConfs = MyAuthenticated { implicit request =>
-    Ok(views.html.confViews.list(models.Conference.findAccepted.sortBy(_.startDate).reverse)(request, authenticatedUserRole.getOrElse(Guest)))
+    val confWithEditRights =
+      Conference.findAccepted.sortBy(_.startDate).reverse
+        .map(c => (c, request.user.exists(_.canEdit(c.id))))
+
+    Ok(views.html.confViews.list(confWithEditRights)(request, authenticatedUserRole.getOrElse(Guest)))
   }
 
   def calendar = MyAuthenticated { implicit request =>
@@ -50,7 +58,7 @@ object ConferenceController extends Controller {
 
   def viewConf(id: Long) = MyAuthenticated { implicit request =>
     models.Conference.findById(id) match {
-      case Some(c) => Ok(views.html.confViews.conf(c)(request, authenticatedUserRole.getOrElse(Guest)))
+      case Some(c) => Ok(views.html.confViews.conf(c, request.user.exists(_.canEdit(id)))(request, authenticatedUserRole.getOrElse(Guest)))
       case None    => NotFound
     }
   }
