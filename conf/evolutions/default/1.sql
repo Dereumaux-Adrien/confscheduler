@@ -31,8 +31,21 @@ CREATE TABLE Conference (
     PRIMARY KEY (id)
 );
 
+CREATE TABLE User (
+    id        bigint NOT NULL AUTO_INCREMENT,
+    firstName VARCHAR(255) NOT NULL,
+    lastName  VARCHAR(255) NOT NULL,
+    email     VARCHAR(255) NOT NULL,
+    lab       bigint NOT NULL REFERENCES Lab(id),
+    hashedPass VARCHAR(255),
+    role      smallint,
+    rememberMeToken VARCHAR(255),
+    PRIMARY KEY (id)
+)
+
 # --- !Downs
 
+DROP TABLE User;
 DROP Table Conference;
 DROP TABLE Lab;
 DROP TABLE Speaker;

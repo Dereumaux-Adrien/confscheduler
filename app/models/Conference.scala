@@ -84,6 +84,7 @@ object Conference {
   def save(conf: Conference): Option[Conference] = DB.withConnection { implicit c =>
     if(findById(conf.id).isDefined) {
       updateQuery.on(
+        "id" -> conf.id,
         "title" -> conf.title,
         "abstr" -> conf.abstr,
         "speaker" -> conf.speaker.id,
