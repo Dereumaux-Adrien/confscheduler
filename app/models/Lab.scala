@@ -26,7 +26,7 @@ object Lab {
     WHERE id = {id}
     """)
 
-  def fixtures = Set(Lab(-1, "CIRI", "Centre de truc plutot cools"), Lab(-1, "POUET", "Le centre des poetes"))
+  def fixtures = Set(Lab(-1, "CIRI", "International Center for Infectiology Research"), Lab(-1, "RO", "Retroviral Oncogenesis"))
 
   def findById(id: Long): Option[Lab] = DB.withConnection { implicit  c =>
     SQL("SELECT * FROM Lab WHERE id = {id}")
