@@ -110,6 +110,17 @@ object ConferenceController extends Controller {
     )
   }}
 
+  def delete(id: Long) = AuthorizedWith(_.canAllowConfs) { implicit request => Future {
+    Conference.findById(id).fold(
+      Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to delete an unknown conference"))
+    )(
+        c => {
+          c.destroy
+          Redirect(routes.ConferenceController.listUpcomingConfs()).flashing(("success", "Conference successfully deleted"))
+        }
+      )
+  }}
+
   def allowList = AuthorizedWith(_.canAllowConfs) { implicit request => Future {
     Ok(views.html.confViews.allowConfList(Conference.findConfsAllowableBy(authorizedUser))(request, authorizedUserRole))
   }}
