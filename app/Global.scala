@@ -4,7 +4,7 @@ import play.api._
 
 object Global extends GlobalSettings{
   override def onStart(app: Application) {
-    if(current.mode == Mode.Dev || current.mode == Mode.Test) {
+    if(current.mode == Mode.Dev || current.mode == Mode.Test || Play.application.configuration.getBoolean("heroku.test").getOrElse(false)) {
         Logger.info("Cleaning DB...")
         User.destroyAll()
         Conference.destroyAll()
