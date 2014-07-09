@@ -31,7 +31,7 @@ CREATE TABLE Conference (
     PRIMARY KEY (id)
 );
 
-CREATE TABLE User (
+CREATE TABLE AppUser (
     id        SERIAL,
     firstName VARCHAR(255) NOT NULL,
     lastName  VARCHAR(255) NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE User (
 
 # --- !Downs
 
-DROP TABLE User;
+DROP TABLE AppUser;
 DROP Table Conference;
 DROP TABLE Lab;
 DROP TABLE Speaker;

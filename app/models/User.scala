@@ -66,38 +66,38 @@ object User {
                      User(-1, "Thomas", "P", "tom@gmail.com", Lab.listAll(1), "123456789".scrypt, Contributor, ""))
 
   val updateQuery = SQL("""
-      UPDATE User
+      UPDATE AppUser
       SET firstName = {firstName}, lastName = {lastName}, email = {email}, lab = {lab}, hashedPass = {hashedPass}, role = {role}, rememberMeToken = {rememberMeToken}
       WHERE id = {id}
   """)
 
   val insertQuery = SQL("""
-      INSERT INTO User(firstName, lastName, email, lab, hashedPass, role, rememberMeToken)
+      INSERT INTO AppUser(firstName, lastName, email, lab, hashedPass, role, rememberMeToken)
       VALUES ({firstName}, {lastName}, {email}, {lab}, {hashedPass}, {role}, {rememberMeToken})
   """)
 
   def findById(id: Long): Option[User] = DB.withConnection {implicit  c =>
-    SQL("SELECT * FROM User WHERE id = {id}")
+    SQL("SELECT * FROM AppUser WHERE id = {id}")
       .on("id" -> id)
       .as(userParser.singleOpt)
   }
 
   def findByEmail(email: String): Option[User] = DB.withConnection {implicit  c =>
-    SQL("SELECT * FROM User WHERE email = {email}")
+    SQL("SELECT * FROM AppUser WHERE email = {email}")
       .on("email" -> email)
       .as(userParser.singleOpt)
   }
 
   def findByRememberMe(rememberMeCookie: Option[Cookie]): Option[User] = DB.withConnection {implicit conn =>
     rememberMeCookie.flatMap {c =>
-      SQL("SELECT * FROM User WHERE rememberMeToken = {rememberMeToken}")
+      SQL("SELECT * FROM AppUser WHERE rememberMeToken = {rememberMeToken}")
         .on("rememberMeToken" -> c.value)
         .as(userParser.singleOpt)
     }
   }
 
   def count: Long = DB.withConnection{implicit c =>
-    SQL("SELECT count(*) FROM User")
+    SQL("SELECT count(*) FROM AppUser")
       .executeQuery()
       .as(scalar[Long].single)
   }
@@ -137,13 +137,13 @@ object User {
 
   // returns true if the user has been destroyed, false if there was an error
   def destroy(user: User): Boolean = DB.withConnection {implicit c =>
-    SQL("DELETE FROM User WHERE id = {id}")
+    SQL("DELETE FROM AppUser WHERE id = {id}")
       .on("id" -> user.id)
       .execute()
   }
 
   def destroyAll(): Boolean = DB.withConnection {implicit c =>
-    SQL("DELETE FROM User")
+    SQL("DELETE FROM AppUser")
       .execute()
   }
 
