@@ -2,10 +2,13 @@ package models
 
 import anorm.SqlParser._
 import com.github.nscala_time.time.Imports._
+import controllers.routes
 import helpers.DateTimeUtils._
+import org.joda.time
+import org.joda.time.format.ISODateTimeFormat
 import play.api.db.DB
 import scala.collection.mutable
-import controllers.ConferenceController.SimpleConference
+import controllers.ConferenceController.{ConferenceEvent, SimpleConference}
 import anorm._
 import helpers.AnormExtension._
 import play.api.Play.current
@@ -21,6 +24,7 @@ case class Conference (
     accepted   : Boolean
 ) {
   val formatter = DateTimeFormat.forPattern("YYYY-MM-dd HH:MM")
+  val isoFormatter = ISODateTimeFormat.dateTime()
 
   def timeFromNow: String = {
     val i = DateTime.now to startDate
@@ -43,9 +47,14 @@ case class Conference (
   def save = Conference.save(this)
 
   def destroy = Conference.destroy(this)
+
+  def toConfEvent: ConferenceEvent =
+    ConferenceEvent(title, isoFormatter.print(startDate), isoFormatter.print(startDate + length), routes.ConferenceController.viewConf(id).toString(), "#FFF")
 }
 
 object Conference {
+  val isoFormatter = ISODateTimeFormat.dateTime()
+
   val insertQuery = SQL("""
       INSERT INTO Conference(title, abstr, speaker, startDate, length, organizedBy, accepted)
       VALUES ({title}, {abstr}, {speaker}, {startDate}, {length}, {organizedBy}, {accepted})
@@ -127,6 +136,18 @@ object Conference {
 
   def listAll: List[Conference] = DB.withConnection {implicit c =>
     SQL("SELECT * FROM Conference").as(conferenceParser *)
+  }
+
+
+  def between(start: DateTime, end: DateTime) = DB.withConnection { implicit c =>
+    SQL("""
+        SELECT * FROM Conference
+        WHERE startDate BETWEEN {startDate} and {endDate}
+      """)
+    .on(
+      "startDate" -> isoFormatter.print(start),
+      "endDate"   -> isoFormatter.print(end)
+    ).as(conferenceParser *)
   }
 
   private val conferenceParser: RowParser[Conference] = {

@@ -11,23 +11,6 @@ $(document).ready(function() {
                         center: 'agendaWeek,month',
                         right:  'next'
                     }, 
-        events     : fixturesEvents()
+        events     : '/api/v1/conf/all'
     });
 });
-
-function fixturesEvents() {
-    var evs = [
-        {
-            title  : 'event 1',
-            start  : '2014-06-11T12:30:00',
-            end    : '2014-06-11T13:30:00'
-        },
-        {
-            title  : 'event 2',
-            start  : '2014-06-12T15:30:00',
-            end    : '2014-06-12T17:00:00'
-        }
-    ];
-
-    return evs;
-}

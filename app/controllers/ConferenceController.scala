@@ -1,26 +1,26 @@
 package controllers
 
+import MySecurity.Authentication.{ForcedAuthentication, MyAuthenticated, MyAuthenticatedRequest}
+import MySecurity.Authorization.{AuthorizedRequest, AuthorizedWith}
 import com.github.nscala_time.time.Imports._
-import play.api.db.DB
-import anorm._
-import scala.Some
+import helpers.DateTimeUtils.TimeString
+import models._
+import org.joda.time.DateTime
+import org.joda.time.format.ISODateTimeFormat
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.mvc.{Action, AnyContent, Controller, Result}
-import play.api.Play.current
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
+import play.api.mvc.{AnyContent, Controller, Result}
 
-import models._
-import helpers.DateTimeUtils
-import DateTimeUtils.TimeString
-
-import org.joda.time.DateTime
-import MySecurity.Authentication.{MyAuthenticatedRequest, MyAuthenticated, ForcedAuthentication}
-import MySecurity.Authorization.{AuthorizedWith, AuthorizedRequest}
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 object ConferenceController extends Controller {
   case class SimpleConference(title: String, abstr: String, speakerId: Long, date: DateTime, length: String, organizerId: Long)
+  case class ConferenceEvent(title: String, start: String, end: String, url: String, backgroundColor: String)
+
+  val isoFormatter = ISODateTimeFormat.date()
 
   val conferenceForm = Form {
     mapping(
@@ -31,6 +31,14 @@ object ConferenceController extends Controller {
       "length" -> text.verifying(_.isValidDuration),
       "organizer" -> longNumber.verifying(Lab.findById(_).isDefined))(SimpleConference.apply)(SimpleConference.unapply)
   }
+
+  implicit val conferenceEventWrites: Writes[ConferenceEvent] = (
+    (JsPath \ "title").write[String] and
+    (JsPath \ "start").write[String] and
+    (JsPath \ "end").write[String] and
+    (JsPath \ "url").write[String] and
+    (JsPath \ "backgroundColor").write[String]
+  )(unlift(ConferenceEvent.unapply))
 
   def authenticatedUserRole(implicit request: MyAuthenticatedRequest[AnyContent]): Option[UserRole] = request.user.map(_.role)
   def authorizedUserRole(implicit request: AuthorizedRequest[AnyContent]): UserRole = request.user.map(_.role).get
@@ -50,6 +58,10 @@ object ConferenceController extends Controller {
         .map(c => (c, request.user.exists(_.canEdit(c.id))))
 
     Ok(views.html.confViews.list(confWithEditRights)(request, authenticatedUserRole.getOrElse(Guest)))
+  }
+
+  def listConfEvents(start: String, end: String) = MyAuthenticated { implicit request =>
+    Ok(Json.toJson(Conference.between(isoFormatter.parseDateTime(start), isoFormatter.parseDateTime(end)).map(_.toConfEvent)))
   }
 
   def calendar = MyAuthenticated { implicit request =>
