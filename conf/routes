@@ -13,6 +13,7 @@ GET     /conf/all                   controllers.ConferenceController.listConfs
 GET     /conf/:id                   controllers.ConferenceController.viewConf(id: Long)
 POST    /conf/:id/allow             controllers.ConferenceController.accept(id: Long)
 POST    /conf/:id/refuse            controllers.ConferenceController.refuse(id: Long)
+POST    /conf/:id/delete            controllers.ConferenceController.delete(id: Long)
 
 GET     /calendar                   controllers.ConferenceController.calendar
 

@@ -12,7 +12,7 @@
 
     @if(canEdit){
         <div class="conference-buttons">
-            <form method="POST" action="@routes.ConferenceController.refuse(conf.id)">
+            <form method="POST" action="@routes.ConferenceController.delete(conf.id)">
                 <button type="submit" class="btn btn-danger">Delete</button>
             </form>
         </div>
