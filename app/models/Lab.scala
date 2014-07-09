@@ -30,7 +30,7 @@ object Lab {
 
   def findById(id: Long): Option[Lab] = DB.withConnection { implicit  c =>
     SQL("SELECT * FROM Lab WHERE id = {id}")
-      .on("id" -> id.toString)
+      .on("id" -> id)
       .as(labParser.singleOpt)
   }
 

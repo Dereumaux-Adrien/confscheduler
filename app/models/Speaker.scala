@@ -73,7 +73,7 @@ object Speaker {
 
   def findById(id: Long): Option[Speaker] = DB.withConnection {implicit c =>
     SQL("SELECT * FROM Speaker WHERE id = {id};")
-      .on("id" -> id.toString)
+      .on("id" -> id)
       .as(speakerParser.singleOpt)
   }
 

@@ -142,11 +142,11 @@ object Conference {
   def between(start: DateTime, end: DateTime) = DB.withConnection { implicit c =>
     SQL("""
         SELECT * FROM Conference
-        WHERE startDate BETWEEN {startDate} and {endDate}
+        WHERE (startDate, startDate) OVERLAPS ({startDate}, {endDate})
       """)
     .on(
-      "startDate" -> isoFormatter.print(start),
-      "endDate"   -> isoFormatter.print(end)
+      "startDate" -> start,
+      "endDate"   -> end
     ).as(conferenceParser *)
   }
 
