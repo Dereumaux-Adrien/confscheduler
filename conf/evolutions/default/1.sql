@@ -2,14 +2,14 @@
 # --- !Ups
 
 CREATE TABLE Lab (
-    id      bigint NOT NULL AUTO_INCREMENT,
+    id      SERIAL,
     acronym VARCHAR(255) NOT NULL UNIQUE,
     name    VARCHAR(500) NOT NULL UNIQUE,
     PRIMARY KEY (id)
 );
 
 CREATE TABLE Speaker (
-    id      bigint NOT NULL AUTO_INCREMENT,
+    id      SERIAL,
     title     VARCHAR(20) NOT NULL,
     firstName VARCHAR(255) NOT NULL,
     lastName  VARCHAR(255) NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE Speaker (
 );
 
 CREATE TABLE Conference (
-    id        bigint NOT NULL AUTO_INCREMENT,
+    id        SERIAL,
     title     VARCHAR(255) NOT NULL,
     abstr     VARCHAR(255) NOT NULL,
     speaker   bigint NOT NULL REFERENCES Speaker(id),
@@ -32,7 +32,7 @@ CREATE TABLE Conference (
 );
 
 CREATE TABLE User (
-    id        bigint NOT NULL AUTO_INCREMENT,
+    id        SERIAL,
     firstName VARCHAR(255) NOT NULL,
     lastName  VARCHAR(255) NOT NULL,
     email     VARCHAR(255) NOT NULL,
