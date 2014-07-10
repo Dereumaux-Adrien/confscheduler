@@ -169,6 +169,6 @@ object Conference {
   }
 
   def fromSimpleConference(conf: SimpleConference): Conference = {
-    Conference(-1, conf.title, conf.abstr, Speaker.findById(conf.speakerId).get, conf.date + conf.time, conf.length.toDuration, Lab.findById(conf.organizerId).get, false)
+    Conference(-1, conf.title, conf.abstr, Speaker.findById(conf.speakerId).get, conf.date + conf.time, conf.length, Lab.findById(conf.organizerId).get, false)
   }
 }

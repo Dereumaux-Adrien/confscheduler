@@ -20,7 +20,7 @@ import scala.concurrent.Future
 
 object ConferenceController extends Controller {
   val isoFormatter = ISODateTimeFormat.date()
-  case class SimpleConference(title: String, abstr: String, speakerId: Long, date: DateTime, timezoneOffset: Int, time:Duration, length: String, organizerId: Long)
+  case class SimpleConference(title: String, abstr: String, speakerId: Long, date: DateTime, timezoneOffset: Int, time:Duration, length: Duration, organizerId: Long)
   case class ConferenceEvent(title: String, start: String, end: String, url: String, backgroundColor: String)
 
   class timeFormatter extends Formatter[Duration] {
@@ -49,7 +49,7 @@ object ConferenceController extends Controller {
       "date" -> jodaDate("yy-MM-dd"),
       "timezoneOffset" -> number,
       "time" -> of[Duration](new timeFormatter),
-      "length" -> text.verifying(_.isValidDuration),
+      "length" -> of[Duration](new timeFormatter),
       "organizer" -> longNumber.verifying(Lab.findById(_).isDefined))(SimpleConference.apply)(SimpleConference.unapply)
   }
 

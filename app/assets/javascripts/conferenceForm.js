@@ -7,4 +7,10 @@ $(function() {
         maxTime: "9:00pm",
         step:15
     });
+    $("#length").timepicker({
+        timeFormat: "G:i",
+        minTime: "0:15am",
+        maxTime: "10:00am",
+        step:15
+    });
 });
