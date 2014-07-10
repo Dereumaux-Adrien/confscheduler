@@ -104,6 +104,7 @@ object User {
   // returns the saved used in an Option or None if saving failed.
   def save(user: User): Option[User] = DB.withConnection { implicit c =>
     if(findById(user.id).isDefined) {
+      println(user.id, user.firstName, user.lastName, user.email, user.lab.id, user.hashedPass, user.role.toInt, user.rememberMeToken)
       if(updateQuery
         .on(
           "id"        -> user.id,
@@ -114,7 +115,7 @@ object User {
           "hashedPass"     -> user.hashedPass,
           "role" -> user.role.toInt,
           "rememberMeToken" -> user.rememberMeToken
-        ).execute()) {
+        ).executeUpdate() == 1) {
         Option(user)
       } else {
         None
