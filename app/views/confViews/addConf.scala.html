@@ -5,6 +5,7 @@
 
 
     @helper.form(routes.ConferenceController.create, 'class -> "form-horizontal") {
+        <input type="hidden" id="timezoneOffset" name="timezoneOffset">
         <div class="form-group">
             <label for="title" class="col-sm-2 control-label">Title</label>
             <div class="col-sm-5">
@@ -14,7 +15,7 @@
         <div class="form-group">
             <label for="abstract" class="col-sm-2 control-label">Abstract</label>
             <div class="col-sm-9">
-                <textarea class="form-control" id="abstract" name="abstr">@conferenceForm("abstr").value.getOrElse("")</textarea>
+                <textarea class="form-control" id="abstract" name="abstract">@conferenceForm("abstract").value.getOrElse("")</textarea>
             </div>
         </div>
         <div class="form-group">

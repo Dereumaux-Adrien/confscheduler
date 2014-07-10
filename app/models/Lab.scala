@@ -57,6 +57,11 @@ object Lab {
       .as(labParser *)
   }
 
+  def count: Long = DB.withConnection{implicit c =>
+    SQL("SELECT count(*) FROM Lab")
+      .as(scalar[Long].single)
+  }
+
   def destroyAll(): Unit = DB.withConnection {implicit c =>
     SQL("DELETE FROM Lab").executeUpdate()
   }

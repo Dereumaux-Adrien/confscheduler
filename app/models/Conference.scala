@@ -23,7 +23,7 @@ case class Conference (
     organizedBy: Lab,
     accepted   : Boolean
 ) {
-  val formatter = DateTimeFormat.forPattern("YYYY-MM-dd HH:MM")
+  val formatter = DateTimeFormat.forPattern("YYYY-MM-dd hh:mm")
   val isoFormatter = ISODateTimeFormat.dateTime()
 
   def timeFromNow: String = {
@@ -138,6 +138,10 @@ object Conference {
     SQL("SELECT * FROM Conference").as(conferenceParser *)
   }
 
+  def count: Long = DB.withConnection{implicit c =>
+    SQL("SELECT count(*) FROM Conference")
+      .as(scalar[Long].single)
+  }
 
   def between(start: DateTime, end: DateTime) = DB.withConnection { implicit c =>
     SQL("""
@@ -165,6 +169,6 @@ object Conference {
   }
 
   def fromSimpleConference(conf: SimpleConference): Conference = {
-    Conference(-1, conf.title, conf.abstr, Speaker.findById(conf.speakerId).get, conf.date, conf.length.toDuration, Lab.findById(conf.organizerId).get, false)
+    Conference(-1, conf.title, conf.abstr, Speaker.findById(conf.speakerId).get, conf.date + conf.time, conf.length.toDuration, Lab.findById(conf.organizerId).get, false)
   }
 }

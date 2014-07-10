@@ -82,6 +82,11 @@ object Speaker {
       .as(speakerParser *)
   }
 
+  def count: Long = DB.withConnection{implicit c =>
+    SQL("SELECT count(*) FROM Speaker")
+      .as(scalar[Long].single)
+  }
+
   def destroyAll(): Unit = DB.withConnection {implicit  c =>
     SQL("DELETE FROM Speaker;").executeUpdate()
   }

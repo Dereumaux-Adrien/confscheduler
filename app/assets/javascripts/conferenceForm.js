@@ -1,5 +1,6 @@
 $(function() {
-    $("#datepicker").datepicker();
+    document.getElementById('timezoneOffset').value = new Date().getTimezoneOffset();
+    $("#datepicker").datepicker({ dateFormat: "yy-mm-dd" });
     $("#timepicker").timepicker({
         timeFormat: "G:i",
         minTime: "6:00am",

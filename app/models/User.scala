@@ -98,7 +98,6 @@ object User {
 
   def count: Long = DB.withConnection{implicit c =>
     SQL("SELECT count(*) FROM AppUser")
-      .executeQuery()
       .as(scalar[Long].single)
   }
 
