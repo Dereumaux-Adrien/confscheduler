@@ -17,17 +17,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 object ConferenceController extends Controller {
-  case class SimpleConference(title: String, abstr: String, speakerId: Long, date: DateTime, length: String, organizerId: Long)
-  case class ConferenceEvent(title: String, start: String, end: String, url: String, backgroundColor: String)
-
   val isoFormatter = ISODateTimeFormat.date()
+  case class SimpleConference(title: String, abstr: String, speakerId: Long, date: DateTime, time:DateTime, length: String, organizerId: Long)
+  case class ConferenceEvent(title: String, start: String, end: String, url: String, backgroundColor: String)
 
   val conferenceForm = Form {
     mapping(
       "title" -> nonEmptyText(1, 100),
       "abstract" -> nonEmptyText(1, 3000),
       "speaker" -> longNumber.verifying(Speaker.findById(_).isDefined),
-      "Date" -> jodaDate,
+      "date" -> jodaDate("dd/MM/yyyy"),
+      "time" -> jodaDate("hh:mm"),
       "length" -> text.verifying(_.isValidDuration),
       "organizer" -> longNumber.verifying(Lab.findById(_).isDefined))(SimpleConference.apply)(SimpleConference.unapply)
   }
@@ -128,7 +128,7 @@ object ConferenceController extends Controller {
   private def createConfWithUser(conf: SimpleConference, user: User): Result = {
     user.role match {
       case Administrator | Moderator =>
-        val newId = Conference.save(Conference.fromSimpleConference(conf)).get.id
+        val newId = Conference.fromSimpleConference(conf).asAccepted.save.get.id
         Redirect(routes.ConferenceController.viewConf(newId))
       case _                         => NotImplemented
 
