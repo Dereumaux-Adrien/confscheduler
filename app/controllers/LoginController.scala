@@ -22,7 +22,7 @@ object LoginController extends Controller {
   val secureCookie             = play.api.Play.isProd(play.api.Play.current)
 
   val loginForm = Form {
-    mapping("email" -> email, "password" -> text, "rememberme" -> boolean)(User.authenticate)(_.map(u => (u.email, "", false)))
+    mapping("email" -> email, "password" -> text, "rememberMe" -> boolean)(User.authenticate)(_.map(u => (u.email, "", false)))
       .verifying("Invalid email or password", result => result.isDefined)
   }
 
