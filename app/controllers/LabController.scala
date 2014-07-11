@@ -16,7 +16,7 @@ object LabController extends Controller {
   val labForm = Form {
     mapping(
       "acronym" -> nonEmptyText(1, 100),
-      "name" -> nonEmptyText(1, 3000))(SimpleLab.apply)(SimpleLab.unapply)
+      "name" -> nonEmptyText(1, 254))(SimpleLab.apply)(SimpleLab.unapply)
   }
 
   def newLab = ForcedAuthentication { implicit request => Future {
