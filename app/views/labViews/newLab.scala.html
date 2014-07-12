@@ -1,49 +1,12 @@
 @(labForm: Form[LabController.SimpleLab])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 @import views.html.helper._
+@import utils._
 
 @main("New User") {
     @helper.form(routes.LabController.create, 'class -> "form-horizontal") {
-        @if(!labForm.errors.isEmpty) {
-        <div class="form-group errors well">
-            <div class="error-message"><h4>The lab couldn't be added, please fix the following issues before trying again: </h4></div>
-            <ul>
-                @for(error <- labForm.errors) {
-                    @if(error.message.contains("required")) {
-                        <li class="error-message">The @error.key field must not be empty.</li>
-                    } else {
-                        @if(!error.message.contains("minLength")) {
-                            @if(error.key == "date"){
-                                <li class="error-message">Please follow the format yyyy-mm-dd in the date field.</li>
-                            }
-                            @if(error.key == "time" || error.key == "length"){
-                                <li class="error-message">Please follow the format hh:mm in the @error.key field.</li>
-                            }
-                        }
-                    }
-                    @if(error.message.contains("maxLength")) {
-                        <li class="error-message">
-                            The @error.key field may only contain up to @error.args characters.
-                        </li>
-                    }
-                }
-            </ul>
-        </div>
-        }
-        <div class="form-group">
-            <label for="acronym" class="col-sm-2 control-label">Acronym:</label>
-            <div class="col-sm-5">
-                <input type="text" class="form-control" id="acronym" name="acronym" value='@labForm("acronym").value.getOrElse("")'>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="name" class="col-sm-2 control-label">Name:</label>
-            <div class="col-sm-5">
-                <input type="text" class="form-control" id="name" name="name" value='@labForm("name").value.getOrElse("")'>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-2"></div>
-            <button type="submit" class="btn btn-default realign-with-fields">Submit</button>
-        </div>
+        @bootstrapErrors(labForm.errors, "lab")
+        @bootstrapInput(labForm("acronym"))
+        @bootstrapInput(labForm("name"))
+        @bootstrapSubmit()
     }
 }
