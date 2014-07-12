@@ -1,4 +1,5 @@
 @(loginForm: Form[Option[User]])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
+@import utils._
 
 @main("Log-in") {
     <script src='@routes.Assets.at("javascripts/loginForm.js")' type="text/javascript"></script>
@@ -9,18 +10,8 @@
                 <div class="error-message"><h4>There was an error while trying to log in, please check your email/password</h4></div>
             </div>
         }
-        <div class="form-group">
-            <label for="email" class="col-sm-2 control-label">Email:</label>
-            <div class="col-sm-4">
-                <input type="text" class="form-control" id="email" name="email" value='@loginForm("email").value.getOrElse("")'>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="password" class="col-sm-2 control-label">Password:</label>
-            <div class="col-sm-4">
-                <input type="password" class="form-control" id="password" name="password" value='@loginForm("password").value.getOrElse("")'>
-            </div>
-        </div>
+        @bootstrapInput(loginForm("email"), size = 4)
+        @bootstrapPassword(loginForm("password"), size = 4)
         <div class="form-group">
             <div class="col-sm-2"></div>
             <div class="checkbox col-sm-3 realign-with-fields">
@@ -30,9 +21,6 @@
                 <div id="rememberMeHelp" data-toggle="tooltip" data-placement="right" title="Check this box if you want this website to remember you after you closed your browser" class="helpTooltip">?</div>
             </div>
        </div>
-        <div class="form-group">
-            <div class="col-sm-2"></div>
-            <button type="submit" class="btn btn-default realign-with-fields">Submit</button>
-        </div>
+        @bootstrapSubmit()
     }
 }
