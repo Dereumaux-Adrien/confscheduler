@@ -1,5 +1,5 @@
 @(conf: Conference, canEdit: Boolean)(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 
 @main(conf.title) {
-    @utils.displayConf(conf, canEdit)
+    @confutils.displayConf(conf, canEdit)
 }
