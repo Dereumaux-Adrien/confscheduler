@@ -22,7 +22,7 @@ object UserController extends Controller {
       "password" -> nonEmptyText(8, 100),
       "repeatPassword" -> nonEmptyText(8, 100),
       "newUserRole" -> text.verifying(User.loggedUserRoleList.contains(_)))(SimpleUser.apply)(SimpleUser.unapply)
-    .verifying(user => user.password == user.repeatPassword)
+    .verifying("Password in the repeat field does not match", user => user.password == user.repeatPassword)
   }
 
   def newUser(role: Option[String]) = ForcedAuthentication { implicit request =>

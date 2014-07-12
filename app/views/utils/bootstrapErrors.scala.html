@@ -1,0 +1,26 @@
+@(errors: Seq[FormError], name: String)
+
+@if(!errors.isEmpty) {
+    <div class="form-group errors well">
+        <div class="error-message"><h4>The @name couldn't be created, please fix the following issues before trying again: </h4></div>
+        <ul>
+        @for(error <- errors) {
+            @if(error.message.contains("required")) {
+                <li class="error-message">The @error.key field must not be empty.</li>
+            } else { @if(!error.message.contains("minLength")) {
+                @if(error.key == "date") {
+                    <li class="error-message">Please follow the format yyyy-mm-dd in the date field.</li>
+                } else { @if(error.key == "time" || error.key == "length") {
+                    <li class="error-message">Please follow the format hh:mm in the @error.key field.</li>
+                } else { @if(error.message.contains("maxLength")) {
+                    <li class="error-message">
+                        The @error.key field may only contain up to @error.args characters.
+                    </li>
+                } else {
+                    <li class="error-message">@error.message</li>
+                }}}
+            }}
+        }
+        </ul>
+    </div>
+}
