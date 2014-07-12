@@ -28,9 +28,8 @@ object UserController extends Controller {
   def newUser(role: Option[String]) = ForcedAuthentication { implicit request =>
     Future {
       request.user.get.role match {
-        case Administrator => Ok(views.html.userViews.newUser(userForm, role)(request, request.user.get.role))
-        case Moderator     => Ok(views.html.userViews.newUser(userForm, Some("Contributor"))(request, request.user.get.role))
-        case _             => Redirect(routes.Application.index()) //TODO: Display a meaningful error message when someone tries to access this page without the rights
+        case Administrator | Moderator => Ok(views.html.userViews.newUser(userForm, request.user.get)(request, request.user.get.role))
+        case _                         => Redirect(routes.Application.index()) //TODO: Display a meaningful error message when someone tries to access this page without the rights
       }
     }
   }
@@ -38,10 +37,10 @@ object UserController extends Controller {
   def create = ForcedAuthentication { implicit request =>
     Future {
       userForm.bindFromRequest.fold(
-        formWithErrors => BadRequest(views.html.userViews.newUser(formWithErrors, formWithErrors("newUserRole").value)(request, authenticatedUserRole.get)),
+        formWithErrors => BadRequest(views.html.userViews.newUser(formWithErrors, request.user.get)(request, authenticatedUserRole.get)),
         newUser        => request.user.get.role match {
           case Administrator                                     => createUser(newUser)
-          case Moderator if newUser.newUserRole == "Contributor" => createUser(newUser)
+          case Moderator if newUser.newUserRole == "Contributor" && newUser.labId == request.user.get.lab.id => createUser(newUser)
           case _                                                 => Redirect(routes.Application.index()) //TODO: Actually display an error message here
         }
       )
