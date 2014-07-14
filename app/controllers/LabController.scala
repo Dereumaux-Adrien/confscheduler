@@ -1,6 +1,7 @@
 package controllers
 
 import MySecurity.Authentication._
+import MySecurity.Authorization._
 import controllers.ConferenceController._
 import models.{Administrator, Lab}
 import play.api.data.Form
@@ -36,8 +37,21 @@ object LabController extends Controller {
     )
   }}
 
+  def list = AuthorizedWith(_.role == Administrator) { implicit request => Future {
+    Ok(views.html.labViews.list(Lab.listAll)(request, request.user.get.role))
+  }}
+
+  def delete(id: Long) = AuthorizedWith(_.role == Administrator) { implicit request => Future {
+    Lab.findById(id).fold(
+      BadRequest(views.html.labViews.list(Lab.listAll)(request, request.user.get.role)).flashing(("error", "You tried to delete a non-existing lab"))
+    )(lab => {
+      lab.destroy()
+      Redirect(routes.LabController.list()).flashing(("success", "Lab successfully deleted"))
+    })
+  }}
+
   def createLab(newLab: SimpleLab): Result = {
-    Lab.fromSimpleLab(newLab).get.save //TODO: Actually handle errors during User creation
+    Lab.fromSimpleLab(newLab).get.save() //TODO: Actually handle errors during User creation
     Redirect(routes.Application.index())
   }
 }

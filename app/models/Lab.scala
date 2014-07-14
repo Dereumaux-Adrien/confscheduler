@@ -11,7 +11,9 @@ case class Lab (
   acronym: String,
   name   : String
 ) {
-  def save = Lab.save(this)
+  def destroy() = Lab.destroy(this)
+
+  def save() = Lab.save(this)
 }
 
 object Lab {
@@ -60,6 +62,12 @@ object Lab {
   def count: Long = DB.withConnection{implicit c =>
     SQL("SELECT count(*) FROM Lab")
       .as(scalar[Long].single)
+  }
+
+  def destroy(lab: Lab) = DB.withConnection {implicit c =>
+    SQL("DELETE FROM Lab WHERE id = {id}")
+      .on("id" -> lab.id)
+      .executeUpdate()
   }
 
   def destroyAll(): Unit = DB.withConnection {implicit c =>
