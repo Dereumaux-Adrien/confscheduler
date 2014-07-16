@@ -16,6 +16,22 @@
         </div>
         @bootstrapSelect(conferenceForm("speaker"), Speaker.listAll.map(s => (s.id.toString, s.firstName + " " + s.lastName)))
         <div class="form-group">
+            <div class="col-sm-2"></div>
+            <div class="realign-with-fields">
+                Or <button id="toggleNewSpeaker" type=button class="btn btn-default" data-toggle="new-speaker" data-target="#new-speaker">
+                        Add new speaker
+                   </button>
+            </div>
+        </div>
+        <div class="new-speaker" id="new-speaker">
+            @bootstrapSelect(conferenceForm("speakerTitle"), List("Dr", "Pr", "Ms", "Mr").map(t => (t, t)), size = 2, label="Title")
+            @bootstrapInput(conferenceForm("firstName"), "First name")
+            @bootstrapInput(conferenceForm("lastName"), "Last name")
+            @bootstrapInput(conferenceForm("email"), "Email")
+            @bootstrapInput(conferenceForm("team"), "Team")
+            @bootstrapInput(conferenceForm("organisation"), "Organisation")
+        </div>
+        <div class="form-group">
             <label for="datepicker" class="col-sm-2 control-label">Date</label>
             <div class="col-sm-2">
                 <input type="text" class="form-control" id="datepicker" name="date" value='@conferenceForm("date").value.getOrElse("")'>

@@ -17,6 +17,8 @@ case class Speaker (
   def fullName: String = title + ". " + firstName + " " + lastName
 
   def save = Speaker.save(this)
+
+  def withId(newId: Long): Speaker = Speaker(newId, firstName, lastName, title, team, organisation, email)
 }
 
 object Speaker {
@@ -44,7 +46,7 @@ object Speaker {
     }
   }
 
-  def save(speaker: Speaker): Option[Long] = DB.withConnection { implicit c =>
+  def save(speaker: Speaker): Option[Speaker] = DB.withConnection { implicit c =>
     if(findById(speaker.id).isDefined) {
       updateQuery
         .on(
@@ -56,10 +58,9 @@ object Speaker {
           "organisation" -> speaker.organisation,
           "email"    -> speaker.email
         ).executeUpdate()
-
-      Option(speaker.id)
+      Option(speaker)
     } else {
-      insertQuery
+      val newId: Option[Long] = insertQuery
         .on(
           "firstName" -> speaker.firstName,
           "lastName" -> speaker.lastName,
@@ -68,6 +69,7 @@ object Speaker {
           "organisation" -> speaker.organisation,
           "email"    -> speaker.email
         ).executeInsert()
+      newId.map(id => speaker.withId(id))
     }
   }
 

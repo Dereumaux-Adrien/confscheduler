@@ -20,7 +20,9 @@ import scala.concurrent.Future
 
 object ConferenceController extends Controller {
   val isoFormatter = ISODateTimeFormat.date()
-  case class SimpleConference(title: String, abstr: String, speakerId: Long, date: DateTime, timezoneOffset: Int, time:Duration, length: Duration, organizerId: Long)
+  case class SimpleConference(title: String, abstr: String, speakerId: Long, date: DateTime, timezoneOffset: Int, time:Duration, length: Duration,
+                              speakerTitle: Option[String], firstName: Option[String], lastName: Option[String], email: Option[String], team: Option[String], organisation: Option[String],
+                              organizerId: Long)
   case class ConferenceEvent(title: String, start: String, end: String, url: String, backgroundColor: String)
 
   class timeFormatter extends Formatter[Duration] {
@@ -45,12 +47,22 @@ object ConferenceController extends Controller {
     mapping(
       "title" -> nonEmptyText(1, 100),
       "abstract" -> nonEmptyText(1, 3000),
-      "speaker" -> longNumber.verifying(Speaker.findById(_).isDefined),
+      "speaker" -> longNumber.verifying(id => Speaker.findById(id).isDefined || id == -1),
       "date" -> jodaDate("yy-MM-dd"),
       "timezoneOffset" -> number,
       "time" -> of[Duration](new timeFormatter),
       "length" -> of[Duration](new timeFormatter),
+      "speakerTitle" -> optional(text),
+      "firstName" -> optional(nonEmptyText(1, 254)),
+      "lastName" -> optional(nonEmptyText(1, 254)),
+      "email" -> optional(email),
+      "team" -> optional(nonEmptyText(1, 254)),
+      "organisation" -> optional(nonEmptyText(1, 254)),
       "organizer" -> longNumber.verifying(Lab.findById(_).isDefined))(SimpleConference.apply)(SimpleConference.unapply)
+      .verifying(
+        c => c.speakerId != -1 ||
+          (c.speakerTitle.isDefined && c.firstName.isDefined && c.lastName.isDefined && c.email.isDefined && c.team.isDefined && c.organisation.isDefined)
+      )
   }
 
   implicit val conferenceEventWrites: Writes[ConferenceEvent] = (

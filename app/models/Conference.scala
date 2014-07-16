@@ -169,6 +169,11 @@ object Conference {
   }
 
   def fromSimpleConference(conf: SimpleConference): Conference = {
-    Conference(-1, conf.title, conf.abstr, Speaker.findById(conf.speakerId).get, conf.date + conf.time, conf.length, Lab.findById(conf.organizerId).get, false)
+    if(conf.speakerId != -1 ){
+      Conference(-1, conf.title, conf.abstr, Speaker.findById(conf.speakerId).get, conf.date + conf.time, conf.length, Lab.findById(conf.organizerId).get, false)
+    } else {
+      val newSpeaker = Speaker(-1, conf.firstName.get, conf.lastName.get, conf.speakerTitle.get, conf.team.get, conf.organisation.get, conf.email.get).save.get
+      Conference(-1, conf.title, conf.abstr, newSpeaker, conf.date + conf.time, conf.length, Lab.findById(conf.organizerId).get, false)
+    }
   }
 }
