@@ -14,7 +14,11 @@
                 <textarea class="form-control" id="abstract" name="abstract">@conferenceForm("abstract").value.getOrElse("")</textarea>
             </div>
         </div>
-        @bootstrapSelect(conferenceForm("speaker"), Speaker.listAll.map(s => (s.id.toString, s.firstName + " " + s.lastName)))
+        @if(conferenceForm("speaker").value.exists(_ == "-1")) {
+            @bootstrapSelect(conferenceForm("speaker"), Speaker.listAll.map(s => (s.id.toString, s.firstName + " " + s.lastName)) :+ ("-1", "New Speaker"))
+        } else {
+            @bootstrapSelect(conferenceForm("speaker"), Speaker.listAll.map(s => (s.id.toString, s.firstName + " " + s.lastName)))
+        }
         <div class="form-group">
             <div class="col-sm-2"></div>
             <div class="realign-with-fields">

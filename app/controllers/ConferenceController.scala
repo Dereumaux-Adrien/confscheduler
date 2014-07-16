@@ -59,7 +59,7 @@ object ConferenceController extends Controller {
       "team" -> optional(nonEmptyText(1, 254)),
       "organisation" -> optional(nonEmptyText(1, 254)),
       "organizer" -> longNumber.verifying(Lab.findById(_).isDefined))(SimpleConference.apply)(SimpleConference.unapply)
-      .verifying(
+      .verifying("Please check that all fields in the new speaker form have been filled",
         c => c.speakerId != -1 ||
           (c.speakerTitle.isDefined && c.firstName.isDefined && c.lastName.isDefined && c.email.isDefined && c.team.isDefined && c.organisation.isDefined)
       )

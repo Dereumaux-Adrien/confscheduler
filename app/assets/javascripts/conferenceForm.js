@@ -2,14 +2,15 @@ $(function() {
     var speakerSelect = $('#speaker');
     var newSpeaker = false;
 
-    if(speakerSelect.val() === -1) {
-        newSpeaker = true;
+    if(speakerSelect.val() === "-1") {
         $("#new-speaker").show();
+        newSpeaker = true;
     }
 
     var clearNewSpeaker = function() {
         speakerSelect.find('[value=-1]').remove();
         $("#new-speaker").hide();
+        newSpeaker = false;
     };
 
     document.getElementById('timezoneOffset').value = new Date().getTimezoneOffset();
