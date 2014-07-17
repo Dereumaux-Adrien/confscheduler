@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <ul>
+    @for(conf <- Conference.listAll) {
+        <li>@conf.title</li>
+    }
+    </ul>
+</body>
+</html>

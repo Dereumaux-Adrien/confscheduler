@@ -3,11 +3,8 @@ package models
 import anorm.SqlParser._
 import com.github.nscala_time.time.Imports._
 import controllers.routes
-import helpers.DateTimeUtils._
-import org.joda.time
 import org.joda.time.format.ISODateTimeFormat
 import play.api.db.DB
-import scala.collection.mutable
 import controllers.ConferenceController.{ConferenceEvent, SimpleConference}
 import anorm._
 import helpers.AnormExtension._
