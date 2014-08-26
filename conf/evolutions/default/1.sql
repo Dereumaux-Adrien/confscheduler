@@ -38,6 +38,7 @@ CREATE TABLE Conference (
     startDate TIMESTAMP NOT NULL,
     length    bigint NOT NULL, -- The duration of the conference in ms
     organizedBy      bigint NOT NULL REFERENCES Lab(id),
+    location  bigint NOT NULL REFERENCES Location(id),
     accepted  boolean,
     private   boolean,
     PRIMARY KEY (id)
