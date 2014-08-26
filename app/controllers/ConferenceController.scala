@@ -75,6 +75,7 @@ object ConferenceController extends Controller {
   )(unlift(ConferenceEvent.unapply))
 
   def authenticatedUserRole(implicit request: MyAuthenticatedRequest[AnyContent]): Option[UserRole] = request.user.map(_.role)
+  def authenticatedUser(implicit request: MyAuthenticatedRequest[AnyContent]): Option[User] = request.user
   def authorizedUserRole(implicit request: AuthorizedRequest[AnyContent]): UserRole = request.user.map(_.role).get
   def authorizedUser(implicit request: AuthorizedRequest[AnyContent]): User = request.user.get
 
@@ -95,7 +96,9 @@ object ConferenceController extends Controller {
   }
 
   def listConfEvents(start: String, end: String) = MyAuthenticated { implicit request =>
-    Ok(Json.toJson(Conference.between(isoFormatter.parseDateTime(start), isoFormatter.parseDateTime(end)).map(_.toConfEvent)))
+    Ok(Json.toJson(Conference.between(isoFormatter.parseDateTime(start), isoFormatter.parseDateTime(end))
+                             .filter(c => !c.priv || authenticatedUser.exists(_.lab == c.organizedBy))
+                             .map(_.toConfEvent)))
   }
 
   def calendar = MyAuthenticated { implicit request =>
