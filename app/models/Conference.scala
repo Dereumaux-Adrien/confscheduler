@@ -42,6 +42,12 @@ case class Conference (
 
   def isInFuture: Boolean = startDate > DateTime.now
 
+  def isAccessibleBy(maybeUser: Option[User]) = !priv || (maybeUser.map(_.role) match {
+      case Some(Administrator)                               => true
+      case Some(_) if maybeUser.get.lab.id == organizedBy.id => true
+      case _                                                 => false
+    })
+
   def save = Conference.save(this)
 
   def destroy = Conference.destroy(this)

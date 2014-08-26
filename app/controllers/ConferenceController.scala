@@ -97,7 +97,7 @@ object ConferenceController extends Controller {
 
   def listConfEvents(start: String, end: String) = MyAuthenticated { implicit request =>
     Ok(Json.toJson(Conference.between(isoFormatter.parseDateTime(start), isoFormatter.parseDateTime(end))
-                             .filter(c => !c.priv || authenticatedUser.exists(_.role == Administrator) || authenticatedUser.exists(_.lab == c.organizedBy))
+                             .filter(_.isAccessibleBy(authenticatedUser))
                              .map(_.toConfEvent)))
   }
 
@@ -107,8 +107,8 @@ object ConferenceController extends Controller {
 
   def viewConf(id: Long) = MyAuthenticated { implicit request =>
     models.Conference.findById(id) match {
-      case Some(c) => Ok(views.html.confViews.conf(c, request.user.exists(_.canEdit(id)))(request, authenticatedUserRole.getOrElse(Guest)))
-      case None    => NotFound
+      case Some(c) if c.isAccessibleBy(authenticatedUser) => Ok(views.html.confViews.conf(c, request.user.exists(_.canEdit(id)))(request, authenticatedUserRole.getOrElse(Guest)))
+      case _    => NotFound
     }
   }
 
