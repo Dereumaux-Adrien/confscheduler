@@ -81,9 +81,17 @@ object Conference {
     findNotAccepted.filter(user.role == Administrator || user.lab == _.organizedBy)
       .sortBy(_.startDate)
 
-  def findAccepted: List[Conference] = DB.withConnection { implicit c =>
-    SQL("SELECT * FROM Conference WHERE accepted = true")
-      .as(conferenceParser *)
+  // Passing None as the argument to this function means the user is a Guest
+  def findAccepted(viewableBy: Option[User]): List[Conference] = DB.withConnection { implicit c =>
+    viewableBy.map(_.role) match {
+      case Some(Administrator) => SQL("SELECT * FROM Conference WHERE accepted = true").as(conferenceParser *)
+      case Some(_)             => {
+        SQL("SELECT * FROM Conference WHERE accepted = true AND organizedBy = {organizerId}")
+          .on("organizerId" -> viewableBy.get.lab.id)
+          .as(conferenceParser *)
+      }
+      case None                => SQL("SELECT * FROM Conference WHERE accepted = true AND private = false").as(conferenceParser *)
+    }
   }
 
   def findNotAccepted: List[Conference] = DB.withConnection { implicit c =>

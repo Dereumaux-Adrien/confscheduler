@@ -81,7 +81,7 @@ object ConferenceController extends Controller {
 
   def listUpcomingConfs = MyAuthenticated { implicit request =>
     val confWithEditRights =
-      Conference.findAccepted.filter(_.isInFuture).sortBy(_.startDate)
+      Conference.findAccepted(authenticatedUser).filter(_.isInFuture).sortBy(_.startDate)
         .map(c => (c, request.user.exists(_.canEdit(c.id))))
 
     Ok(views.html.confViews.list(confWithEditRights)(request, authenticatedUserRole.getOrElse(Guest)))
@@ -89,7 +89,7 @@ object ConferenceController extends Controller {
 
   def listConfs = MyAuthenticated { implicit request =>
     val confWithEditRights =
-      Conference.findAccepted.sortBy(_.startDate).reverse
+      Conference.findAccepted(authenticatedUser).sortBy(_.startDate).reverse
         .map(c => (c, request.user.exists(_.canEdit(c.id))))
 
     Ok(views.html.confViews.list(confWithEditRights)(request, authenticatedUserRole.getOrElse(Guest)))
