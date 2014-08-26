@@ -5,10 +5,29 @@
     <title></title>
 </head>
 <body>
-    <ul>
     @for(conf <- Conference.listAll) {
-        <li>@conf.title</li>
+    <table style="width: @width; position: relative; border-collapse: collapse; margin:0 auto; background-color: #EAEAEA">
+        <tr>
+            <td @trStyle() width = "20%">@conf.startDate.dayOfWeek().getAsText(), @conf.startDate.getDayOfMonth/@conf.startDate.getMonthOfYear<br>@conf.startDate.getHourOfDay : @conf.startDate.getMinuteOfHour</td>
+            <td @trStyle()>@conf.title <span style="font-size:11pt;font-style: italic;color: #888; float:right;">@conf.speaker.title. @conf.speaker.firstName @conf.speaker.lastName</span></td>
+        </tr>
+        <tr>
+            <td @trStyle() colspan="2">@conf.abstr</td>
+        </tr>
+    </table>
+    <hr style="width: @width; margin:10px auto;">
     }
-    </ul>
 </body>
 </html>
+
+@trStyle(size: Int = 0) = {
+    @if(size == 0) {
+        style = 'border: solid 1px black; padding: 10px; margin: 0px;'
+    } else {
+        style = 'border: solid 1px black; padding: 10px; margin: 0px;'
+    }
+}
+
+@width() = {
+    800px
+}
