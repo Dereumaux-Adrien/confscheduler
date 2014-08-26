@@ -28,6 +28,7 @@ CREATE TABLE Conference (
     length    bigint NOT NULL, -- The duration of the conference in ms
     organizedBy      bigint NOT NULL REFERENCES Lab(id),
     accepted  boolean,
+    private   boolean,
     PRIMARY KEY (id)
 );
 

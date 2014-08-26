@@ -51,6 +51,7 @@
                 <input type="text" class="form-control time-input" id="length" name="length" value='@conferenceForm("length").value.getOrElse("")'>
             </div>
         </div>
+        @bootstrapSelect(conferenceForm("private"), List(("true", "Yes"),("false", "No")))
         @bootstrapSelect(conferenceForm("organizer"), Lab.listAll.map(l => (l.id.toString, l.name)))
         @bootstrapSubmit()
     }

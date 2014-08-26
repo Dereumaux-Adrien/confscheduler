@@ -22,7 +22,7 @@ object ConferenceController extends Controller {
   val isoFormatter = ISODateTimeFormat.date()
   case class SimpleConference(title: String, abstr: String, speakerId: Long, date: DateTime, timezoneOffset: Int, time:Duration, length: Duration,
                               speakerTitle: Option[String], firstName: Option[String], lastName: Option[String], email: Option[String], team: Option[String], organisation: Option[String],
-                              organizerId: Long)
+                              organizerId: Long, priv: Boolean)
   case class ConferenceEvent(title: String, start: String, end: String, url: String, backgroundColor: String)
 
   class timeFormatter extends Formatter[Duration] {
@@ -58,7 +58,8 @@ object ConferenceController extends Controller {
       "email" -> optional(email),
       "team" -> optional(nonEmptyText(1, 254)),
       "organisation" -> optional(nonEmptyText(1, 254)),
-      "organizer" -> longNumber.verifying(Lab.findById(_).isDefined))(SimpleConference.apply)(SimpleConference.unapply)
+      "organizer" -> longNumber.verifying(Lab.findById(_).isDefined),
+      "private" -> boolean)(SimpleConference.apply)(SimpleConference.unapply)
       .verifying("Please check that all fields in the new speaker form have been filled",
         c => c.speakerId != -1 ||
           (c.speakerTitle.isDefined && c.firstName.isDefined && c.lastName.isDefined && c.email.isDefined && c.team.isDefined && c.organisation.isDefined)
