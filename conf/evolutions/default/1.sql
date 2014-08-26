@@ -19,6 +19,17 @@ CREATE TABLE Speaker (
     PRIMARY KEY (id)
 );
 
+CREATE TABLE Location (
+    id SERIAL,
+    instituteName VARCHAR(255) NOT NULL,
+    buildingName  VARCHAR(255),
+    roomDesignation VARCHAR(255) NOT NULL,
+    floor         VARCHAR(255) NOT NULL,
+    streetName    VARCHAR(255) NOT NULL,
+    streetNb      int NOT NULL,
+    city          VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE Conference (
     id        SERIAL,
     title     VARCHAR(255) NOT NULL,
@@ -48,6 +59,8 @@ CREATE TABLE AppUser (
 
 DROP TABLE AppUser;
 DROP Table Conference;
+DROP TABLE Location;
 DROP TABLE Lab;
 DROP TABLE Speaker;
+
 
