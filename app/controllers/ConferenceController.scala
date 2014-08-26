@@ -97,7 +97,7 @@ object ConferenceController extends Controller {
 
   def listConfEvents(start: String, end: String) = MyAuthenticated { implicit request =>
     Ok(Json.toJson(Conference.between(isoFormatter.parseDateTime(start), isoFormatter.parseDateTime(end))
-                             .filter(c => !c.priv || authenticatedUser.exists(_.lab == c.organizedBy))
+                             .filter(c => !c.priv || authenticatedUser.exists(_.role == Administrator) || authenticatedUser.exists(_.lab == c.organizedBy))
                              .map(_.toConfEvent)))
   }
 
