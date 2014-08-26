@@ -18,6 +18,7 @@ case class Conference (
     startDate  : DateTime,
     length     : Duration,
     organizedBy: Lab,
+    location   : Location,
     accepted   : Boolean,
     priv       : Boolean
 ) {
@@ -35,10 +36,10 @@ case class Conference (
   def displayDate: String = formatter.print(startDate)
 
   def asAccepted: Conference =
-    Conference(id, title, abstr, speaker, startDate, length, organizedBy, accepted = true, priv)
+    Conference(id, title, abstr, speaker, startDate, length, organizedBy, location, accepted = true, priv)
 
   def withId(newId: Long): Conference =
-    Conference(newId, title, abstr, speaker, startDate, length, organizedBy, accepted, priv)
+    Conference(newId, title, abstr, speaker, startDate, length, organizedBy, location, accepted, priv)
 
   def isInFuture: Boolean = startDate > DateTime.now
 
@@ -60,21 +61,22 @@ object Conference {
   val isoFormatter = ISODateTimeFormat.dateTime()
 
   val insertQuery = SQL("""
-      INSERT INTO Conference(title, abstr, speaker, startDate, length, organizedBy, accepted, private)
-      VALUES ({title}, {abstr}, {speaker}, {startDate}, {length}, {organizedBy}, {accepted}, {private})
+      INSERT INTO Conference(title, abstr, speaker, startDate, length, organizedBy, location, accepted, private)
+      VALUES ({title}, {abstr}, {speaker}, {startDate}, {length}, {organizedBy}, {location}, {accepted}, {private})
   """)
 
   val updateQuery = SQL("""
       UPDATE Conference
-      SET title = {title}, abstr = {abstr}, speaker = {speaker}, startDate = {startDate}, length = {length}, organizedBy = {organizedBy}, accepted = {accepted}, private = {private}
+      SET title = {title}, abstr = {abstr}, speaker = {speaker}, startDate = {startDate},
+        length = {length}, organizedBy = {organizedBy}, location = {location}, accepted = {accepted}, private = {private}
       WHERE id = {id}
   """)
 
   def fixtures = Set (
-    Conference(-1, "DNA will explain every adult behaviour", "Discover how the new discoveries about lactose regulation in E.Coli will be over-interpreted for generations to come !", Speaker.listAll(0), DateTime.now - 2.week, 1.hour, Lab.listAll(0), true, true),
-    Conference(-1, "DNA methylations will explain every adult behaviour", "Discover how the new discoveries about DNA expression regulation via histone-methylation will be over-interpreted for generations to come !", Speaker.listAll(2), DateTime.now + 1.week, 2.hour, Lab.listAll(0), true, true),
-    Conference(-1, "Why Rosalyn Franklin really didn't deserve the Nobel prize", "After all, who wants women in science ? It's not as if they could do important work, like discovering viruses !", Speaker.listAll(1), DateTime.now + 2.week, 2.hour, Lab.listAll(1), true, false),
-    Conference(-1, "I have a Nobel, I can say anything I want, people will listen", "We are being lied to ! HIV doesn't cause AIDS, climate change isn't real, and astrology from Elle is a better predictor than epigenetics !", Speaker.listAll(3), DateTime.now + 3.week, 2.hour, Lab.listAll(0), false, false)
+    Conference(-1, "DNA will explain every adult behaviour", "Discover how the new discoveries about lactose regulation in E.Coli will be over-interpreted for generations to come !", Speaker.listAll(0), DateTime.now - 2.week, 1.hour, Lab.listAll(0), Location.listAll(0), true, true),
+    Conference(-1, "DNA methylations will explain every adult behaviour", "Discover how the new discoveries about DNA expression regulation via histone-methylation will be over-interpreted for generations to come !", Speaker.listAll(2), DateTime.now + 1.week, 2.hour, Lab.listAll(0), Location.listAll(1), true, true),
+    Conference(-1, "Why Rosalyn Franklin really didn't deserve the Nobel prize", "After all, who wants women in science ? It's not as if they could do important work, like discovering viruses !", Speaker.listAll(1), DateTime.now + 2.week, 2.hour, Lab.listAll(1), Location.listAll(0), true, false),
+    Conference(-1, "I have a Nobel, I can say anything I want, people will listen", "We are being lied to ! HIV doesn't cause AIDS, climate change isn't real, and astrology from Elle is a better predictor than epigenetics !", Speaker.listAll(3), DateTime.now + 3.week, 2.hour, Lab.listAll(0), Location.listAll(1), false, false)
   )
 
   def findById(id: Long): Option[Conference] = DB.withConnection{implicit c =>
@@ -106,7 +108,6 @@ object Conference {
   }
 
   def save(conf: Conference): Option[Conference] = DB.withConnection { implicit c =>
-    println(conf.priv)
     if(findById(conf.id).isDefined) {
       updateQuery.on(
         "id" -> conf.id,
@@ -116,6 +117,7 @@ object Conference {
         "startDate" -> conf.startDate,
         "length" -> conf.length.millis,
         "organizedBy" -> conf.organizedBy.id,
+        "location"    -> conf.location.id,
         "accepted" -> conf.accepted,
         "private" -> conf.priv
       ).executeUpdate()
@@ -128,6 +130,7 @@ object Conference {
         "startDate" -> conf.startDate,
         "length" -> conf.length.millis,
         "organizedBy" -> conf.organizedBy.id,
+        "location" -> conf.location.id,
         "accepted" -> conf.accepted,
         "private" -> conf.priv
       ).executeInsert()
@@ -177,19 +180,24 @@ object Conference {
     get[DateTime]("startDate") ~
     get[Long]("length") ~
     get[Long]("organizedBy") ~
+    get[Long]("location") ~
     get[Boolean]("accepted") ~
     get[Boolean]("private") map {
-      case id ~ title ~ abstr ~ speaker ~ startDate ~ length ~ organizedBy ~ accepted ~ priv =>
-        Conference(id, title, abstr, Speaker.findById(speaker).get, startDate, new Duration(length), Lab.findById(organizedBy).get, accepted, priv)
+      case id ~ title ~ abstr ~ speaker ~ startDate ~ length ~ organizedBy ~ location ~ accepted ~ priv =>
+        Conference(id, title, abstr, Speaker.findById(speaker).get,
+          startDate, new Duration(length), Lab.findById(organizedBy).get, Location.findById(location).get, accepted, priv)
     }
   }
 
   def fromSimpleConference(conf: SimpleConference): Conference = {
     if(conf.speakerId != -1 ){
-      Conference(-1, conf.title, conf.abstr, Speaker.findById(conf.speakerId).get, conf.date + conf.time, conf.length, Lab.findById(conf.organizerId).get, false, conf.priv)
+      Conference(-1, conf.title, conf.abstr, Speaker.findById(conf.speakerId).get,
+        conf.date + conf.time, conf.length, Lab.findById(conf.organizerId).get, Location.findById(conf.locationId).get, false, conf.priv)
     } else {
       val newSpeaker = Speaker(-1, conf.firstName.get, conf.lastName.get, conf.speakerTitle.get, conf.team.get, conf.organisation.get, conf.email.get).save.get
-      Conference(-1, conf.title, conf.abstr, newSpeaker, conf.date + conf.time, conf.length, Lab.findById(conf.organizerId).get, false, conf.priv)
+      Conference(-1, conf.title, conf.abstr, newSpeaker, conf.date + conf.time,
+        conf.length, Lab.findById(conf.organizerId).get, Location.findById(conf.locationId).get, false, conf.priv)
     }
   }
 }
+

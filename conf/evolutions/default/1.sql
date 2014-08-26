@@ -27,7 +27,8 @@ CREATE TABLE Location (
     floor         VARCHAR(255) NOT NULL,
     streetName    VARCHAR(255) NOT NULL,
     streetNb      int NOT NULL,
-    city          VARCHAR(255) NOT NULL
+    city          VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE Conference (
@@ -39,8 +40,8 @@ CREATE TABLE Conference (
     length    bigint NOT NULL, -- The duration of the conference in ms
     organizedBy      bigint NOT NULL REFERENCES Lab(id),
     location  bigint NOT NULL REFERENCES Location(id),
-    accepted  boolean,
-    private   boolean,
+    accepted  boolean NOT NULL,
+    private   boolean NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -50,8 +51,8 @@ CREATE TABLE AppUser (
     lastName  VARCHAR(255) NOT NULL,
     email     VARCHAR(255) NOT NULL,
     lab       bigint NOT NULL REFERENCES Lab(id),
-    hashedPass VARCHAR(255),
-    role      int,
+    hashedPass VARCHAR(255) NOT NULL,
+    role      int NOT NULL,
     rememberMeToken VARCHAR(255),
     PRIMARY KEY (id)
 )

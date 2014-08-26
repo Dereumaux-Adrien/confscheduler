@@ -14,6 +14,8 @@
                 <textarea class="form-control" id="abstract" name="abstract">@conferenceForm("abstract").value.getOrElse("")</textarea>
             </div>
         </div>
+
+        <!-- Speaker selection or adding -->
         @if(conferenceForm("speaker").value.exists(_ == "-1")) {
             @bootstrapSelect(conferenceForm("speaker"), Speaker.listAll.map(s => (s.id.toString, s.firstName + " " + s.lastName)) :+ ("-1", "New Speaker"))
         } else {
@@ -35,6 +37,14 @@
             @bootstrapInput(conferenceForm("team"), "Team")
             @bootstrapInput(conferenceForm("organisation"), "Organisation")
         </div>
+
+        <!-- Location selection or adding -->
+        @if(conferenceForm("location").value.exists(_ == "-1")) {
+            @bootstrapSelect(conferenceForm("location"), Location.listAll.map(l => (l.id.toString, l.instituteName + " - " + l.roomDesignation)) :+ ("-1", "New Location"))
+        } else {
+            @bootstrapSelect(conferenceForm("location"), Location.listAll.map(l => (l.id.toString, l.instituteName + " - " + l.roomDesignation)))
+        }
+
         <div class="form-group">
             <label for="datepicker" class="col-sm-2 control-label">Date</label>
             <div class="col-sm-2">
