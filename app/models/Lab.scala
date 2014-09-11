@@ -36,6 +36,11 @@ object Lab {
       .as(labParser.singleOpt)
   }
 
+  def listVisible(user: User): List[Lab] = user.role match {
+    case Administrator => listAll
+    case _             => List(user.lab)
+  }
+
   def fromSimpleLab(lab: SimpleLab): Option[Lab] = {
     Option(Lab(-1, lab.acronym, lab.name))
   }

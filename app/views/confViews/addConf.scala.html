@@ -1,4 +1,4 @@
-@(conferenceForm: Form[ConferenceController.SimpleConference])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
+@(conferenceForm: Form[ConferenceController.SimpleConference], visibleLabs: List[Lab])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 @import utils._
 
 @main("Add a new conference") {
@@ -79,7 +79,7 @@
             </div>
         </div>
         @bootstrapSelect(conferenceForm("private"), List(("true", "Yes"),("false", "No")), size = 2)
-        @bootstrapSelect(conferenceForm("organizer"), Lab.listAll.map(l => (l.id.toString, l.name)))
+        @bootstrapSelect(conferenceForm("organizer"), visibleLabs.map(l => (l.id.toString, l.name)))
         @bootstrapSubmit()
     }
 }
