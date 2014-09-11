@@ -17,9 +17,9 @@
 
         <!-- Speaker selection or adding -->
         @if(conferenceForm("speaker.id").value.exists(_ == "-1")) {
-            @bootstrapSelect(conferenceForm("speaker.id"), Speaker.listAll.map(s => (s.id.toString, s.firstName + " " + s.lastName)) :+ ("-1", "New Speaker"))
+            @bootstrapSelect(conferenceForm("speaker.id"), Speaker.listAll.map(s => (s.id.toString, s.firstName + " " + s.lastName)) :+ ("-1", "New Speaker"), "Speaker")
         } else {
-            @bootstrapSelect(conferenceForm("speaker.id"), Speaker.listAll.map(s => (s.id.toString, s.firstName + " " + s.lastName)))
+            @bootstrapSelect(conferenceForm("speaker.id"), Speaker.listAll.map(s => (s.id.toString, s.firstName + " " + s.lastName)), "Speaker")
         }
         <div class="form-group">
             <div class="col-sm-2"></div>
@@ -40,9 +40,9 @@
 
         <!-- Location selection or adding -->
         @if(conferenceForm("location").value.exists(_ == "-1")) {
-            @bootstrapSelect(conferenceForm("location.id"), Location.listAll.map(l => (l.id.toString, l.instituteName + " - " + l.roomDesignation)) :+ ("-1", "New Location"))
+            @bootstrapSelect(conferenceForm("location.id"), Location.listAll.map(l => (l.id.toString, l.instituteName + " - " + l.roomDesignation)) :+ ("-1", "New Location"), "Location")
         } else {
-            @bootstrapSelect(conferenceForm("location.id"), Location.listAll.map(l => (l.id.toString, l.instituteName + " - " + l.roomDesignation)))
+            @bootstrapSelect(conferenceForm("location.id"), Location.listAll.map(l => (l.id.toString, l.instituteName + " - " + l.roomDesignation)), "Location")
         }
         <div class="form-group">
             <div class="col-sm-2"></div>
@@ -58,7 +58,7 @@
             @bootstrapInput(conferenceForm("location.streetNb"), "Street N°", size = 2)
             @bootstrapInput(conferenceForm("location.instituteName"), label="Institute Name")
             @bootstrapInput(conferenceForm("location.buildingName"), "Building Name")
-            @bootstrapInput(conferenceForm("location.floor"))
+            @bootstrapInput(conferenceForm("location.floor"), "Floor")
             @bootstrapInput(conferenceForm("location.roomDesignation"), "Room Designation")
         </div>
 
@@ -78,7 +78,7 @@
                 <input type="text" class="form-control time-input" id="length" name="length" value='@conferenceForm("length").value.getOrElse("")'>
             </div>
         </div>
-        @bootstrapSelect(conferenceForm("private"), List(("true", "Yes"),("false", "No")))
+        @bootstrapSelect(conferenceForm("private"), List(("true", "Yes"),("false", "No")), size = 2)
         @bootstrapSelect(conferenceForm("organizer"), Lab.listAll.map(l => (l.id.toString, l.name)))
         @bootstrapSubmit()
     }
