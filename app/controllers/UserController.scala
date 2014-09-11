@@ -1,6 +1,7 @@
 package controllers
 
 import MySecurity.Authentication._
+import MySecurity.Authorization._
 import controllers.ConferenceController._
 import models.{Administrator, Lab, Moderator, User}
 import play.api.data.Form
@@ -44,6 +45,19 @@ object UserController extends Controller {
           case _                                                 => Redirect(routes.Application.index()) //TODO: Actually display an error message here
         }
       )
+    }
+  }
+
+  def list = AuthorizedWith(_.role == Administrator) {implicit request =>
+    Future {
+      Ok(views.html.userViews.list(User.listAll)(request, Administrator))
+    }
+  }
+
+  def delete(id: Long) = AuthorizedWith(_.role == Administrator) {implicit request =>
+    Future {
+      User.findById(id).map(_.destroy)
+      Redirect(routes.UserController.list())
     }
   }
 

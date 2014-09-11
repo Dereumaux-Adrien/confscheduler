@@ -14,6 +14,7 @@
     @if(role == Administrator) {
         <hr>
         @utils.activeLi("Add User",  routes.UserController.newUser(None))
+        @utils.activeLi("List Users",  routes.UserController.list)
     }
     @if(role == Administrator) {
         <hr>

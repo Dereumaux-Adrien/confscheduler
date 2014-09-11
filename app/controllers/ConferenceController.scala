@@ -4,7 +4,6 @@ import MySecurity.Authentication.{ForcedAuthentication, MyAuthenticated, MyAuthe
 import MySecurity.Authorization.{AuthorizedRequest, AuthorizedWith}
 import com.github.nscala_time.time.Imports
 import com.github.nscala_time.time.Imports._
-import helpers.DateTimeUtils.TimeString
 import models._
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat

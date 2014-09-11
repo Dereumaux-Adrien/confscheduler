@@ -96,6 +96,11 @@ object User {
     }
   }
 
+  def listAll: List[User] = DB.withConnection {implicit c =>
+    SQL("SELECT * FROM AppUser")
+      .as(userParser *)
+  }
+
   def count: Long = DB.withConnection{implicit c =>
     SQL("SELECT count(*) FROM AppUser")
       .as(scalar[Long].single)
