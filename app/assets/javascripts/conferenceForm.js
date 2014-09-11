@@ -19,7 +19,7 @@ $(function() {
     });
 
     // Speaker select & addition set-up
-    var speakerSelect = $('#speaker');
+    var speakerSelect = $('#speaker\\.id');
     var newSpeaker = false;
 
     if(speakerSelect.val() === "-1") {
@@ -51,7 +51,7 @@ $(function() {
 
     // Location selection & addition set-up
     var newLocation = false;
-    var locationSelect = $('#location');
+    var locationSelect = $('#location\\.id');
 
     if(locationSelect.val() === "-1") {
         $("#new-location").show();

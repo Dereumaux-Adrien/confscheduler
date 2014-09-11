@@ -190,14 +190,22 @@ object Conference {
   }
 
   def fromSimpleConference(conf: SimpleConference): Conference = {
-    if(conf.speakerId != -1 ){
-      Conference(-1, conf.title, conf.abstr, Speaker.findById(conf.speakerId).get,
-        conf.date + conf.time, conf.length, Lab.findById(conf.organizerId).get, Location.findById(conf.locationId).get, false, conf.priv)
-    } else {
-      val newSpeaker = Speaker(-1, conf.firstName.get, conf.lastName.get, conf.speakerTitle.get, conf.team.get, conf.organisation.get, conf.email.get).save.get
-      Conference(-1, conf.title, conf.abstr, newSpeaker, conf.date + conf.time,
-        conf.length, Lab.findById(conf.organizerId).get, Location.findById(conf.locationId).get, false, conf.priv)
-    }
+    val speaker =
+      if(conf.speaker.speakerId != -1) Speaker.findById(conf.speaker.speakerId).get
+      else {
+      Speaker(-1, conf.speaker.firstName.get, conf.speaker.lastName.get, conf.speaker.speakerTitle.get,
+        conf.speaker.team.get, conf.speaker.organisation.get, conf.speaker.email.get).save.get
+      }
+
+    val location =
+      if(conf.location.locationId != -1) Location.findById(conf.location.locationId).get
+      else {
+        Location(-1, conf.location.instituteName.get, conf.location.buildingName, conf.location.roomDesignation.get, conf.location.floor.get,
+        conf.location.streetName.get, conf.location.streetNb.get, conf.location.city.get).save.get
+      }
+
+    Conference(-1, conf.title, conf.abstr, speaker, conf.date + conf.time,
+      conf.length, Lab.findById(conf.organizerId).get, location, accepted = false, priv = conf.priv)
   }
 }
 

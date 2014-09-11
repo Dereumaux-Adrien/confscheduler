@@ -20,9 +20,14 @@ import scala.concurrent.Future
 
 object ConferenceController extends Controller {
   val isoFormatter = ISODateTimeFormat.date()
-  case class SimpleConference(title: String, abstr: String, speakerId: Long, date: DateTime, timezoneOffset: Int, time:Duration, length: Duration,
-                              speakerTitle: Option[String], firstName: Option[String], lastName: Option[String], email: Option[String], team: Option[String], organisation: Option[String],
-                              organizerId: Long, locationId: Long, priv: Boolean)
+  case class SimpleConference(title: String, abstr: String,
+                              date: DateTime, timezoneOffset: Int, time:Duration, length: Duration,
+                              organizerId: Long, speaker: SimpleSpeaker, location: SimpleLocation,
+                              priv: Boolean)
+  case class SimpleSpeaker(speakerId: Long, speakerTitle: Option[String], firstName: Option[String], lastName: Option[String],
+                           email: Option[String], team: Option[String], organisation: Option[String])
+  case class SimpleLocation(locationId: Long,  instituteName :  Option[String], buildingName : Option[String], roomDesignation: Option[String],
+                            floor : Option[String], streetName : Option[String], streetNb : Option[Int], city : Option[String])
   case class ConferenceEvent(title: String, start: String, end: String, url: String, backgroundColor: String)
 
   class timeFormatter extends Formatter[Duration] {
@@ -45,26 +50,38 @@ object ConferenceController extends Controller {
 
   val conferenceForm = Form {
     mapping(
-      "title" -> nonEmptyText(1, 100),
-      "abstract" -> nonEmptyText(1, 3000),
-      "speaker" -> longNumber.verifying(id => Speaker.findById(id).isDefined || id == -1),
-      "date" -> jodaDate("yy-MM-dd"),
+      "title"          -> nonEmptyText(1, 100),
+      "abstract"       -> nonEmptyText(1, 3000),
+      "date"           -> jodaDate("yy-MM-dd"),
       "timezoneOffset" -> number,
-      "time" -> of[Duration](new timeFormatter),
-      "length" -> of[Duration](new timeFormatter),
-      "speakerTitle" -> optional(text),
-      "firstName" -> optional(nonEmptyText(1, 254)),
-      "lastName" -> optional(nonEmptyText(1, 254)),
-      "email" -> optional(email),
-      "team" -> optional(nonEmptyText(1, 254)),
-      "organisation" -> optional(nonEmptyText(1, 254)),
-      "organizer" -> longNumber.verifying(Lab.findById(_).isDefined),
-      "location" -> longNumber.verifying(id => Location.findById(id).isDefined  || id == -1),
+      "time"           -> of[Duration](new timeFormatter),
+      "length"         -> of[Duration](new timeFormatter),
+      "organizer"      -> longNumber.verifying(Lab.findById(_).isDefined),
+      "speaker"        -> mapping (
+          "id"           -> longNumber.verifying(id => Speaker.findById(id).isDefined || id == -1),
+          "speakerTitle" -> optional(text),
+          "firstName"    -> optional(nonEmptyText(1, 254)),
+          "lastName"     -> optional(nonEmptyText(1, 254)),
+          "email"        -> optional(email),
+          "team"         -> optional(nonEmptyText(1, 254)),
+          "organisation" -> optional(nonEmptyText(1, 254))
+      )(SimpleSpeaker.apply)(SimpleSpeaker.unapply).verifying("Please check that all fields in the new speaker form have been filled",
+          c => c.speakerId != -1 
+            || List(c.speakerTitle, c.firstName, c.lastName, c.email, c.team, c.organisation).forall(_.isDefined)
+       ),
+      "location" -> mapping(
+        "id"              -> longNumber.verifying(id => Location.findById(id).isDefined || id == -1),
+        "instituteName"   -> optional(nonEmptyText(1, 250)),
+        "buildingName"    -> optional(text),
+        "roomDesignation" -> optional(nonEmptyText(1, 250)),
+        "floor"           -> optional(nonEmptyText(1, 250)),
+        "streetName"      -> optional(nonEmptyText(1, 250)),
+        "streetNb"        -> optional(number),
+        "city"            -> optional(nonEmptyText(1,250))
+      )(SimpleLocation.apply)(SimpleLocation.unapply).verifying("Please check that all fields in the new location form have been filled (only the building name is optional)",
+        l => l.locationId != -1 
+        || List(l.instituteName, l.roomDesignation, l.floor, l.streetName, l.streetNb, l.city).forall(_.isDefined)),
       "private" -> boolean)(SimpleConference.apply)(SimpleConference.unapply)
-      .verifying("Please check that all fields in the new speaker form have been filled",
-        c => c.speakerId != -1 ||
-          (c.speakerTitle.isDefined && c.firstName.isDefined && c.lastName.isDefined && c.email.isDefined && c.team.isDefined && c.organisation.isDefined)
-      )
   }
 
   implicit val conferenceEventWrites: Writes[ConferenceEvent] = (

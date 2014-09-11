@@ -16,10 +16,10 @@
         </div>
 
         <!-- Speaker selection or adding -->
-        @if(conferenceForm("speaker").value.exists(_ == "-1")) {
-            @bootstrapSelect(conferenceForm("speaker"), Speaker.listAll.map(s => (s.id.toString, s.firstName + " " + s.lastName)) :+ ("-1", "New Speaker"))
+        @if(conferenceForm("speaker.id").value.exists(_ == "-1")) {
+            @bootstrapSelect(conferenceForm("speaker.id"), Speaker.listAll.map(s => (s.id.toString, s.firstName + " " + s.lastName)) :+ ("-1", "New Speaker"))
         } else {
-            @bootstrapSelect(conferenceForm("speaker"), Speaker.listAll.map(s => (s.id.toString, s.firstName + " " + s.lastName)))
+            @bootstrapSelect(conferenceForm("speaker.id"), Speaker.listAll.map(s => (s.id.toString, s.firstName + " " + s.lastName)))
         }
         <div class="form-group">
             <div class="col-sm-2"></div>
@@ -30,19 +30,19 @@
             </div>
         </div>
         <div class="new-speaker" id="new-speaker">
-            @bootstrapSelect(conferenceForm("speakerTitle"), List("Dr", "Pr", "Ms", "Mr").map(t => (t, t)), size = 2, label="Title")
-            @bootstrapInput(conferenceForm("firstName"), "First name")
-            @bootstrapInput(conferenceForm("lastName"), "Last name")
-            @bootstrapInput(conferenceForm("email"), "Email")
-            @bootstrapInput(conferenceForm("team"), "Team")
-            @bootstrapInput(conferenceForm("organisation"), "Organisation")
+            @bootstrapSelect(conferenceForm("speaker.speakerTitle"), List("Dr", "Pr", "Ms", "Mr").map(t => (t, t)), size = 2, label="Title")
+            @bootstrapInput(conferenceForm("speaker.firstName"), "First name")
+            @bootstrapInput(conferenceForm("speaker.lastName"), "Last name")
+            @bootstrapInput(conferenceForm("speaker.email"), "Email")
+            @bootstrapInput(conferenceForm("speaker.team"), "Team")
+            @bootstrapInput(conferenceForm("speaker.organisation"), "Organisation")
         </div>
 
         <!-- Location selection or adding -->
         @if(conferenceForm("location").value.exists(_ == "-1")) {
-            @bootstrapSelect(conferenceForm("location"), Location.listAll.map(l => (l.id.toString, l.instituteName + " - " + l.roomDesignation)) :+ ("-1", "New Location"))
+            @bootstrapSelect(conferenceForm("location.id"), Location.listAll.map(l => (l.id.toString, l.instituteName + " - " + l.roomDesignation)) :+ ("-1", "New Location"))
         } else {
-            @bootstrapSelect(conferenceForm("location"), Location.listAll.map(l => (l.id.toString, l.instituteName + " - " + l.roomDesignation)))
+            @bootstrapSelect(conferenceForm("location.id"), Location.listAll.map(l => (l.id.toString, l.instituteName + " - " + l.roomDesignation)))
         }
         <div class="form-group">
             <div class="col-sm-2"></div>
@@ -53,13 +53,13 @@
             </div>
         </div>
         <div class="new-speaker" id="new-location">
-            @bootstrapInput(conferenceForm("city"))
-            @bootstrapInput(conferenceForm("streetName"), "Street Name")
-            @bootstrapInput(conferenceForm("streetNb"), "Street N°", size = 2)
-            @bootstrapInput(conferenceForm("instituteName"), label="Institute Name")
-            @bootstrapInput(conferenceForm("buildingName"), "Building Name")
-            @bootstrapInput(conferenceForm("floor"))
-            @bootstrapInput(conferenceForm("roomDesignation"), "Room Designation")
+            @bootstrapInput(conferenceForm("location.city"), "City")
+            @bootstrapInput(conferenceForm("location.streetName"), "Street Name")
+            @bootstrapInput(conferenceForm("location.streetNb"), "Street N°", size = 2)
+            @bootstrapInput(conferenceForm("location.instituteName"), label="Institute Name")
+            @bootstrapInput(conferenceForm("location.buildingName"), "Building Name")
+            @bootstrapInput(conferenceForm("location.floor"))
+            @bootstrapInput(conferenceForm("location.roomDesignation"), "Room Designation")
         </div>
 
         <div class="form-group">
