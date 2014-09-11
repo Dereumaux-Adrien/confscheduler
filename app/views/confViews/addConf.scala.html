@@ -44,6 +44,23 @@
         } else {
             @bootstrapSelect(conferenceForm("location"), Location.listAll.map(l => (l.id.toString, l.instituteName + " - " + l.roomDesignation)))
         }
+        <div class="form-group">
+            <div class="col-sm-2"></div>
+            <div class="realign-with-fields">
+                Or <button id="toggleNewLocation" type=button class="btn btn-default" data-toggle="new-location" data-target="#new-location">
+                Add new location
+            </button>
+            </div>
+        </div>
+        <div class="new-speaker" id="new-location">
+            @bootstrapInput(conferenceForm("city"))
+            @bootstrapInput(conferenceForm("streetName"), "Street Name")
+            @bootstrapInput(conferenceForm("streetNb"), "Street N°", size = 2)
+            @bootstrapInput(conferenceForm("instituteName"), label="Institute Name")
+            @bootstrapInput(conferenceForm("buildingName"), "Building Name")
+            @bootstrapInput(conferenceForm("floor"))
+            @bootstrapInput(conferenceForm("roomDesignation"), "Room Designation")
+        </div>
 
         <div class="form-group">
             <label for="datepicker" class="col-sm-2 control-label">Date</label>
