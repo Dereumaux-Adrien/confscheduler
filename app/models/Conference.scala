@@ -30,10 +30,10 @@ case class Conference (
     val p = i.toPeriod
     val d = i.toDuration
 
-    d.getStandardDays + " days, " + p.hours + " hours, " + p.minutes + " minutes."
+    "in " + d.getStandardDays + " days, " + p.hours + " hours, " + p.minutes + " minutes"
   }
 
-  def displayDate: String = formatter.print(startDate)
+  def displayDate: String = "was " + formatter.print(startDate)
 
   def asAccepted: Conference =
     Conference(id, title, abstr, speaker, startDate, length, organizedBy, location, accepted = true, priv)
@@ -48,6 +48,8 @@ case class Conference (
       case Some(_) if maybeUser.get.lab.id == organizedBy.id => true
       case _                                                 => false
     })
+
+  def dateDisplayFormat = if(isInFuture) timeFromNow else displayDate
 
   def save = Conference.save(this)
 
