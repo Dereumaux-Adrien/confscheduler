@@ -65,14 +65,14 @@ object Conference {
   val isoFormatter = ISODateTimeFormat.dateTime()
 
   val insertQuery = SQL("""
-      INSERT INTO Conference(title, abstr, speaker, startDate, length, organizedBy, location, accepted, private)
-      VALUES ({title}, {abstr}, {speaker}, {startDate}, {length}, {organizedBy}, {location}, {accepted}, {private})
+      INSERT INTO Conference(title, abstr, speaker, startDate, length, organizedBy, location, accepted, acceptCode, private)
+      VALUES ({title}, {abstr}, {speaker}, {startDate}, {length}, {organizedBy}, {location}, {accepted}, {acceptCode}, {private})
   """)
 
   val updateQuery = SQL("""
       UPDATE Conference
       SET title = {title}, abstr = {abstr}, speaker = {speaker}, startDate = {startDate},
-        length = {length}, organizedBy = {organizedBy}, location = {location}, accepted = {accepted}, private = {private}
+        length = {length}, organizedBy = {organizedBy}, location = {location}, accepted = {accepted}, acceptCode = {acceptCode}, private = {private}
       WHERE id = {id}
   """)
 
@@ -132,6 +132,7 @@ object Conference {
         "organizedBy" -> conf.organizedBy.id,
         "location"    -> conf.location.id,
         "accepted" -> conf.accepted,
+        "acceptCode" -> conf.acceptCode,
         "private" -> conf.priv
       ).executeUpdate()
       Option(conf)
@@ -145,6 +146,7 @@ object Conference {
         "organizedBy" -> conf.organizedBy.id,
         "location" -> conf.location.id,
         "accepted" -> conf.accepted,
+        "acceptCode" -> conf.acceptCode,
         "private" -> conf.priv
       ).executeInsert()
       newId.map(conf.withId)

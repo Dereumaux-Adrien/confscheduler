@@ -7,6 +7,7 @@ import com.github.nscala_time.time.Imports._
 import models._
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
+import play.api.Logger
 import play.api.data.{FormError, Form}
 import play.api.data.Forms._
 import play.api.data.format.Formatter
@@ -142,18 +143,27 @@ object ConferenceController extends Controller {
     }
   }
 
-  def accept(id: Long) = AuthorizedWith(_.canAllowConf(id)) { implicit request => Future {
-    Conference.findById(id).fold(
-      Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to allow an unknown conference"))
-    )(
-      c => {
-        val accepted = c.asAccepted
-        Redirect(routes.ConferenceController.viewConf(accepted.save.get.id)).flashing(("success", "Conference " + accepted.title + " successfully accepted"))
-      }
-    )
-  }}
+  def accept(id: Long, token: Option[String]) = MyAuthenticated { implicit request =>
+    val conf = Conference.findById(id)
+    
+    def redirectRouteOk(c: Conference) = {
+      c.asAccepted.save
+      Redirect(routes.ConferenceController.listUpcomingConfs()).flashing(("success", "Conference " + c.title + " successfully accepted"))
+    }
+    def redirectRouteRefuse = Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to allow an unknown conference"))
 
-  def refuse(id: Long) = AuthorizedWith(_.canAllowConfs) { implicit request => Future {
+    conf.fold ({
+      redirectRouteRefuse
+    })( c => authenticatedUser.map(_.role) match {
+      case Some(Administrator) | Some(Moderator) => redirectRouteOk(c)
+      case _ if token == c.acceptCode            => redirectRouteOk(c)
+      case _                                     => redirectRouteRefuse
+    })
+  }
+
+  def acceptAuth(id: Long) = accept(id, None)
+
+  def refuse(id: Long, token: Option[String]) = AuthorizedWith(_.canAllowConf(id)) { implicit request => Future {
     Conference.findById(id).fold(
       Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to refuse an unknown conference"))
     )(
@@ -163,6 +173,8 @@ object ConferenceController extends Controller {
       }
     )
   }}
+
+  def refuseAuth(id: Long) = accept(id, None)
 
   def delete(id: Long) = AuthorizedWith(_.canAllowConfs) { implicit request => Future {
     Conference.findById(id).fold(

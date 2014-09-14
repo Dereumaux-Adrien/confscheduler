@@ -11,8 +11,10 @@ GET     /conf/allow                 controllers.ConferenceController.allowList
 GET     /conf/upcoming              controllers.ConferenceController.listUpcomingConfs
 GET     /conf/all                   controllers.ConferenceController.listConfs
 GET     /conf/:id                   controllers.ConferenceController.viewConf(id: Long)
-POST    /conf/:id/allow             controllers.ConferenceController.accept(id: Long)
-POST    /conf/:id/refuse            controllers.ConferenceController.refuse(id: Long)
+POST    /conf/:id/allow             controllers.ConferenceController.acceptAuth(id: Long)
+GET     /conf/:id/allow             controllers.ConferenceController.accept(id: Long, token: Option[String])
+POST    /conf/:id/refuse            controllers.ConferenceController.refuseAuth(id: Long)
+GET     /conf/:id/refuse            controllers.ConferenceController.refuse(id: Long, token: Option[String])
 POST    /conf/:id/delete            controllers.ConferenceController.delete(id: Long)
 
 GET     /calendar                   controllers.ConferenceController.calendar
