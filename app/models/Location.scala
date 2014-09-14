@@ -20,6 +20,14 @@ case class Location (
     Location(newId, instituteName, buildingName, roomDesignation, floor, streetName, streetNb, city)
 
   def save = Location.save(this)
+
+  def displayFloor = floor match {
+    case "1" => "1st"
+    case "2" => "2nd"
+    case "3" => "3rd"
+    case nb if "^[0-9]+$".r.findFirstIn(nb).isDefined => nb + "th"
+    case any   => any
+  }
 }
 
 object Location {

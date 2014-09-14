@@ -1,6 +1,7 @@
 import akka.actor.Props
 import email.{SendMail, Mailer}
 import models._
+import org.joda.time.DateTime
 import play.api.Play.current
 import play.api._
 import play.libs.Akka
@@ -10,7 +11,9 @@ object Global extends GlobalSettings{
     if(current.mode == Mode.Dev) {
       Logger.info("Starting the mailer")
       val mailer = Akka.system.actorOf(Props[Mailer])
-      mailer ! SendMail("tomitom007@gmail.com", "Test subject", views.html.email.weeklyConfList.render().body)
+      val user = User.findByEmail("rosa@gmail.com").get
+      mailer ! SendMail(user.email, "Test subject",
+        views.html.email.weeklyConfList.render(Conference.findVisibleByLabBetween(user.lab, DateTime.now, DateTime.now.plusDays(7)), "week").body)
     }
 
     if(current.mode == Mode.Dev && (User.count == 0 || Conference.count == 0 || Speaker.count == 0 || Lab.count == 0 || Location.count == 0)){

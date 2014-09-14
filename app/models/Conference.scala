@@ -109,6 +109,15 @@ object Conference {
       .as(conferenceParser *)
   }
 
+  def findVisibleByLabBetween(lab: Lab, startPeriod: DateTime, endPeriod: DateTime): List[Conference] = DB.withConnection {implicit c =>
+    SQL("SELECT * FROM Conference WHERE organizedBy = {labId} AND accepted = true " +
+        "AND (startDate, startDate) OVERLAPS ({startPeriod}, {endPeriod})")
+      .on("labId" -> lab.id,
+          "startPeriod" -> startPeriod,
+          "endPeriod" -> endPeriod)
+      .as(conferenceParser *)
+  }
+
   def save(conf: Conference): Option[Conference] = DB.withConnection { implicit c =>
     if(findById(conf.id).isDefined) {
       updateQuery.on(
@@ -167,6 +176,7 @@ object Conference {
     SQL("""
         SELECT * FROM Conference
         WHERE (startDate, startDate) OVERLAPS ({startDate}, {endDate})
+        AND accepted = true
       """)
     .on(
       "startDate" -> start,
