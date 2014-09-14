@@ -41,6 +41,7 @@ CREATE TABLE Conference (
     organizedBy      bigint NOT NULL REFERENCES Lab(id),
     location  bigint NOT NULL REFERENCES Location(id),
     accepted  boolean NOT NULL,
+    acceptCode VARCHAR(255),
     private   boolean NOT NULL,
     PRIMARY KEY (id)
 );
@@ -60,7 +61,7 @@ CREATE TABLE AppUser (
 # --- !Downs
 
 DROP TABLE AppUser;
-DROP Table Conference;
+DROP TABLE Conference;
 DROP TABLE Location;
 DROP TABLE Lab;
 DROP TABLE Speaker;

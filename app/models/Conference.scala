@@ -9,6 +9,7 @@ import controllers.ConferenceController.{ConferenceEvent, SimpleConference}
 import anorm._
 import helpers.AnormExtension._
 import play.api.Play.current
+import play.api.libs.Crypto
 
 case class Conference (
     id         : Long,
@@ -20,6 +21,7 @@ case class Conference (
     organizedBy: Lab,
     location   : Location,
     accepted   : Boolean,
+    acceptCode : Option[String],
     priv       : Boolean
 ) {
   val formatter = DateTimeFormat.forPattern("YYYY-MM-dd hh:mm")
@@ -36,10 +38,10 @@ case class Conference (
   def displayDate: String = "was " + formatter.print(startDate)
 
   def asAccepted: Conference =
-    Conference(id, title, abstr, speaker, startDate, length, organizedBy, location, accepted = true, priv)
+    Conference(id, title, abstr, speaker, startDate, length, organizedBy, location, accepted = true, None, priv)
 
   def withId(newId: Long): Conference =
-    Conference(newId, title, abstr, speaker, startDate, length, organizedBy, location, accepted, priv)
+    Conference(newId, title, abstr, speaker, startDate, length, organizedBy, location, accepted, acceptCode, priv)
 
   def isInFuture: Boolean = startDate > DateTime.now
 
@@ -75,10 +77,10 @@ object Conference {
   """)
 
   def fixtures = Set (
-    Conference(-1, "DNA will explain every adult behaviour", "Discover how the new discoveries about lactose regulation in E.Coli will be over-interpreted for generations to come !", Speaker.listAll(0), DateTime.now - 2.week, 1.hour, Lab.listAll(0), Location.listAll(0), true, true),
-    Conference(-1, "DNA methylations will explain every adult behaviour", "Discover how the new discoveries about DNA expression regulation via histone-methylation will be over-interpreted for generations to come !", Speaker.listAll(2), DateTime.now + 1.week, 2.hour, Lab.listAll(0), Location.listAll(1), true, true),
-    Conference(-1, "Why Rosalyn Franklin really didn't deserve the Nobel prize", "After all, who wants women in science ? It's not as if they could do important work, like discovering viruses !", Speaker.listAll(1), DateTime.now + 2.week, 2.hour, Lab.listAll(1), Location.listAll(0), true, false),
-    Conference(-1, "I have a Nobel, I can say anything I want, people will listen", "We are being lied to ! HIV doesn't cause AIDS, climate change isn't real, and astrology from Elle is a better predictor than epigenetics !", Speaker.listAll(3), DateTime.now + 3.week, 2.hour, Lab.listAll(0), Location.listAll(1), false, false)
+    Conference(-1, "DNA will explain every adult behaviour", "Discover how the new discoveries about lactose regulation in E.Coli will be over-interpreted for generations to come !", Speaker.listAll(0), DateTime.now - 2.week, 1.hour, Lab.listAll(0), Location.listAll(0), true, None, true),
+    Conference(-1, "DNA methylations will explain every adult behaviour", "Discover how the new discoveries about DNA expression regulation via histone-methylation will be over-interpreted for generations to come !", Speaker.listAll(2), DateTime.now + 1.week, 2.hour, Lab.listAll(0), Location.listAll(1), true, None, true),
+    Conference(-1, "Why Rosalyn Franklin really didn't deserve the Nobel prize", "After all, who wants women in science ? It's not as if they could do important work, like discovering viruses !", Speaker.listAll(1), DateTime.now + 2.week, 2.hour, Lab.listAll(1), Location.listAll(0), true, None, false),
+    Conference(-1, "I have a Nobel, I can say anything I want, people will listen", "We are being lied to ! HIV doesn't cause AIDS, climate change isn't real, and astrology from Elle is a better predictor than epigenetics !", Speaker.listAll(3), DateTime.now + 3.week, 2.hour, Lab.listAll(0), Location.listAll(1), false, Some(Crypto.generateToken), false)
   )
 
   def findById(id: Long): Option[Conference] = DB.withConnection{implicit c =>
@@ -194,10 +196,11 @@ object Conference {
     get[Long]("organizedBy") ~
     get[Long]("location") ~
     get[Boolean]("accepted") ~
+    get[Option[String]]("acceptCode") ~
     get[Boolean]("private") map {
-      case id ~ title ~ abstr ~ speaker ~ startDate ~ length ~ organizedBy ~ location ~ accepted ~ priv =>
+      case id ~ title ~ abstr ~ speaker ~ startDate ~ length ~ organizedBy ~ location ~ accepted ~ acceptCode ~ priv =>
         Conference(id, title, abstr, Speaker.findById(speaker).get,
-          startDate, new Duration(length), Lab.findById(organizedBy).get, Location.findById(location).get, accepted, priv)
+          startDate, new Duration(length), Lab.findById(organizedBy).get, Location.findById(location).get, accepted, acceptCode, priv)
     }
   }
 
@@ -217,7 +220,7 @@ object Conference {
       }
 
     Conference(-1, conf.title, conf.abstr, speaker, conf.date + conf.time,
-      conf.length, Lab.findById(conf.organizerId).get, location, accepted = false, priv = conf.priv)
+      conf.length, Lab.findById(conf.organizerId).get, location, accepted = false, Some(Crypto.generateToken), priv = conf.priv)
   }
 }
 
