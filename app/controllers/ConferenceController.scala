@@ -1,20 +1,25 @@
 package controllers
 
+import java.net.InetAddress
+
 import MySecurity.Authentication.{ForcedAuthentication, MyAuthenticated, MyAuthenticatedRequest}
 import MySecurity.Authorization.{AuthorizedRequest, AuthorizedWith}
+import akka.actor.Props
 import com.github.nscala_time.time.Imports
 import com.github.nscala_time.time.Imports._
+import email.{SendMail, Mailer}
 import models._
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
-import play.api
-import play.api.Logger
+import play.api.{Play, Logger}
 import play.api.data.{FormError, Form}
 import play.api.data.Forms._
 import play.api.data.format.Formatter
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import play.api.mvc.{AnyContent, Controller, Result}
+import play.libs.Akka
+import play.api.Play.current
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -200,12 +205,40 @@ object ConferenceController extends Controller {
   }}
 
   private def createConfWithUser(conf: SimpleConference, user: User): Result = {
+    val newConf = Conference.fromSimpleConference(conf)
     user.role match {
-      case Administrator | Moderator =>
-        val newId = Conference.fromSimpleConference(conf).asAccepted.save.get.id
+      case Administrator | Moderator => {
+        val newId = newConf.asAccepted.save.get.id
         Redirect(routes.ConferenceController.viewConf(newId))
-      case _                         => NotImplemented
-
+      }
+      case Contributor               => {
+        newConf.save match {
+          case None => {
+            Logger.error("Tried to save the new conference " + newConf.title + "failed!")
+            Redirect(routes.ConferenceController.listUpcomingConfs()).flashing(("error", "The conference " + newConf.title + " couldn't be submitted for moderation, please re-try later."))
+          }
+          case Some(c) => {
+            sendConfirmationMail(c)
+            Redirect(routes.ConferenceController.listUpcomingConfs()).flashing(("success", "The conference " + newConf.title + " has been submitted for moderation by your team's moderator."))
+          }
+        }
+      }
     }
+  }
+
+  private def sendConfirmationMail(c: Conference) = {
+    val mailer = Akka.system.actorOf(Props[Mailer])
+    val moderators = User.findModeratorForLab(c.organizedBy)
+    val hostName = Play.configuration.getString("application.hostName").getOrElse({
+      val tentativeHostName = InetAddress.getLocalHost.getHostName
+      Logger.warn("No hostname defined, guessed hostname: " + tentativeHostName)
+      tentativeHostName
+    })
+    val acceptURL = "http://" + hostName + routes.ConferenceController.accept(c.id, c.acceptCode).url
+    val refuseURL = "http://" + hostName + routes.ConferenceController.refuse(c.id, c.acceptCode).url
+
+    if(moderators.isEmpty) Logger.warn("The lab " + c.organizedBy.name + " doesn't have any moderator! Conference can't be accepted")
+    else                   moderators.map(mod => mailer ! SendMail(mod.email, "[ConfScheduler] A new conference needs to be moderated",
+                                                                     views.html.email.confModeration(c, acceptURL, refuseURL).body))
   }
 }

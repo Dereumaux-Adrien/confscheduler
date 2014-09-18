@@ -106,6 +106,17 @@ object User {
       .as(scalar[Long].single)
   }
 
+
+  def findModeratorForLab(lab: Lab): List[User] = DB.withConnection{implicit c =>
+    SQL("SELECT * FROM AppUser WHERE role={moderator} OR role={administrator} AND lab={labId}")
+      .on(
+        "moderator" -> Moderator.toInt,
+        "administrator" -> Administrator.toInt,
+        "labId" -> lab.id
+      )
+      .as(userParser *)
+  }
+
   // returns the saved used in an Option or None if saving failed.
   def save(user: User): Option[User] = DB.withConnection { implicit c =>
     if(findById(user.id).isDefined) {

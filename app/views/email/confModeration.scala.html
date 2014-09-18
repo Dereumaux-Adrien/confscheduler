@@ -1,0 +1,44 @@
+@(conf: Conference, acceptAddress: String, refuseAddress: String)
+
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <div>
+        <h3>ConfScheduler</h3>
+        <hr>
+        <p>The following conference needs to be moderated</p>
+    </div>
+    <table style="width: @width; position: relative; border-collapse: collapse; margin:0 auto; background-color: #F7F7F7">
+        <tr>
+            <td @trStyle() width = "20%">@conf.startDate.dayOfWeek().getAsText(), @conf.startDate.getDayOfMonth/@conf.startDate.getMonthOfYear<br>@conf.startDate.getHourOfDay : @conf.startDate.getMinuteOfHour</td>
+            <td @trStyle()>@conf.title <span style="font-size:11pt;font-style: italic;color: #777; float:right;">@conf.speaker.title. @conf.speaker.firstName @conf.speaker.lastName</span></td>
+        </tr>
+        <tr>
+            <td @trStyle() colspan="2">In room @conf.location.roomDesignation, @conf.location.displayFloor floor, @conf.location.instituteName, @conf.location.streetNb @conf.location.streetName, @conf.location.city</td>
+        </tr>
+        <tr>
+            <td @trStyle() colspan="2">@conf.abstr</td>
+        </tr>
+    </table>
+    <div>
+        <strong><a href="@acceptAddress">accept</a></strong> or <strong><a href="@refuseAddress">refuse</a></strong>
+    </div>
+    <div>
+        <p>This is an automated email sent to you by the Confscheduler mailing system. If you would like to unsuscribe, please speak with the person in charge of Confscheduler in your team.</p>
+    </div>
+</body>
+</html>
+
+@trStyle(size: Int = 0) = {
+    @if(size == 0) {
+        style = 'border: solid 1px black; padding: 10px; margin: 0px;'
+    } else {
+        style = 'border: solid 1px black; padding: 10px; margin: 0px;'
+    }
+}
+
+@width() = {800px}
