@@ -4,18 +4,18 @@ import java.io.File
 
 import MySecurity.Authentication._
 import MySecurity.Authorization._
+import logo.Logo
 import models.{Administrator, Lab}
 import play.api.Play
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.libs.Crypto
 import play.api.libs.Files.TemporaryFile
-import play.api.mvc.MultipartFormData.FilePart
 import play.api.mvc._
 import play.api.Play.current
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
 
 object LabController extends Controller {
   case class SimpleLab(acronym: String, name: String)
@@ -25,6 +25,13 @@ object LabController extends Controller {
       "acronym" -> nonEmptyText(1, 100),
       "name" -> nonEmptyText(1, 254))(SimpleLab.apply)(SimpleLab.unapply)
   }
+
+  def logo(id: Long) = ForcedAuthentication{implicit request => Future {
+      Lab.findById(id).flatMap(_.logoId) match {
+        case Some(logoId) => Ok.sendFile(Logo.find(logoId))
+        case _            => Redirect(routes.LabController.list()).flashing(("error", "Couldn't find the logo for this lab"))
+      }
+  }}
 
   def newLab: Action[AnyContent] = AuthorizedWith(_.role == Administrator) { implicit request => Future {
       Ok(views.html.labViews.newLab(labForm)(request, request.user.get.role))
@@ -39,14 +46,14 @@ object LabController extends Controller {
 
   def successfullAddition(labName: String) = Redirect(routes.LabController.list()).flashing(("success", "Successfully created new lab: " + labName))
 
-  def AddNewLabWithLogo(form: Form[SimpleLab], logo: FilePart[TemporaryFile])(implicit request: Request[Any]) = {
+  def AddNewLabWithLogo(form: Form[SimpleLab], logo: Logo)(implicit request: Request[Any]) = {
     labForm.bindFromRequest.fold(
       formWithErrors => BadRequest(views.html.labViews.newLab(formWithErrors)(request, Administrator)),
       newLab         => {
-        val logoId = Crypto.generateToken
-        logo.ref.moveTo(new File(Play.configuration.getString("application.imageSavePath").getOrElse(System.getenv("HOME") + "/.confscheduler/logos/") + logoId))
-        val lab   = Lab.fromSimpleLab(newLab, Some(logoId)).get
+        val saving = logo.save()
+        val lab   = Lab.fromSimpleLab(newLab, Some(logo.logoId)).get
         val LabId = lab.save().get
+        Await.result(saving, 1 second)
         successfullAddition(lab.name)
       }
     )
@@ -69,15 +76,13 @@ object LabController extends Controller {
   }
 
   def createLab(implicit request: MyAuthenticatedRequest[MultipartFormData[TemporaryFile]]) = {
-    val logo = request.body.file("logo")
-    val isImage = logo.flatMap(_.contentType).exists(t => t.equals("image/jpeg") || t.equals("image/png"))
-    val sizeUnder4Mb = logo.map(_.ref.file.length()).exists(_ < 4*1024*1024) //We only accept file up to 4Mb in size
     val form = labForm.bindFromRequest
-
-    logo match {
-      case Some(f) if isImage && sizeUnder4Mb => AddNewLabWithLogo(form, f)
-      case Some(f)                            => LogoInvalid(form)
-      case None                               => AddNewLabWithoutLogo(form)
+    request.body.file("logo") match {
+      case None => AddNewLabWithoutLogo(form)
+      case Some(tempFile) => Logo(tempFile) match {
+        case Some(smallLogo) => AddNewLabWithLogo(form, smallLogo)
+        case _               => LogoInvalid(form)
+      }
     }
   }
 

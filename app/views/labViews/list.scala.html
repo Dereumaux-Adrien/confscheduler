@@ -4,6 +4,9 @@
     <div class="conf-listing">
         <h4>@lab.acronym</h4>
         <p>@lab.name</p>
+        @if(lab.logoId.isDefined){
+            <div><img src="@routes.LabController.logo(lab.id).url"></div>
+        }
         <div class="conference-buttons">
             <form method="POST" action="@routes.LabController.delete(lab.id)">
                 <button type="submit" class="btn btn-danger">Delete</button>

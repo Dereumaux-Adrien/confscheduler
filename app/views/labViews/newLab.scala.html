@@ -2,11 +2,13 @@
 @import views.html.helper._
 @import utils._
 
-@main("New User") {
-    @helper.form(routes.LabController.create, 'class -> "form-horizontal") {
+@main("New Lab") {
+    @helper.form(routes.LabController.create, 'class -> "form-horizontal", 'enctype -> "multipart/form-data") {
         @bootstrapErrors(labForm.errors, "lab")
         @bootstrapInput(labForm("acronym"))
         @bootstrapInput(labForm("name"))
+        <p>Select the logo of the new lab (must be either a JPEG or a PNG, under 4MB):</p>
+        <input type="file" name="logo">
         @bootstrapSubmit()
     }
 }
