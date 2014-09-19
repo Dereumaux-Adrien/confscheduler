@@ -9,7 +9,8 @@ import play.api.Play.current
 case class Lab (
   id     : Long,
   acronym: String,
-  name   : String
+  name   : String,
+  logoId : Option[String]
 ) {
   def destroy() = Lab.destroy(this)
 
@@ -18,17 +19,17 @@ case class Lab (
 
 object Lab {
   private val insertQuery = SQL("""
-      INSERT INTO Lab(acronym, name)
-      VALUES ({acronym}, {name})
+      INSERT INTO Lab(acronym, name, logoId)
+      VALUES ({acronym}, {name}, {logoId})
     """)
 
   private val updateQuery = SQL("""
     UPDATE Lab
-    SET acronym = {acronym}, name = {name}
+    SET acronym = {acronym}, name = {name}, logoId = {logoId}
     WHERE id = {id}
     """)
 
-  def fixtures = Set(Lab(-1, "CIRI", "International Center for Infectiology Research"), Lab(-1, "RO", "Retroviral Oncogenesis"))
+  def fixtures = Set(Lab(-1, "CIRI", "International Center for Infectiology Research", None), Lab(-1, "RO", "Retroviral Oncogenesis", None))
 
   def findById(id: Long): Option[Lab] = DB.withConnection { implicit  c =>
     SQL("SELECT * FROM Lab WHERE id = {id}")
@@ -41,20 +42,27 @@ object Lab {
     case _             => List(user.lab)
   }
 
-  def fromSimpleLab(lab: SimpleLab): Option[Lab] = {
-    Option(Lab(-1, lab.acronym, lab.name))
+  def fromSimpleLab(lab: SimpleLab, logoId: Option[String]): Option[Lab] = {
+    Option(Lab(-1, lab.acronym, lab.name, logoId))
   }
 
   def save(lab: Lab): Option[Long] = DB.withConnection { implicit c =>
     if(findById(lab.id).isDefined) {
       updateQuery
-        .on("acronym" -> lab.acronym, "name" -> lab.name, "id" -> lab.id.toString)
+        .on(
+          "acronym" -> lab.acronym,
+          "name" -> lab.name,
+          "id" -> lab.id.toString,
+          "logoId" -> lab.logoId)
         .executeUpdate()
 
       Option(lab.id)
     } else {
       insertQuery
-        .on("acronym" -> lab.acronym, "name" -> lab.name)
+        .on(
+          "acronym" -> lab.acronym,
+          "name" -> lab.name,
+          "logoId" -> lab.logoId)
         .executeInsert()
     }
   }
@@ -81,15 +89,16 @@ object Lab {
 
   def seedDB(): Unit = DB.withConnection {implicit c =>
     for(lab <- fixtures) {
-      lab.save
+      lab.save()
     }
   }
 
   private val labParser: RowParser[Lab] = {
       get[Long]("id") ~
       get[String]("acronym") ~
-      get[String]("name")  map {
-      case id ~ acronym ~ name => Lab(id, acronym, name)
+      get[String]("name") ~
+      get[Option[String]]("logoId") map {
+      case id ~ acronym ~ name ~ logoId => Lab(id, acronym, name, logoId)
     }
   }
 }

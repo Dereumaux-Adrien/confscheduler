@@ -1,3 +1,5 @@
+import java.io.File
+
 import akka.actor.Props
 import email.{SendMail, Mailer}
 import models._
@@ -8,6 +10,11 @@ import play.libs.Akka
 
 object Global extends GlobalSettings{
   override def onStart(app: Application) {
+    val logoSaveDir = new File(Play.configuration.getString("application.imageSavePath").getOrElse(System.getenv("HOME") + "/.confscheduler/logos/"))
+    if(!logoSaveDir.exists() && !logoSaveDir.mkdirs()) {
+      throw new Error("Couldn't create/access the directory set to save logos: " + logoSaveDir.toURI)
+    }
+
     if(current.mode == Mode.Dev) {
       Logger.info("Starting the mailer")
       val mailer = Akka.system.actorOf(Props[Mailer])
