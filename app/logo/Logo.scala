@@ -18,7 +18,7 @@ class Logo private(tempFile: FilePart[TemporaryFile]) {
 
   def save(): Future[Unit] = {
     val logoFile = new File(savePath + logoId + ".jpg")
-    Future(Image(tempFile.ref.file).fit(400, 200).writer(Format.JPEG).withCompression(20).write(logoFile))
+    Future(Image(tempFile.ref.file).fit(400, 200).writer(Format.JPEG).withCompression(95).write(logoFile))
   }
 }
 
