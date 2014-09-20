@@ -36,7 +36,7 @@ object Global extends GlobalSettings{
     }
 
     if(current.mode == Mode.Test || Play.application.configuration.getBoolean("heroku.test").getOrElse(false)) {
-      initDB()
+      initDB(true)
     }
   }
 
@@ -55,21 +55,21 @@ object Global extends GlobalSettings{
     }
   }
 
-  def initDB(): Unit = {
-    Logger.info("Cleaning DB...")
+  def initDB(silent: Boolean = false): Unit = {
+    if(!silent) Logger.info("Cleaning DB...")
     User.destroyAll()
     Conference.destroyAll()
     Location.destroyAll()
     Speaker.destroyAll()
     Lab.destroyAll()
-    Logger.info("... done.")
+    if(!silent) Logger.info("... done.")
 
-    Logger.info("Starting to seed DB...")
+    if(!silent) Logger.info("Starting to seed DB...")
     Speaker.seedDB()
     Lab.seedDB()
     Location.seedDB()
     Conference.seedDB()
     User.seedDB()
-    Logger.info("... done")
+    if(!silent) Logger.info("... done")
   }
 }

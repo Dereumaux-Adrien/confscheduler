@@ -12,7 +12,6 @@ import play.api.test.Helpers._
  */
 @RunWith(classOf[JUnitRunner])
 class ApplicationSpec extends Specification {
-
   "Application" should {
 
     "send 404 on a bad request" in new WithApplication{
@@ -20,7 +19,7 @@ class ApplicationSpec extends Specification {
     }
 
     "render the upcoming conferences page" in new WithApplication{
-      val conflist = route(FakeRequest(GET, "/conf")).get
+      val conflist = route(FakeRequest(GET, "/conf/upcoming")).get
 
       status(conflist) must equalTo(OK)
       contentType(conflist) must beSome.which(_ == "text/html")
@@ -32,7 +31,7 @@ class ApplicationSpec extends Specification {
 
       status(calendar) must equalTo(OK)
       contentType(calendar) must beSome.which(_ == "text/html")
-      contentAsString(calendar) must contain ("Public Conferences Calendar")
+      contentAsString(calendar) must contain ("Calendar")
       contentAsString(calendar) must contain ("""<div id="calendar">""")
     }
 
