@@ -15,9 +15,12 @@ case class Lab (
   def destroy() = Lab.destroy(this)
 
   def save() = Lab.save(this)
+
+  def withId(newId: Long): Lab = Lab(newId, acronym, name, logoId)
 }
 
 object Lab {
+
   private val insertQuery = SQL("""
       INSERT INTO Lab(acronym, name, logoId)
       VALUES ({acronym}, {name}, {logoId})
@@ -46,7 +49,7 @@ object Lab {
     Option(Lab(-1, lab.acronym, lab.name, logoId))
   }
 
-  def save(lab: Lab): Option[Long] = DB.withConnection { implicit c =>
+  def save(lab: Lab): Option[Lab] = DB.withConnection { implicit c =>
     if(findById(lab.id).isDefined) {
       updateQuery
         .on(
@@ -56,14 +59,15 @@ object Lab {
           "logoId" -> lab.logoId)
         .executeUpdate()
 
-      Option(lab.id)
+      Option(lab)
     } else {
-      insertQuery
+      val newId: Option[Long] = insertQuery
         .on(
           "acronym" -> lab.acronym,
           "name" -> lab.name,
           "logoId" -> lab.logoId)
         .executeInsert()
+      newId.map(lab.withId)
     }
   }
 

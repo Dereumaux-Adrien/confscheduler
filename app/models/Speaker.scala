@@ -69,7 +69,7 @@ object Speaker {
           "organisation" -> speaker.organisation,
           "email"    -> speaker.email
         ).executeInsert()
-      newId.map(id => speaker.withId(id))
+      newId.map(speaker.withId)
     }
   }
 
