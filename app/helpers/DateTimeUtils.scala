@@ -4,11 +4,13 @@ import org.joda.time._
 import org.joda.time.format._
 import anorm._
 
+import scala.concurrent.duration._
+
 object DateTimeUtils {
   implicit class TimeString(s: String) {
     def isValidDuration: Boolean = s.matches( """^(\d+[hH])?(\d+[mM])?$""") && !s.trim.isEmpty
 
-    def toDuration: Duration = {
+    def toDuration: org.joda.time.Duration = {
       val pattern = """^(?:(\d+)[hH])?(?:(\d+)[mM])?$""".r
       s match {
         case pattern(h, m) if h != null && m != null => new Period(h.toInt, m.toInt, 0, 0).toStandardDuration
@@ -17,6 +19,28 @@ object DateTimeUtils {
         case _ => throw new IllegalArgumentException("duration string given doesn't follow the format nn[Hh]nn[mM]")
       }
     }
+  }
+
+  def findNextMonth(sendOn: Int): FiniteDuration = {
+    var count = 1
+    var currentDay = DateTime.now().plusDays(1)
+    while (currentDay.getDayOfMonth != sendOn) {
+      count += 1
+      currentDay = currentDay.plusDays(1)
+    }
+
+    count.days - DateTime.now().getMillisOfDay.milliseconds
+  }
+
+  def findNextDayOfWeek(day: Int): FiniteDuration = {
+    var count: Int = 1
+    var currentDay = DateTime.now().plusDays(1)
+    while (currentDay.getDayOfWeek != day) {
+      count += 1
+      currentDay = currentDay.plusDays(1)
+    }
+
+    count.days - DateTime.now().getMillisOfDay.milliseconds
   }
 }
 
