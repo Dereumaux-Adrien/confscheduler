@@ -25,7 +25,6 @@ object Global extends GlobalSettings{
 
   override def onStart(app: Application) {
     createLogoDirectory()
-    scheduleMailing()
 
     if(current.mode == Mode.Dev) {
       //testMailer
@@ -36,7 +35,9 @@ object Global extends GlobalSettings{
     }
 
     if(current.mode == Mode.Test || Play.application.configuration.getBoolean("heroku.test").getOrElse(false)) {
-      initDB(true)
+      initDB(silent = true)
+    } else {
+      scheduleMailing()
     }
   }
 
