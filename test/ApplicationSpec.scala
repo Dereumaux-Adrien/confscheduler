@@ -2,7 +2,7 @@ import models._
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
-import play.api.{Mode, mvc, Play}
+import play.api.{mvc, Play}
 import scala.language.experimental.macros
 
 import play.api.test._
@@ -28,21 +28,35 @@ class ApplicationSpec extends Specification {
 
   def isAccessible(page: Future[mvc.Result]) = status(page) == OK && contentType(page).contains("text/html")
 
-  def testAccess(url: String, role: UserRole, access: Boolean) = role.toString + " " + {if(access) "can" else "can't"} + " access " + url >> {
+  def testAccess(url: String, role: UserRole, access: Boolean, method: String) = role.toString + " " + {if(access) "can" else "can't"} + " access " + url >> {
     val result = role match {
-      case Administrator => route(FakeRequest(GET, url).withSession(getAdminSession: _*)).get
-      case Moderator     => route(FakeRequest(GET, url).withSession(getModeratorSession: _*)).get
-      case Contributor   => route(FakeRequest(GET, url).withSession(getContributorSession: _*)).get
-      case _             => route(FakeRequest(GET, url)).get
+      case Administrator => route(FakeRequest(method, url).withSession(getAdminSession: _*)).get
+      case Moderator     => route(FakeRequest(method, url).withSession(getModeratorSession: _*)).get
+      case Contributor   => route(FakeRequest(method, url).withSession(getContributorSession: _*)).get
+      case _             => route(FakeRequest(method, url)).get
     }
     isAccessible(result) must beEqualTo(access)
   }
 
-  def adminOnlyAccess(url: String) = {
-    testAccess(url, Administrator, access = true)
-    testAccess(url, Moderator, access = false)
-    testAccess(url, Contributor, access = false)
-    testAccess(url, Guest, access = false)
+  def adminOnlyAccess(url: String, method: String) = {
+    testAccess(url, Administrator, access = true, method)
+    testAccess(url, Moderator, access = false, method)
+    testAccess(url, Contributor, access = false, method)
+    testAccess(url, Guest, access = false, method)
+  }
+
+  def modOrBetterAccess(url: String, method: String) = {
+    testAccess(url, Administrator, access = true, method)
+    testAccess(url, Moderator, access = true, method)
+    testAccess(url, Contributor, access = false, method)
+    testAccess(url, Guest, access = false, method)
+  }
+
+  def loggedAccess(url: String, method: String) = {
+    testAccess(url, Administrator, access = true, method)
+    testAccess(url, Moderator, access = true, method)
+    testAccess(url, Contributor, access = true, method)
+    testAccess(url, Guest, access = false, method)
   }
 
   var fake: FakeApplication = _
@@ -77,15 +91,27 @@ class ApplicationSpec extends Specification {
     }
 
     "render the new lab page to only an admin" in {
-      adminOnlyAccess("/lab/new")
+      adminOnlyAccess("/lab/new", GET)
     }
 
     "render the lab list page to only an admin" in {
-      adminOnlyAccess("/lab/all")
+      adminOnlyAccess("/lab/all", GET)
     }
 
     "render the user list page to only an admin" in {
-      adminOnlyAccess("/user/all")
+      adminOnlyAccess("/user/all", GET)
+    }
+
+    "render the user add page to an admin or moderator" in {
+      modOrBetterAccess("/user/new", GET)
+    }
+
+    "render the conference add page to a logged user" in {
+      loggedAccess("/conf/new", GET)
+    }
+
+    "render the conference accept page to an admin or moderator" in {
+      modOrBetterAccess("/conf/allow", GET)
     }
   }
   step {Play.stop()}
