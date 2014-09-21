@@ -76,7 +76,7 @@ class ApplicationSpec extends Specification {
     "not render the new lab page to a moderator" in {
       val newLab = route(FakeRequest(GET, "/lab/new").withSession(getModeratorSession: _*)).get
 
-      status(newLab) must equalTo(OK)
+      status(newLab) must equalTo(SEE_OTHER)
       contentAsString(newLab) must not contain "Acronym"
       contentAsString(newLab) must not contain "Name"
     }

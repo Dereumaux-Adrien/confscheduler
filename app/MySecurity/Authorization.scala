@@ -1,6 +1,7 @@
 package MySecurity
 
 import controllers.routes
+import play.api.Logger
 import scala.concurrent.Future
 import play.api.mvc.Results._
 import models.User
@@ -24,14 +25,14 @@ object Authorization {
   }
 
   object Authorized extends ActionFilter[AuthorizedRequest] {
-    def filter[A](request: AuthorizedRequest[A]) = Future.successful {
+    def filter[A](request: AuthorizedRequest[A]): Future[Option[Result]] = Future.successful {
       if(request.user.isDefined && request.f(request.user.get)) {
         None
       } else {
         if(request.method == "POST") {
-          if(request.user.isDefined) None else Some(Unauthorized)
+          Some(Unauthorized)
         } else {
-          if(request.user.isDefined) None else Some(Redirect(unsuccessfulAuthorizationRoute))
+          Some(Redirect(unsuccessfulAuthorizationRoute))
         }
       }
     }
