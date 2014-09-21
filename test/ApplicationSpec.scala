@@ -1,11 +1,14 @@
+import models._
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
-import play.api.Play
-import play.api.mvc.Session
+import play.api.{Mode, mvc, Play}
+import scala.language.experimental.macros
 
 import play.api.test._
 import play.api.test.Helpers._
+
+import scala.concurrent.Future
 
 /**
  * Add your spec here.
@@ -20,8 +23,27 @@ class ApplicationSpec extends Specification {
   }
 
   def getAdminSession = getSession("rosa@gmail.com", "123456789")
-
   def getModeratorSession = getSession("jimmy@gmail.com", "987654321")
+  def getContributorSession = getSession("tom@gmail.com", "123456789")
+
+  def isAccessible(page: Future[mvc.Result]) = status(page) == OK && contentType(page).contains("text/html")
+
+  def testAccess(url: String, role: UserRole, access: Boolean) = role.toString + " " + {if(access) "can" else "can't"} + " access " + url >> {
+    val result = role match {
+      case Administrator => route(FakeRequest(GET, url).withSession(getAdminSession: _*)).get
+      case Moderator     => route(FakeRequest(GET, url).withSession(getModeratorSession: _*)).get
+      case Contributor   => route(FakeRequest(GET, url).withSession(getContributorSession: _*)).get
+      case _             => route(FakeRequest(GET, url)).get
+    }
+    isAccessible(result) must beEqualTo(access)
+  }
+
+  def adminOnlyAccess(url: String) = {
+    testAccess(url, Administrator, access = true)
+    testAccess(url, Moderator, access = false)
+    testAccess(url, Contributor, access = false)
+    testAccess(url, Guest, access = false)
+  }
 
   var fake: FakeApplication = _
 
@@ -34,58 +56,36 @@ class ApplicationSpec extends Specification {
     }
 
     "render the upcoming conferences page" in {
-      val conflist = route(FakeRequest(GET, "/conf/upcoming")).get
-
-      status(conflist) must equalTo(OK)
-      contentType(conflist) must beSome.which(_ == "text/html")
+      val upcomingConfs = route(FakeRequest(GET, "/conf/upcoming")).get
+      isAccessible(upcomingConfs) must beTrue
     }
 
     "render the conference list page" in {
-      val conflist = route(FakeRequest(GET, "/conf/all")).get
-
-      status(conflist) must equalTo(OK)
-      contentType(conflist) must beSome.which(_ == "text/html")
+      val confList = route(FakeRequest(GET, "/conf/all")).get
+      isAccessible(confList) must beTrue
     }
 
     "render the calendar page" in {
       val calendar = route(FakeRequest(GET, "/calendar")).get
-
-      status(calendar) must equalTo(OK)
-      contentType(calendar) must beSome.which(_ == "text/html")
-      contentAsString(calendar) must contain ("Calendar")
+      isAccessible(calendar) must beTrue
       contentAsString(calendar) must contain ("""<div id="calendar">""")
     }
 
     "render the login page" in {
       val login = route(FakeRequest(GET, "/login")).get
-
-      status(login) must equalTo(OK)
-      contentType(login) must beSome.which(_ == "text/html")
-      contentAsString(login) must contain("Login")
+      isAccessible(login) must beTrue
     }
 
-    "render the new lab page to an admin" in {
-      val newLab = route(FakeRequest(GET, "/lab/new").withSession(getAdminSession: _*)).get
-
-      status(newLab) must equalTo(OK)
-      contentType(newLab) must beSome.which(_ == "text/html")
-      contentAsString(newLab) must contain("Acronym")
-      contentAsString(newLab) must contain("Name")
+    "render the new lab page to only an admin" in {
+      adminOnlyAccess("/lab/new")
     }
 
-    "not render the new lab page to a moderator" in {
-      val newLab = route(FakeRequest(GET, "/lab/new").withSession(getModeratorSession: _*)).get
-
-      status(newLab) must equalTo(SEE_OTHER)
-      contentAsString(newLab) must not contain "Acronym"
-      contentAsString(newLab) must not contain "Name"
+    "render the lab list page to only an admin" in {
+      adminOnlyAccess("/lab/all")
     }
 
-    "render the lab list page to an admin" in {
-      val newLab = route(FakeRequest(GET, "/lab/all").withSession(getAdminSession: _*)).get
-
-      status(newLab) must equalTo(OK)
-      contentType(newLab) must beSome.which(_ == "text/html")
+    "render the user list page to only an admin" in {
+      adminOnlyAccess("/user/all")
     }
   }
   step {Play.stop()}
