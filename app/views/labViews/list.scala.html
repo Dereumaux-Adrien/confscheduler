@@ -1,15 +1,15 @@
 @(labs: List[Lab])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 
 @displayLab(lab: Lab) = {
-    <div class="conf-listing">
-        <h4>@lab.acronym</h4>
-        <p>@lab.name</p>
-        @if(lab.logoId.isDefined){
-            <div><img src="@routes.LabController.logo(lab.id).url"></div>
+    <div class="listing lab-listing">
+        @if(lab.logoId.isDefined) {
+            <img height="100" src="@routes.LabController.logo(lab.id).url">
         }
-        <div class="conference-buttons">
+        <div class="content">
+            <h4>@lab.acronym</h4>
+            @lab.name
             <form method="POST" action="@routes.LabController.delete(lab.id)">
-                <button type="submit" class="btn btn-danger">Delete</button>
+                <span class="pull-right"><button type="submit" class="btn btn-danger user-delete">Delete</button></span>
             </form>
         </div>
     </div>

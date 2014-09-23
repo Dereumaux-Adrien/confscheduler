@@ -1,14 +1,13 @@
 @(conf: Conference, canEdit: Boolean)
 
-<div class="conf-listing">
+<div class="listing">
+    <h4>@conf.title <span class="speaker-name">@conf.speaker.fullName</span>
+        <div class="time-to-conf"> @conf.dateDisplayFormat, room @conf.location.roomDesignation in @conf.location.instituteName</div>
+    </h4>
+    @conf.abstr
     @if(canEdit){
         <form method="POST" class="conference-buttons" action="@routes.ConferenceController.delete(conf.id)">
             <button type="submit" class="btn btn-danger">Delete</button>
         </form>
     }
-
-    <h4>@conf.title <span class="speaker-name">@conf.speaker.fullName</span>
-        <div class="time-to-conf"> @conf.dateDisplayFormat, room @conf.location.roomDesignation in @conf.location.instituteName</div>
-    </h4>
-    @conf.abstr
 </div>

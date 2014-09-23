@@ -114,7 +114,7 @@
     .mainPanel {
         padding-top :@spacing-under-top-hr;
 
-        .conf-listing {
+        .listing {
             background-color: @main-contrast-color;
             padding: 3px 10px 9px 15px;
             border-radius: 3px;
@@ -138,6 +138,27 @@
                 display: inline;
                 float: right;
                 margin-top: 5px;
+            }
+        }
+
+        .lab-listing {
+            position: relative;
+
+            img {
+                float: left;
+                margin-top: 7px;
+                margin-right: 15px;
+                width: 20%;
+            }
+
+            .content {
+                overflow: hidden;
+
+                form {
+                    position: absolute;
+                    bottom: 10px;
+                    right: 10px;
+                }
             }
         }
 
