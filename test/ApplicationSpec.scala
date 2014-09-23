@@ -1,8 +1,12 @@
+import javax.xml.transform.OutputKeys
+
 import models._
+import org.joda.time.DateTime
+import org.joda.time.format.ISODateTimeFormat
 import org.specs2.mutable._
 import org.specs2.runner._
 import org.junit.runner._
-import play.api.{mvc, Play}
+import play.api.{Logger, mvc, Play}
 import scala.language.experimental.macros
 
 import play.api.test._
@@ -63,6 +67,16 @@ class ApplicationSpec extends Specification {
 
   step {fake = FakeApplication()}
   step {Play.start(fake)}
+
+  "API" should {
+    "Provide a JSON list of confs" in {
+      val startDate = DateTime.now().toString(ISODateTimeFormat.date())
+      val endDate = DateTime.now().plusDays(7).toString(ISODateTimeFormat.date())
+      val url = "/api/v1/conf/all?start=" + startDate + "&end=" + endDate
+      val JSONListConfs = route(FakeRequest(GET, url)).get
+      status(JSONListConfs) mustEqual OK and(contentType(JSONListConfs).contains("application/json") must beTrue)
+    }
+  }
 
   "Application" should {
     "send 404 on a bad request" in {
