@@ -1,6 +1,7 @@
 @(confs: List[(Conference, Boolean)])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 
 @main("Index") {
+    @utils.filter()
     @for(conf <- confs) {
         @confutils.displayConf(conf._1, conf._2)
     }

@@ -1,6 +1,7 @@
 @(users: List[User])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 
-@main("Index") {
+@main("User List") {
+    @utils.filter()
     @for(user <- users) {
         <div class="user-listing">
             @user.firstName @user.lastName

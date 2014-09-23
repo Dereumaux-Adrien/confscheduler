@@ -48,6 +48,7 @@
         padding-left: 0px;
         padding-right: 5px;
         border-right: thin solid @main-contrast-color;
+        height: 100%;
 
         hr {
             margin-bottom: 5px;
@@ -113,6 +114,18 @@
 
     .mainPanel {
         padding-top :@spacing-under-top-hr;
+
+        .spacer {
+            clear: both;
+        }
+
+        .filter-nav {
+            form {
+                float: right;
+                margin: 0px 0px 5px 0px;
+                padding: 2px;
+            }
+        }
 
         .listing {
             background-color: @main-contrast-color;

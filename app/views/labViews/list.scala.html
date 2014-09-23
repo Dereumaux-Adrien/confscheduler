@@ -15,7 +15,8 @@
     </div>
 }
 
-@main("Index") {
+@main("Lab List") {
+    @utils.filter()
     @for(lab <- labs) {
         @displayLab(lab)
     }
