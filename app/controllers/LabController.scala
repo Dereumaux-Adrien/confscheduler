@@ -40,7 +40,7 @@ object LabController extends Controller {
   def create = MyAuthenticated(parse.multipartFormData) { implicit request => {
     request.user.map(_.role) match {
       case Some(Administrator) => createLab
-      case _                   => Redirect(routes.ConferenceController.listUpcomingConfs()).flashing(("error", "You do not have the rights to create a new lab."))
+      case _                   => Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You do not have the rights to create a new lab."))
     }
   }}
 

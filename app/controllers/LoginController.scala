@@ -32,7 +32,7 @@ object LoginController extends Controller {
 
   def logout = Action { implicit request =>
     val removeRememberMe = DiscardingCookie(rememberMeCookieName, rememberMeCookiePath, rememberMeCookieDomain, secureCookie)
-    Redirect(routes.ConferenceController.listUpcomingConfs()).withNewSession.discardingCookies(removeRememberMe).flashing(("success", "Logout successful"))
+    Redirect(routes.ConferenceController.listUpcomingConfs(None)).withNewSession.discardingCookies(removeRememberMe).flashing(("success", "Logout successful"))
   }
 
   def authenticate = Action.async { implicit request =>
@@ -50,12 +50,12 @@ object LoginController extends Controller {
       Cache.set(userId, user)
 
       if(user.rememberMeToken.isEmpty) {
-        Redirect(routes.ConferenceController.listUpcomingConfs()).withSession((sessionName, userId)).flashing(("success", "Logged in as " + user.firstName + " " + user.lastName))
+        Redirect(routes.ConferenceController.listUpcomingConfs(None)).withSession((sessionName, userId)).flashing(("success", "Logged in as " + user.firstName + " " + user.lastName))
       } else {
         val cToken = user.rememberMeToken
         val rememberMeCookie = Cookie(rememberMeCookieName, cToken, rememberMeCookieLifetime, rememberMeCookiePath, rememberMeCookieDomain, secureCookie, rememberMeCookieHttpOnly)
 
-        Redirect(routes.ConferenceController.listUpcomingConfs()).withSession((sessionName, userId)).withCookies(rememberMeCookie).flashing(("success", "Logged in as " + user.firstName + " " + user.lastName))
+        Redirect(routes.ConferenceController.listUpcomingConfs(None)).withSession((sessionName, userId)).withCookies(rememberMeCookie).flashing(("success", "Logged in as " + user.firstName + " " + user.lastName))
       }
     }
   }

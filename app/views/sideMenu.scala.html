@@ -24,7 +24,7 @@
 }
 
 <ul class="nav nav-pills nav-stacked">
-    @utils.activeLi("Upcoming Conferences", routes.ConferenceController.listUpcomingConfs)
+    @utils.activeLi("Upcoming Conferences", routes.ConferenceController.listUpcomingConfs(None))
     @utils.activeLi("All Conferences", routes.ConferenceController.listConfs(None))
     @utils.activeLi("Conferences Calendar", routes.ConferenceController.calendar)
     @genMenu(userRole)

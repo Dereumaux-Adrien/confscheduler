@@ -103,10 +103,14 @@ object ConferenceController extends Controller {
   def authorizedUserRole(implicit request: AuthorizedRequest[AnyContent]): UserRole = request.user.map(_.role).get
   def authorizedUser(implicit request: AuthorizedRequest[AnyContent]): User = request.user.get
 
-  def listUpcomingConfs = MyAuthenticated { implicit request =>
-    val confWithEditRights =
-      Conference.findAccepted(authenticatedUser).filter(_.isInFuture).sortBy(_.startDate)
+  def listUpcomingConfs(filter: Option[String]) = MyAuthenticated { implicit request =>
+    val confWithEditRights = if (filter.isDefined) {
+      Conference.findAcceptedWithFilter(authenticatedUser, filter.get).filter(_.isInFuture).sortBy(_.startDate).reverse
         .map(c => (c, request.user.exists(_.canEdit(c.id))))
+    } else {
+      Conference.findAccepted(authenticatedUser).filter(_.isInFuture).sortBy(_.startDate).reverse
+        .map(c => (c, request.user.exists(_.canEdit(c.id))))
+    }
 
     Ok(views.html.confViews.list(confWithEditRights)(request, authenticatedUserRole.getOrElse(Guest)))
   }
@@ -158,7 +162,7 @@ object ConferenceController extends Controller {
 
     def redirectRouteOk(c: Conference) = {
       c.asAccepted.save
-      Redirect(routes.ConferenceController.listUpcomingConfs()).flashing(("success", "Conference " + c.title + " successfully accepted"))
+      Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "Conference " + c.title + " successfully accepted"))
     }
     def redirectRouteRefuse = Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to allow an unknown conference"))
 
@@ -178,7 +182,7 @@ object ConferenceController extends Controller {
 
     def redirectRouteOk(c: Conference) = {
       c.destroy
-      Redirect(routes.ConferenceController.listUpcomingConfs()).flashing(("success", "Conference successfully refused"))
+      Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "Conference successfully refused"))
     }
     def redirectRouteRefuse = Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to refuse an unknown conference"))
 
@@ -199,7 +203,7 @@ object ConferenceController extends Controller {
     )(
         c => {
           c.destroy
-          Redirect(routes.ConferenceController.listUpcomingConfs()).flashing(("success", "Conference successfully deleted"))
+          Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "Conference successfully deleted"))
         }
       )
   }}
@@ -219,11 +223,11 @@ object ConferenceController extends Controller {
         newConf.save match {
           case None => {
             Logger.error("Tried to save the new conference " + newConf.title + "failed!")
-            Redirect(routes.ConferenceController.listUpcomingConfs()).flashing(("error", "The conference " + newConf.title + " couldn't be submitted for moderation, please re-try later."))
+            Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "The conference " + newConf.title + " couldn't be submitted for moderation, please re-try later."))
           }
           case Some(c) => {
             sendConfirmationMail(c)
-            Redirect(routes.ConferenceController.listUpcomingConfs()).flashing(("success", "The conference " + newConf.title + " has been submitted for moderation by your team's moderator."))
+            Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "The conference " + newConf.title + " has been submitted for moderation by your team's moderator."))
           }
         }
       }
