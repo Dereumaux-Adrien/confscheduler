@@ -48,16 +48,20 @@ object UserController extends Controller {
     }
   }
 
-  def list = AuthorizedWith(_.role == Administrator) {implicit request =>
+  def list(filter: Option[String]) = AuthorizedWith(_.role == Administrator) {implicit request =>
     Future {
-      Ok(views.html.userViews.list(User.listAll)(request, Administrator))
+      if(filter.isDefined) {
+        Ok(views.html.userViews.list(User.filteredWith(filter.get))(request, Administrator))
+      } else {
+        Ok(views.html.userViews.list(User.listAll)(request, Administrator))
+      }
     }
   }
 
   def delete(id: Long) = AuthorizedWith(_.role == Administrator) {implicit request =>
     Future {
       User.findById(id).map(_.destroy)
-      Redirect(routes.UserController.list())
+      Redirect(routes.UserController.list(None))
     }
   }
 

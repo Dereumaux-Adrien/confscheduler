@@ -20,7 +20,7 @@ POST    /conf/:id/delete            controllers.ConferenceController.delete(id: 
 GET     /calendar                   controllers.ConferenceController.calendar
 
 GET     /user/new                   controllers.UserController.newUser(type: Option[String])
-GET     /user/all                   controllers.UserController.list
+GET     /user/all                   controllers.UserController.list(filter: Option[String])
 POST    /user/:id/delete            controllers.UserController.delete(id: Long)
 POST    /user/new                   controllers.UserController.create
 

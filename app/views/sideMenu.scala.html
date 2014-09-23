@@ -14,11 +14,11 @@
     @if(role == Administrator) {
         <hr>
         @utils.activeLi("Add User",  routes.UserController.newUser(None))
-        @utils.activeLi("List Users",  routes.UserController.list)
+        @utils.activeLi("List Users",  routes.UserController.list(None))
     }
     @if(role == Administrator) {
         <hr>
-        @utils.activeLi("List Labs",  routes.LabController.list)
+        @utils.activeLi("List Labs",  routes.LabController.list())
         @utils.activeLi("Add Lab",  routes.LabController.newLab)
     }
 }

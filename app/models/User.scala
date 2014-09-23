@@ -96,6 +96,16 @@ object User {
     }
   }
 
+  def filteredWith(filter: String): List[User] = DB.withConnection {implicit  c =>
+    val wideFilter = "%" + filter.toLowerCase + "%"
+    SQL(
+      """SELECT u.* FROM AppUser u
+        |JOIN Lab l ON u.lab = l.id
+        |WHERE lower(u.firstName) LIKE {filter} OR lower(u.lastName) LIKE {filter} OR lower(l.name) LIKE {filter} """.stripMargin)
+      .on("filter" -> wideFilter)
+      .as(userParser *)
+  }
+
   def listAll: List[User] = DB.withConnection {implicit c =>
     SQL("SELECT * FROM AppUser")
       .as(userParser *)
