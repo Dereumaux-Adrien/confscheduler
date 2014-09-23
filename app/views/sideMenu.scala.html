@@ -18,7 +18,7 @@
     }
     @if(role == Administrator) {
         <hr>
-        @utils.activeLi("List Labs",  routes.LabController.list())
+        @utils.activeLi("List Labs",  routes.LabController.list(None))
         @utils.activeLi("Add Lab",  routes.LabController.newLab)
     }
 }

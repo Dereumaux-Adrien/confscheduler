@@ -26,7 +26,7 @@ POST    /user/new                   controllers.UserController.create
 
 GET     /lab/new                    controllers.LabController.newLab
 POST    /lab/new                    controllers.LabController.create
-GET     /lab/all                    controllers.LabController.list
+GET     /lab/all                    controllers.LabController.list(filter: Option[String])
 POST    /lab/:id/delete             controllers.LabController.delete(id: Long)
 GET     /lab/:id/logo               controllers.LabController.logo(id: Long)
 

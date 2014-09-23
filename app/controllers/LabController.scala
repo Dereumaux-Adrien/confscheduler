@@ -29,7 +29,7 @@ object LabController extends Controller {
   def logo(id: Long) = ForcedAuthentication{implicit request => Future {
       Lab.findById(id).flatMap(_.logoId) match {
         case Some(logoId) => Ok.sendFile(Logo.find(logoId))
-        case _            => Redirect(routes.LabController.list()).flashing(("error", "Couldn't find the logo for this lab"))
+        case _            => Redirect(routes.LabController.list(None)).flashing(("error", "Couldn't find the logo for this lab"))
       }
   }}
 
@@ -44,7 +44,7 @@ object LabController extends Controller {
     }
   }}
 
-  def successfullAddition(labName: String) = Redirect(routes.LabController.list()).flashing(("success", "Successfully created new lab: " + labName))
+  def successfullAddition(labName: String) = Redirect(routes.LabController.list(None)).flashing(("success", "Successfully created new lab: " + labName))
 
   def AddNewLabWithLogo(form: Form[SimpleLab], logo: Logo)(implicit request: Request[Any]) = {
     labForm.bindFromRequest.fold(
@@ -86,8 +86,12 @@ object LabController extends Controller {
     }
   }
 
-  def list = AuthorizedWith(_.role == Administrator) { implicit request => Future {
-    Ok(views.html.labViews.list(Lab.listAll)(request, request.user.get.role))
+  def list(filter: Option[String]) = AuthorizedWith(_.role == Administrator) { implicit request => Future {
+    if(filter.isDefined) {
+      Ok(views.html.labViews.list(Lab.filteredWith(filter.get))(request, request.user.get.role))
+    } else {
+      Ok(views.html.labViews.list(Lab.listAll)(request, request.user.get.role))
+    }
   }}
 
   def delete(id: Long) = AuthorizedWith(_.role == Administrator) { implicit request => Future {
@@ -95,7 +99,7 @@ object LabController extends Controller {
       BadRequest(views.html.labViews.list(Lab.listAll)(request, request.user.get.role)).flashing(("error", "You tried to delete a non-existing lab"))
     )(lab => {
       lab.destroy()
-      Redirect(routes.LabController.list()).flashing(("success", "Lab successfully deleted"))
+      Redirect(routes.LabController.list(None)).flashing(("success", "Lab successfully deleted"))
     })
   }}
 }

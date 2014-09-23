@@ -20,7 +20,6 @@ case class Lab (
 }
 
 object Lab {
-
   private val insertQuery = SQL("""
       INSERT INTO Lab(acronym, name, logoId)
       VALUES ({acronym}, {name}, {logoId})
@@ -69,6 +68,12 @@ object Lab {
         .executeInsert()
       newId.map(lab.withId)
     }
+  }
+  def filteredWith(filter: String): List[Lab] = DB.withConnection {implicit c =>
+    val wideFilter = "%" + filter.toLowerCase + "%"
+    SQL("SELECT * FROM Lab WHERE lower(name) LIKE {filter} OR lower(acronym) LIKE {filter}")
+      .on("filter" -> wideFilter)
+      .as(labParser *)
   }
 
   def listAll: List[Lab] = DB.withConnection {implicit c =>
