@@ -98,11 +98,36 @@ object Conference {
     viewableBy.map(_.role) match {
       case Some(Administrator) => SQL("SELECT * FROM Conference WHERE accepted = true").as(conferenceParser *)
       case Some(_)             => {
-        SQL("SELECT * FROM Conference WHERE accepted = true AND organizedBy = {organizerId}")
+        SQL("SELECT * FROM Conference WHERE accepted = true AND (organizedBy = {organizerId} OR private = false)")
           .on("organizerId" -> viewableBy.get.lab.id)
           .as(conferenceParser *)
       }
       case None                => SQL("SELECT * FROM Conference WHERE accepted = true AND private = false").as(conferenceParser *)
+    }
+  }
+
+
+  def findAcceptedWithFilter(viewableBy: Option[User], filter: String) = DB.withConnection { implicit c =>
+    val query = """SELECT c.* FROM Conference c
+                  |JOIN Speaker s ON c.speaker = s.id
+                  |WHERE c.accepted = true AND
+                  |(lower(c.title) LIKE {filter} OR lower(s.firstName) LIKE {filter} OR lower(s.lastName) LIKE {filter})""".stripMargin
+
+    val wideFilter = "%" + filter.toLowerCase + "%"
+    val adminQuery = SQL(query)
+      .on("filter" -> wideFilter)
+
+    val userQuery = SQL(query + "AND (c.organizedBy = {organizerId} OR c.private = false)")
+      .on("filter" -> wideFilter)
+
+    val guestQuery = SQL(query + "AND private = false")
+      .on("filter" -> wideFilter)
+
+    viewableBy.map(_.role) match {
+      case Some(Administrator) => adminQuery.as(conferenceParser *)
+      case Some(_)             => userQuery.on("organizerId" -> viewableBy.get.lab.id)
+                                    .as(conferenceParser *)
+      case None                =>guestQuery.as(conferenceParser *)
     }
   }
 

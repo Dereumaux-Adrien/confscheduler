@@ -111,10 +111,14 @@ object ConferenceController extends Controller {
     Ok(views.html.confViews.list(confWithEditRights)(request, authenticatedUserRole.getOrElse(Guest)))
   }
 
-  def listConfs = MyAuthenticated { implicit request =>
-    val confWithEditRights =
+  def listConfs(filter: Option[String]) = MyAuthenticated { implicit request =>
+    val confWithEditRights = if (filter.isDefined) {
+      Conference.findAcceptedWithFilter(authenticatedUser, filter.get).sortBy(_.startDate).reverse
+        .map(c => (c, request.user.exists(_.canEdit(c.id))))
+    } else {
       Conference.findAccepted(authenticatedUser).sortBy(_.startDate).reverse
         .map(c => (c, request.user.exists(_.canEdit(c.id))))
+    }
 
     Ok(views.html.confViews.list(confWithEditRights)(request, authenticatedUserRole.getOrElse(Guest)))
   }
