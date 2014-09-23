@@ -2,10 +2,12 @@
 
 <div class="listing">
     <div class="content">
-        <h4>@conf.title <span class="speaker-name">@conf.speaker.fullName</span>
-            <div class="time-to-conf"> @conf.dateDisplayFormat, room @conf.location.roomDesignation in @conf.location.instituteName</div>
-        </h4>
-        @conf.abstr
+        <div class="text">
+            <h4>@conf.title <span class="speaker-name">@conf.speaker.fullName</span>
+                <div class="time-to-conf"> @conf.dateDisplayFormat, room @conf.location.roomDesignation in @conf.location.instituteName</div>
+            </h4>
+            @conf.abstr
+        </div>
         <div class="logo">
             @if(conf.organizedBy.logoId.isDefined) {
             <img height="70" src="@routes.LabController.logo(conf.organizedBy.id).url">
