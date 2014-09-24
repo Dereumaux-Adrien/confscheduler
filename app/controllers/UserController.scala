@@ -42,7 +42,10 @@ object UserController extends Controller {
         newUser        => request.user.get.role match {
           case Administrator                                     => createUser(newUser)
           case Moderator if newUser.newUserRole == "Contributor" && newUser.labId == request.user.get.lab.id => createUser(newUser)
-          case _                                                 => Redirect(routes.Application.index()) //TODO: Actually display an error message here
+          case Moderator if newUser.newUserRole != "Contributor" || newUser.labId != request.user.get.lab.id =>
+            Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You do not have the permission to add non-contributors users, or users in another lab"))
+          case _                                                 =>
+            Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You do not have the permission to add users"))
         }
       )
     }
