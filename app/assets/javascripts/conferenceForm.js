@@ -2,7 +2,7 @@ $(function() {
     // Calendar & Time Picker set-up
     document.getElementById('timezoneOffset').value = new Date().getTimezoneOffset();
 
-    $("#datepicker").datepicker({ dateFormat: "yy-mm-dd" });
+    $("#datepicker").datepicker({ minDate: 0, dateFormat: "yy-mm-dd" });
 
     $("#timepicker").timepicker({
         timeFormat: "G:i",
