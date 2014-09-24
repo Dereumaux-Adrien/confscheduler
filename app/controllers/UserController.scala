@@ -4,6 +4,7 @@ import MySecurity.Authentication._
 import MySecurity.Authorization._
 import controllers.ConferenceController._
 import models.{Administrator, Lab, Moderator, User}
+import play.api.Logger
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc.{Controller, Result}
@@ -30,7 +31,7 @@ object UserController extends Controller {
     Future {
       request.user.get.role match {
         case Administrator | Moderator => Ok(views.html.userViews.newUser(userForm, request.user.get)(request, request.user.get.role))
-        case _                         => Redirect(routes.Application.index()) //TODO: Display a meaningful error message when someone tries to access this page without the rights
+        case _                         => Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You do not have the rights to add users"))
       }
     }
   }
@@ -43,9 +44,9 @@ object UserController extends Controller {
           case Administrator                                     => createUser(newUser)
           case Moderator if newUser.newUserRole == "Contributor" && newUser.labId == request.user.get.lab.id => createUser(newUser)
           case Moderator if newUser.newUserRole != "Contributor" || newUser.labId != request.user.get.lab.id =>
-            Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You do not have the permission to add non-contributors users, or users in another lab"))
+            Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You do not have the rights to add non-contributors users, or users in another lab"))
           case _                                                 =>
-            Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You do not have the permission to add users"))
+            Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You do not have the rights to add users"))
         }
       )
     }
@@ -69,7 +70,11 @@ object UserController extends Controller {
   }
 
   def createUser(newUser: SimpleUser): Result = {
-    User.fromSimpleUser(newUser).get.save //TODO: Actually handle errors during User creation
-    Redirect(routes.Application.index())
+    User.fromSimpleUser(newUser).get.save match {
+      case Some(u) => Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "User " + u.firstName + " " + u.lastName + " successfully created."))
+      case None    =>
+        Logger.error("Failure to save a new user, please check that the DB has been set correctly.")
+        Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "There was an error during User creation. Please try again later"))
+    }
   }
 }
