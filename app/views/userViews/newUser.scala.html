@@ -5,8 +5,8 @@
 @main("New User") {
     @helper.form(routes.UserController.create, 'class -> "form-horizontal") {
         @bootstrapErrors(userForm.errors, "user")
-        @bootstrapInput(userForm("firstName"), size = 3)
-        @bootstrapInput(userForm("lastName"), size = 3)
+        @bootstrapInput(userForm("firstName"), label="First Name", size = 3)
+        @bootstrapInput(userForm("lastName"), label="Last Name", size = 3)
         @bootstrapInput(userForm("email"), size = 4)
         @bootstrapPassword(userForm("password"), size = 3)
         @bootstrapPassword(userForm("repeatPassword"), "Repeat password:", 3)
