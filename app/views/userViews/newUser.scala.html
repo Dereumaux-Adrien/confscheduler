@@ -11,11 +11,13 @@
         @bootstrapPassword(userForm("password"), size = 3)
         @bootstrapPassword(userForm("repeatPassword"), "Repeat password", 3)
         @if(user.role == Moderator) {
+        <span style="display: none;">
             @bootstrapInput(userForm("newUserRole"), "New user role", 2, disabled = true, "Contributor")
             @bootstrapSelect(userForm("labId"), List((user.lab.id.toString, user.lab.name)), "Lab", disabled = true)
+        </span>
         } else {
             @bootstrapSelect(userForm("newUserRole"), User.loggedUserRoleList.map(r => (r, r)), "New user role", 2)
-            @bootstrapSelect(userForm("labId"), Lab.listAll.map(l => (l.id.toString, l.name)), "Lab")
+            @bootstrapSelect(userForm("labId"), Lab.listAll.map(l => (l.id.toString, l.name)), "Lab:")
         }
         @bootstrapSubmit()
     }

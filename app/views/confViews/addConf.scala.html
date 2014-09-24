@@ -79,7 +79,9 @@
             </div>
         </div>
         @bootstrapSelect(conferenceForm("private"), List(("true", "Yes"),("false", "No")), size = 2)
-        @bootstrapSelect(conferenceForm("organizer"), visibleLabs.map(l => (l.id.toString, l.name)))
+        <span style="@if(userRole != Administrator) {display:none}">
+            @bootstrapSelect(conferenceForm("organizer"), visibleLabs.map(l => (l.id.toString, l.name)))
+        </span>
         @bootstrapSubmit()
     }
 }
