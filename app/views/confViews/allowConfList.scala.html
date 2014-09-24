@@ -2,7 +2,7 @@
 
 @displayAllowableConfListing(conf: Conference) = {
     <div class="listing">
-        <h4>@conf.title <span class="speaker-name">@conf.speaker.fullName</span><span class="time-to-conf"> in @conf.timeFromNow</span></h4>
+        <h4>@conf.title <span class="speaker-name">@conf.speaker.fullName</span><span class="time-to-conf"> in @conf.dateDisplayFormat</span></h4>
         <p>@conf.abstr</p>
         <div class="conference-buttons">
             <form method="POST" action="@routes.ConferenceController.accept(conf.id, None)">
