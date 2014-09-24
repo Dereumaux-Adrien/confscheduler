@@ -195,7 +195,7 @@ object ConferenceController extends Controller {
     })
   }
 
-  def refuseAuth(id: Long) = accept(id, None)
+  def refuseAuth(id: Long) = refuse(id, None)
 
   def delete(id: Long) = AuthorizedWith(_.canAllowConfs) { implicit request => Future {
     Conference.findById(id).fold(
