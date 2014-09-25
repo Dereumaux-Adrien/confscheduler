@@ -98,8 +98,12 @@ object LabController extends Controller {
     Lab.findById(id).fold(
       BadRequest(views.html.labViews.list(Lab.listAll)(request, request.user.get.role)).flashing(("error", "You tried to delete a non-existing lab"))
     )(lab => {
-      lab.destroy()
-      Redirect(routes.LabController.list(None)).flashing(("success", "Lab successfully deleted"))
+      val labHasBeenDestroyed = lab.destroy()
+      if(labHasBeenDestroyed) {
+        Redirect(routes.LabController.list(None)).flashing(("success", "Lab successfully deleted"))
+      } else {
+        Redirect(routes.LabController.list(None)).flashing(("error", "This lab is still referenced by some conferences or users, please delete them first"))
+      }
     })
   }}
 }

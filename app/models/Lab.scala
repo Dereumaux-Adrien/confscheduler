@@ -3,6 +3,8 @@ package models
 import anorm.SqlParser._
 import controllers.LabController.SimpleLab
 import anorm._
+import org.postgresql.util.PSQLException
+import play.api.Logger
 import play.api.db.DB
 import play.api.Play.current
 
@@ -86,10 +88,18 @@ object Lab {
       .as(scalar[Long].single)
   }
 
-  def destroy(lab: Lab) = DB.withConnection {implicit c =>
-    SQL("DELETE FROM Lab WHERE id = {id}")
-      .on("id" -> lab.id)
-      .executeUpdate()
+  def destroy(lab: Lab):Boolean = DB.withConnection {implicit c =>
+    try {
+      SQL("DELETE FROM Lab WHERE id = {id}")
+        .on("id" -> lab.id)
+        .executeUpdate()
+      true
+    } catch {
+      case e: PSQLException
+        if e.getMessage.contains("update or delete on table \"lab\" violates foreign key constraint \"conference_organizedby_fkey\" on table \"conference\"") |
+           e.getMessage.contains("update or delete on table \"lab\" violates foreign key constraint \"appuser_lab_fkey\" on table \"appuser\"")
+        => Logger.warn(e.getServerErrorMessage.getMessage); false
+    }
   }
 
   def destroyAll(): Unit = DB.withConnection {implicit c =>
