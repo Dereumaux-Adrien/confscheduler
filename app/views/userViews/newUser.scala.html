@@ -16,7 +16,7 @@
             @bootstrapSelect(userForm("labId"), List((user.lab.id.toString, user.lab.name)), "Lab", disabled = true)
         </span>
         } else {
-            @bootstrapSelect(userForm("newUserRole"), User.loggedUserRoleList.map(r => (r, r)), "New user role", 2)
+            @bootstrapSelect(userForm("newUserRole"), User.loggedUserRoleList.map(r => (r, r)).reverse, "New user role", 2)
             @bootstrapSelect(userForm("labId"), Lab.listAll.map(l => (l.id.toString, l.name)), "Lab:")
         }
         @bootstrapSubmit()
