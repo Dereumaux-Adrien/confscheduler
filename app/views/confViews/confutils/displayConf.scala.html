@@ -4,7 +4,8 @@
     <div class="content">
         <div class="text">
             <h4>@conf.title <span class="speaker-name">@conf.speaker.fullName</span>
-                <div class="time-to-conf"> @conf.dateDisplayFormat, room @conf.location.roomDesignation in @conf.location.instituteName</div>
+                <div class="time-to-conf">Organized by the @conf.organizedBy.name team.</div>
+                <div class="time-to-conf">@conf.dateDisplayFormat.capitalize, room @conf.location.roomDesignation in @conf.location.instituteName.</div>
             </h4>
             @conf.abstr
         </div>
