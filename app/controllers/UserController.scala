@@ -3,7 +3,7 @@ package controllers
 import MySecurity.Authentication._
 import MySecurity.Authorization._
 import controllers.ConferenceController._
-import models.{Administrator, Lab, Moderator, User}
+import models._
 import play.api.Logger
 import play.api.data.Form
 import play.api.data.Forms._
@@ -52,22 +52,35 @@ object UserController extends Controller {
     }
   }
 
-  def list(filter: Option[String]) = AuthorizedWith(_.role == Administrator) {implicit request =>
-    Future {
-      if(filter.isDefined) {
-        Ok(views.html.userViews.list(User.filteredWith(filter.get))(request, Administrator))
-      } else {
-        Ok(views.html.userViews.list(User.listAll)(request, Administrator))
+  def list(filter: Option[String]) = AuthorizedWith(u => u.role == Administrator | u.role == Moderator) {implicit request => Future {
+    (filter.isDefined, authorizedUser.role) match {
+      case (true, Administrator) => Ok(views.html.userViews.list(User.filteredWith(filter.get))(request, Administrator))
+      case (false, Administrator) => Ok(views.html.userViews.list(User.listAll)(request, Administrator))
+        // In the following case, we're ok with doing the filtering here instead of the DB as the nb of contributors/lab is low, and it saves writing yet another method
+      case (true, Moderator) =>
+        Ok(views.html.userViews.list(User.findContributorsInLab(authorizedUser.lab)
+          .filter(u => u.firstName.toLowerCase.contains(filter.get.toLowerCase) | u.lastName.toLowerCase.contains(filter.get.toLowerCase)))
+          (request, Administrator))
+      case (false, Moderator) => Ok(views.html.userViews.list(User.findContributorsInLab(authorizedUser.lab))(request, Administrator))
+    }
+  }}
+
+  def delete(id: Long) = AuthorizedWith(u => u.role == Administrator | u.role == Moderator) {implicit request => Future {
+    def destroyUser = {
+      val toDestroy = User.findById(id)
+      toDestroy match {
+        case Some(u) => u.destroy; Redirect(routes.UserController.list(None)).flashing(("success", "User" + u.firstName + " " + u.lastName + " deleted"))
+        case None    =>
+          Logger.error("Tried to delete user " + id + " which doesn't exist")
+          Redirect(routes.UserController.list(None)).flashing(("error", "User with id " + id + " doesn't exist"))
       }
     }
-  }
-
-  def delete(id: Long) = AuthorizedWith(_.role == Administrator) {implicit request =>
-    Future {
-      User.findById(id).map(_.destroy)
-      Redirect(routes.UserController.list(None))
+    authorizedUser.role match {
+      case Administrator => destroyUser
+      case Moderator if User.findById(id).exists(u => u.lab.id == authorizedUser.lab.id && u.role == Contributor) => destroyUser
+      case _            => Redirect(routes.UserController.list(None)).flashing(("error", "You do not have the rights to delete this user"))
     }
-  }
+  }}
 
   def createUser(newUser: SimpleUser): Result = {
     User.fromSimpleUser(newUser).get.save match {

@@ -10,13 +10,13 @@
     @if(role == Moderator) {
         <hr>
         @utils.activeLi("Add Contributor", routes.UserController.newUser(Some("Contributor")))
+        <hr>
+        @utils.activeLi("List Contributors",  routes.UserController.list(None))
     }
     @if(role == Administrator) {
         <hr>
         @utils.activeLi("Add User",  routes.UserController.newUser(None))
-        @utils.activeLi("List Users",  routes.UserController.list(None))
-    }
-    @if(role == Administrator) {
+@utils.activeLi("List Users",  routes.UserController.list(None))
         <hr>
         @utils.activeLi("List Labs",  routes.LabController.list(None))
         @utils.activeLi("Add Lab",  routes.LabController.newLab)

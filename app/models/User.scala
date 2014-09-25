@@ -127,6 +127,15 @@ object User {
       .as(userParser *)
   }
 
+  def findContributorsInLab(lab: Lab): List[User] = DB.withConnection{implicit c =>
+    SQL("SELECT * FROM AppUser WHERE role={contributor} AND lab={labId}")
+      .on(
+        "contributor" -> Contributor.toInt,
+        "labId" -> lab.id
+      )
+      .as(userParser *)
+  }
+
   // returns the saved used in an Option or None if saving failed.
   def save(user: User): Option[User] = DB.withConnection { implicit c =>
     if(findById(user.id).isDefined) {
