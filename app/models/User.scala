@@ -118,7 +118,7 @@ object User {
 
 
   def findModeratorForLab(lab: Lab): List[User] = DB.withConnection{implicit c =>
-    SQL("SELECT * FROM AppUser WHERE role={moderator} OR role={administrator} AND lab={labId}")
+    SQL("SELECT * FROM AppUser WHERE (role={moderator} OR role={administrator}) AND lab={labId}")
       .on(
         "moderator" -> Moderator.toInt,
         "administrator" -> Administrator.toInt,
