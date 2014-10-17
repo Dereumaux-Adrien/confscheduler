@@ -1,4 +1,4 @@
-@(conferenceForm: Form[ConferenceController.SimpleConference], visibleLabs: List[Lab])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
+@(conferenceForm: Form[ConferenceController.SimpleConference], visibleLabs: List[Lab], today: String)(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 @import utils._
 
 @main("Add a new conference") {
@@ -63,19 +63,19 @@
         </div>
 
         <div class="form-group">
-            <label for="datepicker" class="col-sm-2 control-label">Date</label>
+            <label for="datepicker" class="col-sm-2 control-label">Date *</label>
             <div class="col-sm-2">
-                <input type="text" class="form-control" id="datepicker" name="date" value='@conferenceForm("date").value.getOrElse("")'>
+                <input type="text" class="form-control" id="datepicker" name="date" value='@conferenceForm("date").value.getOrElse(today)'>
             </div>
-            <label for="timepicker" class="col-sm-1 control-label">Time</label>
+            <label for="timepicker" class="col-sm-1 control-label">Time *</label>
             <div class="col-sm-2">
-                <input id="timepicker" type="text" name="time" class="form-control time-input" value='@conferenceForm("time").value.getOrElse("")'>
+                <input id="timepicker" type="text" name="time" class="form-control time-input" value='@conferenceForm("time").value.getOrElse("9:00")'>
             </div>
         </div>
         <div class="form-group">
-            <label for="length" class="col-sm-2 control-label">Length</label>
+            <label for="length" class="col-sm-2 control-label">Length *</label>
             <div class="col-sm-2">
-                <input type="text" class="form-control time-input" id="length" name="length" value='@conferenceForm("length").value.getOrElse("")'>
+                <input type="text" class="form-control time-input" id="length" name="length" value='@conferenceForm("length").value.getOrElse("0:45")'>
             </div>
         </div>
         @bootstrapSelect(conferenceForm("private"), List(("true", "Yes"),("false", "No")), size = 2)

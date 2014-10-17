@@ -1,7 +1,10 @@
 @(field: Field, options: List[(String, String)], label: String = "", size: Int = 5, disabled: Boolean = false)
 
 <div class="form-group">
-    <label for="@field.name" class="col-sm-2 control-label">@if(label.equals("")) {@field.name.capitalize} else {@label}</label>
+    <label for="@field.name" class="col-sm-2 control-label">
+        @if(label.equals("")) {@field.name.capitalize} else {@label}
+        @if(field.constraints.map({case(s, _) => s}).contains("constraint.required")) {*}
+    </label>
     <div class="col-sm-@size">
         <select class="form-control" id="@field.name" name="@field.name" @if(disabled) {readonly}>
             @for(opt <- options) {
