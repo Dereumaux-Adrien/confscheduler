@@ -7,6 +7,7 @@
         @bootstrapErrors(labForm.errors, "lab")
         @bootstrapInput(labForm("acronym"))
         @bootstrapInput(labForm("name"))
+        @bootstrapInput(labForm("email"), label="Email *")
         <p>Select the logo of the new lab (must be either a JPEG or a PNG, under 4MB):</p>
         <input type="file" name="logo">
         @bootstrapSubmit()

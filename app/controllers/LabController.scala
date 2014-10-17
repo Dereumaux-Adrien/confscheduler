@@ -18,12 +18,14 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 
 object LabController extends Controller {
-  case class SimpleLab(acronym: String, name: String)
+  case class SimpleLab(acronym: String, name: String, email: String)
 
   val labForm = Form {
     mapping(
       "acronym" -> nonEmptyText(1, 100),
-      "name" -> nonEmptyText(1, 254))(SimpleLab.apply)(SimpleLab.unapply)
+      "name" -> nonEmptyText(1, 254),
+      "email" -> email
+    )(SimpleLab.apply)(SimpleLab.unapply)
   }
 
   def logo(id: Long) = ForcedAuthentication{implicit request => Future {

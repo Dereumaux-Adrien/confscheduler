@@ -3,8 +3,9 @@
 
 CREATE TABLE Lab (
     id      SERIAL,
-    acronym VARCHAR(255) NOT NULL UNIQUE,
+    acronym VARCHAR(255) NOT NULL,
     name    VARCHAR(500) NOT NULL UNIQUE,
+    email   VARCHAR(500) NOT NULL UNIQUE,
     logoId  VARCHAR(30) UNIQUE,
     PRIMARY KEY (id)
 );
