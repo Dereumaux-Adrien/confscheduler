@@ -3,8 +3,8 @@ $(document).ready(function() {
         firstDay   : 1,
         defaultView: "agendaWeek",
         allDaySlot : false,
-        minTime    : "06:00:00",
-        maxTime    : "23:00:00",
+        minTime    : "09:00:00",
+        maxTime    : "21:00:00",
         timeFormat : "HH:mm",
         header     : {
                         left:   'prev',

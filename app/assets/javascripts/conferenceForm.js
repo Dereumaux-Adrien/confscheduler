@@ -6,8 +6,8 @@ $(function() {
 
     $("#timepicker").timepicker({
         timeFormat: "G:i",
-        minTime: "6:00am",
-        maxTime: "9:00pm",
+        minTime: "9:00am",
+        maxTime: "8:00pm",
         step:15
     });
 
