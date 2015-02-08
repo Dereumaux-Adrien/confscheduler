@@ -16,3 +16,5 @@ dist
 secret.conf
 db.conf
 email.conf
+/node_modules/*
+/projectFilesBackup

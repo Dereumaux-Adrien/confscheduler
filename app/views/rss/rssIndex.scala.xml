@@ -1,0 +1,15 @@
+@(confs: List[Conference])
+
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>External Seminars</title>
+        <description>List of the external seminars</description>
+        @for(conf <- confs) {
+            <item>
+                <title>@conf.title</title>
+                <description>@conf.abstr - by @conf.speaker.fullName, @conf.displayDate. Organized by @conf.organizedBy.name</description>
+            </item>
+        }
+    </channel>
+</rss>
