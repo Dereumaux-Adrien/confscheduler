@@ -145,6 +145,15 @@ object Conference {
       .as(conferenceParser *)
   }
 
+  def findPublicBetween(startPeriod: DateTime, endPeriod: DateTime): List[Conference] = DB.withConnection {implicit c =>
+    SQL("SELECT * FROM Conference WHERE accepted = true AND private = false" +
+      "AND (startDate, startDate) OVERLAPS ({startPeriod}, {endPeriod})")
+      .on("startPeriod" -> startPeriod,
+        "endPeriod" -> endPeriod)
+      .as(conferenceParser *)
+  }
+
+
   def save(conf: Conference): Option[Conference] = DB.withConnection { implicit c =>
     if(findById(conf.id).isDefined) {
       updateQuery.on(
