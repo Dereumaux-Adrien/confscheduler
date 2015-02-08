@@ -3,7 +3,7 @@
 @main("Index") {
     @utils.filter()
     @if(confs.isEmpty) {
-        <strong>No conferences matching your criteria found</strong>
+        <strong>No seminars matching your criteria found</strong>
     }
     @for(conf <- confs) {
         @confutils.displayConf(conf._1, conf._2)

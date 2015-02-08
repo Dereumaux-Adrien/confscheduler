@@ -104,7 +104,7 @@ object LabController extends Controller {
       if(labHasBeenDestroyed) {
         Redirect(routes.LabController.list(None)).flashing(("success", "Lab successfully deleted"))
       } else {
-        Redirect(routes.LabController.list(None)).flashing(("error", "This lab is still referenced by some conferences or users, please delete them first"))
+        Redirect(routes.LabController.list(None)).flashing(("error", "This lab is still referenced by some seminars or users, please delete them first"))
       }
     })
   }}

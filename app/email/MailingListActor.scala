@@ -20,11 +20,11 @@ class MailingListActor extends Actor {
   val mailer = Akka.system.actorOf(Props[Mailer])
 
   override def receive = {
-    case Mailing(Weekly) => Lab.listAll.foreach(lab => mailer ! SendMail(lab.email, "[Bio-Hebdo] Weekly Conferences Reminder",
+    case Mailing(Weekly) => Lab.listAll.foreach(lab => mailer ! SendMail(lab.email, "[Bio-Hebdo] Weekly Seminar Reminder",
         views.html.email.weeklyConfList.render(Conference.findVisibleByLabBetween(lab, DateTime.now, DateTime.now.plusDays(7)), "week").body)
     )
     case Mailing(Monthly) => {
-      Lab.listAll.foreach(lab => mailer ! SendMail(lab.email, "[Bio-Conf] Monthly Conferences Reminder",
+      Lab.listAll.foreach(lab => mailer ! SendMail(lab.email, "[Bio-Conf] Monthly Seminar Reminder",
         views.html.email.weeklyConfList.render(Conference.findPublicBetween(DateTime.now, DateTime.now.plusMonths(1)), "month").body)
       )
       Akka.system.scheduler.scheduleOnce(DateTimeUtils.findNextMonth(1), Akka.system.actorOf(Props[MailingListActor]), Mailing(Monthly))

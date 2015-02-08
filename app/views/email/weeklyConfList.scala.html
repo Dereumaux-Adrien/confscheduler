@@ -10,10 +10,10 @@
 <div>
     <h3>ConfScheduler</h3>
     <hr>
-    <p>Here are the conferences you might be interested in for this @period:</p>
+    <p>Here are the seminars you might be interested in for this @period:</p>
 </div>
     @if(confs.isEmpty){
-        <div style="width: @width; position: relative; margin:0 auto; text-align:center;"><h5>No conferences to display for this @period</h5></div>
+        <div style="width: @width; position: relative; margin:0 auto; text-align:center;"><h5>No seminars to display for this @period</h5></div>
     }
     @for(conf <- confs) {
     <table style="width: @width; position: relative; border-collapse: collapse; margin:0 auto; background-color: #F7F7F7">

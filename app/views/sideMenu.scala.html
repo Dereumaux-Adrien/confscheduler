@@ -2,10 +2,10 @@
 
 @genMenu(role: UserRole) = {
     @if(role != Guest) {
-        @utils.activeLi("Add Conference", routes.ConferenceController.addConf)
+        @utils.activeLi("Add Seminar", routes.ConferenceController.addConf)
     }
     @if(role == Moderator || role == Administrator) {
-        @utils.activeLi("Accept Conferences", routes.ConferenceController.allowList)
+        @utils.activeLi("Accept Seminars", routes.ConferenceController.allowList)
     }
     @if(role == Moderator) {
         <hr>
@@ -24,8 +24,8 @@
 }
 
 <ul class="nav nav-pills nav-stacked">
-    @utils.activeLi("Upcoming Conferences", routes.ConferenceController.listUpcomingConfs(None))
-    @utils.activeLi("All Conferences", routes.ConferenceController.listConfs(None))
-    @utils.activeLi("Conferences Calendar", routes.ConferenceController.calendar)
+    @utils.activeLi("Upcoming Seminars", routes.ConferenceController.listUpcomingConfs(None))
+    @utils.activeLi("All Seminars", routes.ConferenceController.listConfs(None))
+    @utils.activeLi("Seminar Calendar", routes.ConferenceController.calendar)
     @genMenu(userRole)
 </ul>

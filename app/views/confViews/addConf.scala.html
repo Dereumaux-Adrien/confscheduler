@@ -1,12 +1,12 @@
 @(conferenceForm: Form[ConferenceController.SimpleConference], visibleLabs: List[Lab], today: String)(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 @import utils._
 
-@main("Add a new conference") {
+@main("Add a new seminar") {
     <script src='@routes.Assets.at("javascripts/conferenceForm.js")' type="text/javascript"></script>
 
     @helper.form(routes.ConferenceController.create, 'class -> "form-horizontal") {
         <input type="hidden" id="timezoneOffset" name="timezoneOffset">
-        @bootstrapErrors(conferenceForm.errors, "conference")
+        @bootstrapErrors(conferenceForm.errors, "seminar")
         @bootstrapInput(conferenceForm("title"))
         <div class="form-group">
             <label for="abstract" class="col-sm-2 control-label">Abstract</label>

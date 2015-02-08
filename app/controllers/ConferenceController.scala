@@ -162,9 +162,9 @@ object ConferenceController extends Controller {
 
     def redirectRouteOk(c: Conference) = {
       c.asAccepted.save
-      Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "Conference " + c.title + " successfully accepted"))
+      Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "Seminar " + c.title + " successfully accepted"))
     }
-    def redirectRouteRefuse = Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to allow an unknown conference"))
+    def redirectRouteRefuse = Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to allow an unknown seminar"))
 
     conf.fold ({
       redirectRouteRefuse
@@ -182,9 +182,9 @@ object ConferenceController extends Controller {
 
     def redirectRouteOk(c: Conference) = {
       c.destroy
-      Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "Conference successfully refused"))
+      Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "Seminar successfully refused"))
     }
-    def redirectRouteRefuse = Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to refuse an unknown conference"))
+    def redirectRouteRefuse = Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to refuse an unknown seminar"))
 
     conf.fold ({
       redirectRouteRefuse
@@ -199,11 +199,11 @@ object ConferenceController extends Controller {
 
   def delete(id: Long) = AuthorizedWith(_.canAllowConfs) { implicit request => Future {
     Conference.findById(id).fold(
-      Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to delete an unknown conference"))
+      Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to delete an unknown seminar"))
     )(
         c => {
           c.destroy
-          Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "Conference successfully deleted"))
+          Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "Seminar successfully deleted"))
         }
       )
   }}
@@ -222,12 +222,12 @@ object ConferenceController extends Controller {
       case Contributor               => {
         newConf.save match {
           case None => {
-            Logger.error("Tried to save the new conference " + newConf.title + "failed!")
-            Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "The conference " + newConf.title + " couldn't be submitted for moderation, please re-try later."))
+            Logger.error("Tried to save the new seminar " + newConf.title + "failed!")
+            Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "The seminar " + newConf.title + " couldn't be submitted for moderation, please re-try later."))
           }
           case Some(c) => {
             sendConfirmationMail(c)
-            Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "The conference " + newConf.title + " has been submitted for moderation by your team's moderator."))
+            Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "The seminar " + newConf.title + " has been submitted for moderation by your team's moderator."))
           }
         }
       }
@@ -245,8 +245,8 @@ object ConferenceController extends Controller {
     val acceptURL = "http://" + hostName + routes.ConferenceController.accept(c.id, c.acceptCode).url
     val refuseURL = "http://" + hostName + routes.ConferenceController.refuse(c.id, c.acceptCode).url
 
-    if(moderators.isEmpty) Logger.warn("The lab " + c.organizedBy.name + " doesn't have any moderator! Conference can't be accepted")
-    else                   moderators.map(mod => mailer ! SendMail(mod.email, "[ConfScheduler] A new conference needs to be moderated",
+    if(moderators.isEmpty) Logger.warn("The lab " + c.organizedBy.name + " doesn't have any moderator! Seminar can't be accepted")
+    else                   moderators.map(mod => mailer ! SendMail(mod.email, "[ConfScheduler] A new seminar needs to be moderated",
                                                                      views.html.email.confModeration(c, acceptURL, refuseURL).body))
   }
 }
