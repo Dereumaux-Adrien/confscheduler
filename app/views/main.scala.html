@@ -6,7 +6,7 @@
 <html>
     <head>
         <title>@title</title>
-
+        <link rel="alternate" type="application/rss+xml" title="External Seminar Feed" href="/rss">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap.min.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/fullcalendar.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jquery-ui.min.css")">
@@ -44,6 +44,9 @@
                 <img src="/assets/logos/inserm.fr.gif" height="@logoHeight">
                 <img src="/assets/logos/Logo UCBL.jpg" height="@logoHeight">
                 <img src="/assets/logos/CNRSfr-grand.jpg" height="@logoHeight">
+            </div>
+            <div class="feeds">
+                <a href="/rss"><img src="/assets/logos/feed-icon-32x32.jpg" height="14px"> RSS Feed</a>
             </div>
             <div class="attribution">
                 <a href="@routes.Application.legals().toString">Mentions légales et Crédits</a>
