@@ -21,6 +21,17 @@ object DateTimeUtils {
     }
   }
 
+  def findNextYear(sendOn: Int): FiniteDuration = {
+    var count = 1
+    var currentDay = DateTime.now().plusDays(1)
+    while (currentDay.getDayOfYear != sendOn) {
+      count += 1
+      currentDay = currentDay.plusDays(1)
+    }
+
+    count.days - DateTime.now().getMillisOfDay.milliseconds
+  }
+
   def findNextMonth(sendOn: Int): FiniteDuration = {
     var count = 1
     var currentDay = DateTime.now().plusDays(1)

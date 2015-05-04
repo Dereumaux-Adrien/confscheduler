@@ -201,6 +201,11 @@ object Conference {
     SQL("DELETE FROM Conference").executeUpdate()
   }
 
+  def destroyAfterTenYearPeriod() = DB.withConnection { implicit c =>
+    SQL("DELETE FROM Conference " +
+      "WHERE datediff(startDate,now())<-3653;").executeUpdate()
+  }
+
   def seedDB(): Unit = {
     for(conf <- fixtures) {
       conf.save

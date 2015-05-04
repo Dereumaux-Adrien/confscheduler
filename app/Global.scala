@@ -16,11 +16,14 @@ object Global extends GlobalSettings{
   def scheduleMailing() = {
     val delayBeforeNextMonday = DateTimeUtils.findNextDayOfWeek(DateTimeConstants.MONDAY)
     val delayBeforeNextMonth  = DateTimeUtils.findNextMonth(1)
+    val delayBeforeNextYear = DateTimeUtils.findNextYear(1)
 
     val mailer = Akka.system.actorOf(Props[MailingListActor])
     Akka.system().scheduler.schedule(delayBeforeNextMonday, 7 days, mailer, Mailing(Weekly))
     Akka.system().scheduler.scheduleOnce(delayBeforeNextMonth, mailer, Mailing(Monthly))
 
+
+    Akka.system().scheduler.scheduleOnce(delayBeforeNextYear, mailer, Mailing(Monthly))
   }
 
   override def onStart(app: Application) {
