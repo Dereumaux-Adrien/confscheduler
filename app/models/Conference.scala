@@ -110,8 +110,14 @@ object Conference {
   def findAcceptedWithFilter(viewableBy: Option[User], filter: String) = DB.withConnection { implicit c =>
     val query = """SELECT c.* FROM Conference c
                   |JOIN Speaker s ON c.speaker = s.id
+                  |JOIN Lab l ON c.organizedBy = l.id
                   |WHERE c.accepted = true AND
-                  |(lower(c.title) LIKE {filter} OR lower(s.firstName) LIKE {filter} OR lower(s.lastName) LIKE {filter})""".stripMargin
+                  |(lower(c.title) LIKE {filter}
+                  |OR lower(s.firstName) LIKE {filter}
+                  |OR lower(s.lastName) LIKE {filter}
+                  |OR lower(c.abstr) LIKE {filter}
+                  |OR lower(l.acronym) LIKE {filter}
+                  |OR lower(l.name) LIKE {filter})""".stripMargin
 
     val wideFilter = "%" + filter.toLowerCase + "%"
     val adminQuery = SQL(query)
@@ -138,7 +144,7 @@ object Conference {
 
   def findVisibleByLabBetween(lab: Lab, startPeriod: DateTime, endPeriod: DateTime): List[Conference] = DB.withConnection {implicit c =>
     SQL("SELECT * FROM Conference WHERE organizedBy = {labId} AND accepted = true " +
-        "AND (startDate, startDate) OVERLAPS ({startPeriod}, {endPeriod})")
+        "AND startDate BETWEEN {startPeriod} AND {endPeriod}")
       .on("labId" -> lab.id,
           "startPeriod" -> startPeriod,
           "endPeriod" -> endPeriod)
@@ -147,7 +153,7 @@ object Conference {
 
   def findPublicBetween(startPeriod: DateTime, endPeriod: DateTime): List[Conference] = DB.withConnection {implicit c =>
     SQL("SELECT * FROM Conference WHERE accepted = true AND private = false" +
-      "AND (startDate, startDate) OVERLAPS ({startPeriod}, {endPeriod})")
+      "AND startDate BETWEEN {startPeriod} AND {endPeriod}")
       .on("startPeriod" -> startPeriod,
         "endPeriod" -> endPeriod)
       .as(conferenceParser *)
@@ -213,8 +219,8 @@ object Conference {
   def between(start: DateTime, end: DateTime) = DB.withConnection { implicit c =>
     SQL("""
         SELECT * FROM Conference
-        WHERE (startDate, startDate) OVERLAPS ({startDate}, {endDate})
-        AND accepted = true
+        WHERE accepted = true
+        AND  startDate BETWEEN {startDate} AND {endDate}
       """)
     .on(
       "startDate" -> start,

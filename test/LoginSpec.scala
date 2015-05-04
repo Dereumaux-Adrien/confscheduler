@@ -24,7 +24,7 @@ class LoginSpec extends Specification {
 
     "redirect to the upcoming conf list page after successful login" in new WithApplication {
       val login = route(FakeRequest(POST, "/login").withFormUrlEncodedBody(validUsername, validPassword)).get
-      headers(login) must havePair("Location" -> routes.ConferenceController.listUpcomingConfs().toString())
+      headers(login) must havePair("Location" -> routes.ConferenceController.listUpcomingConfs(None).toString())
     }
 
     "prevent invalid user from logging in" in new WithApplication {

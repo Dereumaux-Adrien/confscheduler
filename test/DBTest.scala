@@ -25,7 +25,7 @@ class DBTest extends Specification {
     }
 
     "be able to save valid Labs" in {
-      val validLab = Lab(-1, "ERF", "Erectus Raging Friends", None)
+      val validLab = Lab(-1, "ERF", "Erectus Raging Friends", "ERF@gmail.com", None)
       val labCount = Lab.count
 
       validLab.save()

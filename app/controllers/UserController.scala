@@ -60,8 +60,8 @@ object UserController extends Controller {
       case (true, Moderator) =>
         Ok(views.html.userViews.list(User.findContributorsInLab(authorizedUser.lab)
           .filter(u => u.firstName.toLowerCase.contains(filter.get.toLowerCase) | u.lastName.toLowerCase.contains(filter.get.toLowerCase)))
-          (request, Administrator))
-      case (false, Moderator) => Ok(views.html.userViews.list(User.findContributorsInLab(authorizedUser.lab))(request, Administrator))
+          (request, Moderator))
+      case (false, Moderator) => Ok(views.html.userViews.list(User.findContributorsInLab(authorizedUser.lab))(request, Moderator))
     }
   }}
 

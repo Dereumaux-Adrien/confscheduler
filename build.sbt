@@ -15,5 +15,6 @@ libraryDependencies ++= Seq(
   "com.lambdaworks" % "scrypt" % "1.4.0",
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
   "org.apache.commons" % "commons-email" % "1.3.3",
-  "com.sksamuel.scrimage" %% "scrimage-core" % "1.4.1"
+  "com.sksamuel.scrimage" %% "scrimage-core" % "1.4.1",
+  "mysql" % "mysql-connector-java" % "5.1.27"
 )

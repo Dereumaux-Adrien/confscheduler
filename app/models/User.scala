@@ -101,11 +101,13 @@ object User {
     SQL(
       """SELECT u.* FROM AppUser u
         |JOIN Lab l ON u.lab = l.id
-        |WHERE lower(u.firstName) LIKE {filter} OR lower(u.lastName) LIKE {filter} OR lower(l.name) LIKE {filter} """.stripMargin)
-      .on("filter" -> wideFilter)
+        |WHERE lower(u.firstName) LIKE {filter}
+        |OR lower(u.lastName) LIKE {filter}
+        |OR lower(l.name) LIKE {filter}
+        |OR lower(l.acronym) LIKE {strictFilter}""".stripMargin)
+      .on("filter" -> wideFilter, "strictFilter"->filter.toLowerCase)
       .as(userParser *)
   }
-
   def listAll: List[User] = DB.withConnection {implicit c =>
     SQL("SELECT * FROM AppUser")
       .as(userParser *)
