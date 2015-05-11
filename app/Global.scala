@@ -1,7 +1,9 @@
+import database.Cleaner
 import java.io.File
 
 import akka.actor.Props
 import email._
+import database._
 import helpers.DateTimeUtils
 import models._
 import org.joda.time.{DateTimeConstants, DateTime}
@@ -22,8 +24,8 @@ object Global extends GlobalSettings{
     Akka.system().scheduler.schedule(delayBeforeNextMonday, 7 days, mailer, Mailing(Weekly))
     Akka.system().scheduler.scheduleOnce(delayBeforeNextMonth, mailer, Mailing(Monthly))
 
-
-    Akka.system().scheduler.scheduleOnce(delayBeforeNextYear, mailer, Mailing(Monthly))
+    val cleaner = Akka.system.actorOf(Props[Cleaner])
+    Akka.system().scheduler.scheduleOnce(delayBeforeNextYear, cleaner, TenYearPeriod)
   }
 
   override def onStart(app: Application) {
