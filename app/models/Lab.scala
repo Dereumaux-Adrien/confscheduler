@@ -75,6 +75,7 @@ object Lab {
       newId.map(lab.withId)
     }
   }
+
   def filteredWith(filter: String): List[Lab] = DB.withConnection {implicit c =>
     val wideFilter = "%" + filter.toLowerCase + "%"
     SQL("SELECT * FROM Lab WHERE lower(name) LIKE {filter} OR lower(acronym) LIKE {filter}")
