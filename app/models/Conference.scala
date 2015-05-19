@@ -143,8 +143,8 @@ object Conference {
   }
 
   def findVisibleByLabBetween(lab: Lab, startPeriod: DateTime, endPeriod: DateTime): List[Conference] = DB.withConnection {implicit c =>
-    SQL("SELECT * FROM Conference WHERE organizedBy = {labId} AND accepted = true " +
-        "AND startDate BETWEEN {startPeriod} AND {endPeriod}")
+    SQL(
+      "SELECT * FROM Conference WHERE organizedBy = {labId} AND accepted = true AND startDate BETWEEN {startPeriod} AND {endPeriod}")
       .on("labId" -> lab.id,
           "startPeriod" -> startPeriod,
           "endPeriod" -> endPeriod)
@@ -152,8 +152,8 @@ object Conference {
   }
 
   def findPublicBetween(startPeriod: DateTime, endPeriod: DateTime): List[Conference] = DB.withConnection {implicit c =>
-    SQL("SELECT * FROM Conference WHERE accepted = true AND private = false" +
-      "AND startDate BETWEEN {startPeriod} AND {endPeriod}")
+    SQL(
+      "SELECT * FROM Conference WHERE accepted = true AND private = false AND startDate BETWEEN {startPeriod} AND {endPeriod}")
       .on("startPeriod" -> startPeriod,
         "endPeriod" -> endPeriod)
       .as(conferenceParser *)
@@ -202,8 +202,7 @@ object Conference {
   }
 
   def destroyAfterTenYearPeriod() = DB.withConnection { implicit c =>
-    SQL("DELETE FROM Conference " +
-      "WHERE datediff(startDate,now())<-3653;").executeUpdate()
+    SQL("DELETE FROM Conference WHERE datediff(startDate,now())<-3653;").executeUpdate()
   }
 
   def seedDB(): Unit = {
