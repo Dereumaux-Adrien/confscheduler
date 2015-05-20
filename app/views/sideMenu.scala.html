@@ -9,16 +9,19 @@
     }
     @if(role == Moderator) {
         <hr>
-        @utils.activeLi("Add Contributor", routes.UserController.newUser(Some("Contributor")))
         @utils.activeLi("List Contributors",  routes.UserController.list(None))
+        @utils.activeLi("Add Contributor", routes.UserController.newUser(Some("Contributor")))
     }
     @if(role == Administrator) {
         <hr>
-        @utils.activeLi("Add User",  routes.UserController.newUser(None))
         @utils.activeLi("List Users",  routes.UserController.list(None))
+        @utils.activeLi("Add User",  routes.UserController.newUser(None))
         <hr>
-        @utils.activeLi("Add Lab",  routes.LabController.newLab)
         @utils.activeLi("List Labs",  routes.LabController.list(None))
+        @utils.activeLi("Add Lab",  routes.LabController.newLab)
+        <hr>
+        @utils.activeLi("List Lab Groups",  routes.LabGroupController.list(None))
+        @utils.activeLi("Add Lab Group",  routes.LabGroupController.newLabGroup)
     }
 }
 
