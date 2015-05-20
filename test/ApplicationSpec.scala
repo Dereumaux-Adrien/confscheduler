@@ -112,6 +112,14 @@ class ApplicationSpec extends Specification {
       adminOnlyAccess("/lab/all", GET)
     }
 
+    "render the new lab page to only an admin" in {
+      adminOnlyAccess("/labGroup/new", GET)
+    }
+
+    "render the lab list page to only an admin" in {
+      adminOnlyAccess("/labGroup/all", GET)
+    }
+
     "render the user list page to an admin or moderator" in {
       modOrBetterAccess("/user/all", GET)
     }

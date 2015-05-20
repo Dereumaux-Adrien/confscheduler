@@ -58,6 +58,23 @@ CREATE TABLE AppUser (
     role      int NOT NULL,
     rememberMeToken VARCHAR(255),
     PRIMARY KEY (id)
+);
+
+CREATE TABLE LabGroup (
+    id      INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name    VARCHAR(500) NOT NULL UNIQUE,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IndexLabGroup (
+	id_group      INT UNSIGNED NOT NULL,
+	id_lab      INT UNSIGNED NOT NULL,
+	FOREIGN KEY (id_group)
+      REFERENCES LabGroup(id)
+		ON DELETE CASCADE,
+	FOREIGN KEY (id_lab)
+      REFERENCES Lab(id)
+		ON DELETE CASCADE
 )
 
 # --- !Downs
@@ -67,5 +84,5 @@ DROP TABLE Conference;
 DROP TABLE Location;
 DROP TABLE Lab;
 DROP TABLE Speaker;
-
-
+DROP TABLE LabGroup;
+DROP TABLE IndexLabGroup;

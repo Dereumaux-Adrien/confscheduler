@@ -24,6 +24,9 @@ object Global extends GlobalSettings{
     Akka.system().scheduler.schedule(delayBeforeNextMonday, 7 days, mailer, Mailing(Weekly))
     Akka.system().scheduler.scheduleOnce(delayBeforeNextMonth, mailer, Mailing(Monthly))
 
+    //Akka.system().scheduler.schedule(delayBeforeNextMonday, 1.minutes, mailer, Mailing(Weekly))
+    //Akka.system.scheduler.scheduleOnce(1.minute, Akka.system.actorOf(Props[MailingListActor]), Mailing(Monthly))
+
     val cleaner = Akka.system.actorOf(Props[Cleaner])
     Akka.system().scheduler.scheduleOnce(delayBeforeNextYear, cleaner, TenYearPeriod)
   }

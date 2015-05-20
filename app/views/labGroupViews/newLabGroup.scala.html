@@ -1,0 +1,11 @@
+@(labGroupForm: Form[LabGroupController.SimpleLabGroup])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
+@import views.html.helper._
+@import utils._
+
+@main("New Lab Group") {
+    @helper.form(routes.LabGroupController.create, 'class -> "form-horizontal", 'enctype -> "multipart/form-data") {
+        @bootstrapErrors(labGroupForm.errors, "labGroup")
+        @bootstrapInput(labGroupForm("name"))
+        @bootstrapSubmit()
+    }
+}

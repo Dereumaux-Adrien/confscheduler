@@ -1,0 +1,19 @@
+@(labGroups: List[LabGroup])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
+
+@displayLabGroup(labGroup: LabGroup) = {
+<div class="listing labGroup-listing">
+    <div class="content">
+        <h4>@labGroup.name</h4>
+        <form method="POST" action="@routes.LabGroupController.delete(labGroup.id)">
+            <span class="pull-right"><button type="submit" class="btn btn-danger user-delete">Delete</button></span>
+        </form>
+    </div>
+</div>
+}
+
+@main("LabGroup List") {
+    @utils.filter()
+    @for(labGroup <- labGroups) {
+        @displayLabGroup(labGroup)
+    }
+}
