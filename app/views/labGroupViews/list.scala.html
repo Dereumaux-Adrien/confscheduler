@@ -5,7 +5,10 @@
     <div class="content">
         <h4>@labGroup.name</h4>
         <form method="POST" action="@routes.LabGroupController.delete(labGroup.id)">
-            <span class="pull-right"><button type="submit" class="btn btn-danger user-delete">Delete</button></span>
+            <span class="pull-right"><button type="submit" class="btn btn-danger labGroup-delete">Delete</button></span>
+        </form>
+        <form method="POST" action="@routes.LabGroupController.delete(labGroup.id)">
+            <span class="pull-right"><button type="submit" class="btn  lab-add">Add Lab</button></span>
         </form>
     </div>
 </div>

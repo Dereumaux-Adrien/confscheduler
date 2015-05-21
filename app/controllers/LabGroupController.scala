@@ -60,7 +60,7 @@ object LabGroupController extends Controller {
       BadRequest(views.html.labGroupViews.list(LabGroup.listAll)(request, request.user.get.role)).flashing(("error", "You tried to delete a non-existing labGroup"))
     )(labGroup => {
       labGroup.destroy()
-      Redirect(routes.LabController.list(None)).flashing(("success", "LabGroup successfully deleted"))
+      Redirect(routes.LabGroupController.list(None)).flashing(("success", "LabGroup successfully deleted"))
     })
   }}
 
