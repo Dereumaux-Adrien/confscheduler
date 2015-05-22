@@ -1,0 +1,44 @@
+@(labGroup: LabGroup,labs: List[Lab], add: Boolean)(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
+
+@displayLabToAdd(lab: Lab) = {
+<div class="listing lab-listing">
+    @if(lab.logoId.isDefined) {
+    <img height="100" src="@routes.LabController.logo(lab.id).url">
+    }
+    <div class="content">
+        <h4>@lab.acronym</h4>
+        @lab.name
+        <form method="POST" action="@routes.LabGroupController.addLab(labGroup.id, lab.id)">
+            <span class="pull-right"><button type="submit" class="btn btn-success lab-add">Add Lab</button></span>
+        </form>
+    </div>
+</div>
+}
+
+@displayLabToRemove(lab: Lab) = {
+<div class="listing lab-listing">
+    @if(lab.logoId.isDefined) {
+    <img height="100" src="@routes.LabController.logo(lab.id).url">
+    }
+    <div class="content">
+        <h4>@lab.acronym</h4>
+        @lab.name
+        <form method="POST" action="@routes.LabGroupController.removeLab(labGroup.id, lab.id)">
+            <span class="pull-right"><button type="submit" class="btn btn-danger lab-remove">Remove Lab</button></span>
+        </form>
+    </div>
+</div>
+}
+
+@main("Lab List") {
+    @utils.filter()
+    @if(add){
+        @for(lab <- labs) {
+            @displayLabToAdd(lab)
+        }
+    } else {
+        @for(lab <- labs) {
+            @displayLabToRemove(lab)
+        }
+    }
+}

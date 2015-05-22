@@ -90,11 +90,21 @@ object LabGroup {
 
   def addLabToGroup(idLabGroup: Long, idLab: Long) = DB.withConnection {implicit c =>
     SQL("""
-      INSERT INTO dbconfscheduler.IndexLabGroup
+      INSERT INTO IndexLabGroup
       VALUES ({idLabGroup}, {idLab})
         """)
       .on("idLabGroup" -> idLabGroup, "idLab" -> idLab)
       .executeUpdate()
+  }
+
+  def removeLabFromGroup(idLabGroup: Long, idLab: Long) = DB.withConnection {implicit c =>
+    SQL("""
+      DELETE FROM IndexLabGroup
+      WHERE id_group={idLabGroup} AND id_lab={idLab}
+        """)
+      .on("idLabGroup" -> idLabGroup, "idLab" -> idLab)
+      .executeUpdate()
+    true
   }
 
 }

@@ -35,7 +35,9 @@ GET         /lab/:id/logo           controllers.LabController.logo(id: Long)
 GET         /labGroup/new           controllers.LabGroupController.newLabGroup
 POST        /labGroup/new           controllers.LabGroupController.create
 GET         /labGroup/:id/addLab    controllers.LabGroupController.listLabToAdd(id: Long, filter: Option[String])
+GET         /labGroup/:id/removeLab controllers.LabGroupController.listLabOfGroup(id: Long, filter: Option[String])
 POST        /labGroup/addLab        controllers.LabGroupController.addLab(idLabGroup: Long, idLab: Long)
+POST        /labGroup/removeLab     controllers.LabGroupController.removeLab(idLabGroup: Long, idLab: Long)
 GET         /labGroup/all           controllers.LabGroupController.list(filter: Option[String])
 POST        /labGroup/:id/delete    controllers.LabGroupController.delete(id: Long)
 
