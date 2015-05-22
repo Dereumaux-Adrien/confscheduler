@@ -88,7 +88,7 @@ object LabGroupController extends Controller {
         BadRequest(views.html.labGroupViews.list(LabGroup.listAll)(request, request.user.get.role)).flashing(("error", "You tried to add a Lab non-existing into a labGroup"))
       )(labGroup => {
         LabGroup.addLabToGroup(idLabGroup, idLab)
-        successfullLabAddition(LabGroup.findById(idLabGroup).get.name, Lab.findById(idLab).get.name)
+        successfullLabAddition(LabGroup.findById(idLabGroup).get, Lab.findById(idLab).get.name)
       })
     })
   }}
@@ -101,13 +101,13 @@ object LabGroupController extends Controller {
         BadRequest(views.html.labGroupViews.list(LabGroup.listAll)(request, request.user.get.role)).flashing(("error", "You tried to add a Lab non-existing into a labGroup"))
       )(labGroup => {
         LabGroup.removeLabFromGroup(idLabGroup, idLab)
-        successfullLabRemoval(LabGroup.findById(idLabGroup).get.name, Lab.findById(idLab).get.name)
+        successfullLabRemoval(LabGroup.findById(idLabGroup).get, Lab.findById(idLab).get.name)
       })
     })
   }}
 
-  def successfullLabAddition(labGroupName: String, labName: String) = Redirect(routes.LabGroupController.list(None)).flashing(("success", "Successfully added lab: " + labName + " to Group: " + labGroupName))
+  def successfullLabAddition(labGroup: LabGroup, labName: String) = Redirect(routes.LabGroupController.listLabToAdd(labGroup.id, None)).flashing(("success", "Successfully added lab: " + labName + " to Group: " + labGroup.name))
 
-  def successfullLabRemoval(labGroupName: String, labName: String) = Redirect(routes.LabGroupController.list(None)).flashing(("success", "Successfully removed lab: " + labName + " from Group: " + labGroupName))
+  def successfullLabRemoval(labGroup: LabGroup, labName: String) = Redirect(routes.LabGroupController.listLabOfGroup(labGroup.id, None)).flashing(("success", "Successfully removed lab: " + labName + " from Group: " + labGroup.name))
 
 }
