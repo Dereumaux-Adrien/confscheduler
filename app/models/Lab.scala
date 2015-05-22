@@ -117,6 +117,20 @@ object Lab {
     }
   }
 
+  def findLabToAddToLabGroup(idLabGroup: Long, filter: String = ""): List[Lab] = DB.withConnection {implicit c =>
+    val wideFilter = "%" + filter.toLowerCase + "%"
+    SQL("SELECT * FROM Lab WHERE id NOT IN (SELECT l.id FROM Lab l JOIN IndexLabGroup i on l.id=i.id_lab WHERE i.id_group={id}) AND (lower(name) LIKE {filter} OR lower(acronym) LIKE {filter})")
+      .on("filter" -> wideFilter, "id" -> idLabGroup)
+      .as(Lab.labParser *)
+  }
+
+  def findLabToRemoveFromLabGroup(idLabGroup: Long, filter: String = ""): List[Lab] = DB.withConnection {implicit c =>
+    val wideFilter = "%" + filter.toLowerCase + "%"
+    SQL("SELECT l.* FROM Lab l JOIN IndexLabGroup i on l.id=i.id_lab WHERE i.id_group={id} AND (lower(name) LIKE {filter} OR lower(acronym) LIKE {filter})")
+      .on("filter" -> wideFilter, "id" -> idLabGroup)
+      .as(Lab.labParser *)
+  }
+
   private val labParser: RowParser[Lab] = {
       get[Long]("id") ~
       get[String]("acronym") ~
@@ -126,4 +140,5 @@ object Lab {
       case id ~ acronym ~ name ~ email ~ logoId => Lab(id, acronym, name, email, logoId)
     }
   }
+
 }

@@ -11,9 +11,9 @@ import play.api.db.DB
 import play.api.Play.current
 
 case class LabGroup (
-                 id     : Long,
-                 name   : String
-                 ) {
+  id     : Long,
+  name   : String
+) {
   def destroy() = LabGroup.destroy(this)
 
   def save() = LabGroup.save(this)
@@ -86,6 +86,15 @@ object LabGroup {
       get[String]("name") map {
       case id  ~ name => LabGroup(id, name)
     }
+  }
+
+  def addLabToGroup(idLabGroup: Long, idLab: Long) = DB.withConnection {implicit c =>
+    SQL("""
+      INSERT INTO dbconfscheduler.IndexLabGroup
+      VALUES ({idLabGroup}, {idLab})
+        """)
+      .on("idLabGroup" -> idLabGroup, "idLab" -> idLab)
+      .executeUpdate()
   }
 
 }

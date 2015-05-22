@@ -1,6 +1,6 @@
 package controllers
 
-import models.{Administrator, LabGroup}
+import models.{Lab, Administrator, LabGroup}
 import play.api.data.Form
 import play.api.data.Forms._
 import MySecurity.Authorization._
@@ -64,5 +64,27 @@ object LabGroupController extends Controller {
     })
   }}
 
+  def listLabToAdd(id: Long, filter: Option[String]) = AuthorizedWith(_.role == Administrator) { implicit request => Future {
+    if(filter.isDefined) {
+      Ok(views.html.labGroupViews.addLab(LabGroup.findById(id).get, Lab.findLabToAddToLabGroup(LabGroup.findById(id).get.id,filter.get))(request, request.user.get.role))
+    } else {
+      Ok(views.html.labGroupViews.addLab(LabGroup.findById(id).get, Lab.findLabToAddToLabGroup(LabGroup.findById(id).get.id))(request, request.user.get.role))
+    }
+  }}
+
+  def addLab(idLabGroup: Long, idLab: Long)= AuthorizedWith(_.role == Administrator) { implicit request => Future {
+    LabGroup.findById(idLabGroup).fold(
+      BadRequest(views.html.labGroupViews.list(LabGroup.listAll)(request, request.user.get.role)).flashing(("error", "You tried to add a Lab into a non-existing labGroup"))
+    )(labGroup => {
+      Lab.findById(idLab).fold(
+        BadRequest(views.html.labGroupViews.list(LabGroup.listAll)(request, request.user.get.role)).flashing(("error", "You tried to add a Lab non-existing into a labGroup"))
+      )(labGroup => {
+        LabGroup.addLabToGroup(idLabGroup, idLab)
+        successfullLabAddition(LabGroup.findById(idLabGroup).get.name, Lab.findById(idLab).get.name)
+      })
+    })
+  }}
+
+  def successfullLabAddition(labGroupName: String, labName: String) = Redirect(routes.LabGroupController.list(None)).flashing(("success", "Successfully added lab: " + labName + " to Group: " + labGroupName))
 
 }
