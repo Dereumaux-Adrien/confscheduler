@@ -107,4 +107,10 @@ object LabGroup {
     true
   }
 
+  def findGroupsByLab(idLab: Long): List[LabGroup] = DB.withConnection {implicit c =>
+    SQL("SELECT l.* FROM LabGroup l JOIN IndexLabGroup i ON l.id=i.id_group WHERE i.id_lab = {idLab}")
+      .on("idLab" -> idLab)
+      .as(labGroupParser *)
+  }
+
 }

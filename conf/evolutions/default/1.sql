@@ -45,6 +45,7 @@ CREATE TABLE Conference (
     accepted  boolean NOT NULL,
     acceptCode VARCHAR(255),
     private   boolean NOT NULL,
+	forGroup  bigint REFERENCES LabGroup(id),     
     PRIMARY KEY (id)
 );
 
@@ -78,11 +79,10 @@ CREATE TABLE IndexLabGroup (
 )
 
 # --- !Downs
-
-DROP TABLE AppUser;
-DROP TABLE Conference;
-DROP TABLE Location;
-DROP TABLE Lab;
-DROP TABLE Speaker;
-DROP TABLE LabGroup;
 DROP TABLE IndexLabGroup;
+DROP TABLE Conference;
+DROP TABLE Speaker;
+DROP TABLE Location;
+DROP TABLE AppUser;
+DROP TABLE LabGroup;
+DROP TABLE Lab;

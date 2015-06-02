@@ -48,8 +48,8 @@
             <div class="col-sm-2"></div>
             <div class="realign-with-fields">
                 Or <button id="toggleNewLocation" type=button class="btn btn-default" data-toggle="new-location" data-target="#new-location">
-                Add new location
-            </button>
+                    Add new location
+                </button>
             </div>
         </div>
         <div class="new-speaker" id="new-location">
@@ -78,9 +78,11 @@
                 <input type="text" class="form-control time-input" id="length" name="length" value='@conferenceForm("length").value.getOrElse("0:45")'>
             </div>
         </div>
-        @bootstrapSelect(conferenceForm("private"), List(("true", "Yes"),("false", "No")), size = 2)
         <span style="@if(userRole != Administrator) {display:none}">
             @bootstrapSelect(conferenceForm("organizer"), visibleLabs.map(l => (l.id.toString, l.name)))
+        </span>
+        <span>
+            @bootstrapSelect(conferenceForm("private"), List(("false", "No"),("true", "Yes")), size = 2)
         </span>
         @bootstrapSubmit()
     }

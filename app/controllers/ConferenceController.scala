@@ -150,7 +150,8 @@ object ConferenceController extends Controller {
 
   def create() = ForcedAuthentication { implicit request =>
     Future {
-      conferenceForm.bindFromRequest.fold(
+      val form= conferenceForm.bindFromRequest()
+      form.fold(
         formWithErrors => BadRequest(views.html.confViews.addConf(formWithErrors, Lab.listVisible(request.user.get), isoFormatter.print(DateTime.now()))(request, authenticatedUserRole.get)),
         conf           => createConfWithUser(conf, request.user.get)
       )
@@ -212,22 +213,64 @@ object ConferenceController extends Controller {
     Ok(views.html.confViews.allowConfList(Conference.findConfsAllowableBy(authorizedUser))(request, authorizedUserRole))
   }}
 
-  private def createConfWithUser(conf: SimpleConference, user: User): Result = {
-    val newConf = Conference.fromSimpleConference(conf)
-    user.role match {
-      case Administrator | Moderator => {
-        val newId = newConf.asAccepted.save.get.id
-        Redirect(routes.ConferenceController.viewConf(newId))
+  def privacySelection(confId: Long) = MyAuthenticated { implicit request =>
+    val lab = Conference.findById(confId).get.organizedBy
+    val groups = models.LabGroup.findGroupsByLab(lab.id)
+    Ok(views.html.confViews.selectPrivacy(lab, groups, Conference.findById(confId).get)(request, authenticatedUserRole.getOrElse(Guest)))
+  }
+
+  def createConfWithPrivacy(confId: Long, groupId: Option[Long]) = ForcedAuthentication {implicit request =>
+    Future {
+      val user = request.user.get
+      var newConf = Conference.findById(confId).get
+      if(groupId.isDefined){
+        newConf = newConf.copy(forGroup = LabGroup.findById(groupId.get))
+        Conference.updateForGroup(newConf)
       }
-      case Contributor               => {
-        newConf.save match {
-          case None => {
-            Logger.error("Tried to save the new seminar " + newConf.title + "failed!")
-            Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "The seminar " + newConf.title + " couldn't be submitted for moderation, please re-try later."))
+      user.role match {
+        case Administrator | Moderator => {
+          val newId = newConf.asAccepted.save.get.id
+          Redirect(routes.ConferenceController.viewConf(newId))
+        }
+        case Contributor               => {
+          newConf.save match {
+            case None => {
+              Logger.error("Tried to save the new seminar " + newConf.title + "failed!")
+              Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "The seminar " + newConf.title + " couldn't be submitted for moderation, please re-try later."))
+            }
+            case Some(c) => {
+              sendConfirmationMail(c)
+              Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "The seminar " + newConf.title + " has been submitted for moderation by your team's moderator."))
+            }
           }
-          case Some(c) => {
-            sendConfirmationMail(c)
-            Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "The seminar " + newConf.title + " has been submitted for moderation by your team's moderator."))
+        }
+      }
+    }
+  }
+
+  private def createConfWithUser(conf: SimpleConference, user: User): Result = {
+
+    val newConf = Conference.fromSimpleConference(conf)
+    var newId = newConf.save.get.id
+
+    if(newConf.priv){
+      Redirect(routes.ConferenceController.privacySelection(newId))
+    }else{
+      user.role match {
+        case Administrator | Moderator => {
+          newId = newConf.asAccepted.save.get.id
+          Redirect(routes.ConferenceController.viewConf(newId))
+        }
+        case Contributor               => {
+          newConf.save match {
+            case None => {
+              Logger.error("Tried to save the new seminar " + newConf.title + "failed!")
+              Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "The seminar " + newConf.title + " couldn't be submitted for moderation, please re-try later."))
+            }
+            case Some(c) => {
+              sendConfirmationMail(c)
+              Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "The seminar " + newConf.title + " has been submitted for moderation by your team's moderator."))
+            }
           }
         }
       }

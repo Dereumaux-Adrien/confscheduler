@@ -6,6 +6,7 @@ import controllers.routes
 import org.joda.time.format.ISODateTimeFormat
 import play.api.db.DB
 import controllers.ConferenceController.{ConferenceEvent, SimpleConference}
+import controllers.LabGroupController.SimpleLabGroup
 import anorm._
 import helpers.AnormExtension._
 import play.api.Play.current
@@ -22,7 +23,8 @@ case class Conference (
     location   : Location,
     accepted   : Boolean,
     acceptCode : Option[String],
-    priv       : Boolean
+    priv       : Boolean,
+    forGroup   : Option[LabGroup]=None
 ) {
   val formatter = DateTimeFormat.forPattern("YYYY-MM-dd hh:mm")
   val isoFormatter = ISODateTimeFormat.dateTime()
@@ -38,10 +40,10 @@ case class Conference (
   def displayDate: String = "was " + formatter.print(startDate)
 
   def asAccepted: Conference =
-    Conference(id, title, abstr, speaker, startDate, length, organizedBy, location, accepted = true, None, priv)
+    Conference(id, title, abstr, speaker, startDate, length, organizedBy, location, accepted = true, None, priv, forGroup)
 
   def withId(newId: Long): Conference =
-    Conference(newId, title, abstr, speaker, startDate, length, organizedBy, location, accepted, acceptCode, priv)
+    Conference(newId, title, abstr, speaker, startDate, length, organizedBy, location, accepted, acceptCode, priv, forGroup)
 
   def isInFuture: Boolean = startDate > DateTime.now
 
@@ -220,6 +222,16 @@ object Conference {
       .as(scalar[Long].single)
   }
 
+  def updateForGroup(conf: Conference): Option[Conference] = DB.withConnection { implicit c =>
+    SQL("""
+      UPDATE Conference
+      SET forGroup = {forGroup}
+      WHERE id = {id}
+        """).on("id" -> conf.id, "forGroup" -> conf.forGroup.get.id).executeUpdate()
+    Option(conf)
+
+  }
+
   def between(start: DateTime, end: DateTime) = DB.withConnection { implicit c =>
     SQL("""
         SELECT * FROM Conference
@@ -243,14 +255,15 @@ object Conference {
     get[Long]("location") ~
     get[Boolean]("accepted") ~
     get[Option[String]]("acceptCode") ~
-    get[Boolean]("private") map {
-      case id ~ title ~ abstr ~ speaker ~ startDate ~ length ~ organizedBy ~ location ~ accepted ~ acceptCode ~ priv =>
+    get[Boolean]("private") ~
+    get[Option[Long]]("forGroup") map {
+      case id ~ title ~ abstr ~ speaker ~ startDate ~ length ~ organizedBy ~ location ~ accepted ~ acceptCode ~ priv ~ forGroup =>
         Conference(id, title, abstr, Speaker.findById(speaker).get,
-          startDate, new Duration(length), Lab.findById(organizedBy).get, Location.findById(location).get, accepted, acceptCode, priv)
+          startDate, new Duration(length), Lab.findById(organizedBy).get, Location.findById(location).get, accepted, acceptCode, priv, LabGroup.findById(forGroup.getOrElse(0)))
     }
   }
 
-  def fromSimpleConference(conf: SimpleConference): Conference = {
+  def fromSimpleConference(conf: SimpleConference, groupId: Option[Long] = None): Conference = {
     val speaker =
       if(conf.speaker.speakerId != -1) Speaker.findById(conf.speaker.speakerId).get
       else {
@@ -266,7 +279,7 @@ object Conference {
       }
 
     Conference(-1, conf.title, conf.abstr, speaker, conf.date + conf.time,
-      conf.length, Lab.findById(conf.organizerId).get, location, accepted = false, Some(Crypto.generateToken), priv = conf.priv)
+      conf.length, Lab.findById(conf.organizerId).get, location, accepted = false, Some(Crypto.generateToken), priv = conf.priv, None)
   }
 }
 

@@ -1,0 +1,36 @@
+@(lab: Lab, labGroups: List[LabGroup], conf: Conference)(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
+
+
+@displayLab(lab: Lab) = {
+<label>Choose to wich Lab or LabGoup this seminar will be open</label>
+<div class="listing lab-listing">
+    @if(lab.logoId.isDefined) {
+    <img height="100" src="@routes.LabController.logo(lab.id).url">
+    }
+    <div class="content">
+        <h4>@lab.acronym</h4>
+        @lab.name
+        <form method="POST" action="@routes.ConferenceController.createConfWithPrivacy(conf.id, None)">
+            <span class="pull-right"><button type="submit" class="btn btn-select privacy-select">Select</button></span>
+        </form>
+    </div>
+</div>
+}
+
+@displayLabGroup(labGroup: LabGroup) = {
+<div class="listing labGroup-listing">
+    <div class="content">
+        <h4>@labGroup.name</h4>
+        <form method="POST" action="@routes.ConferenceController.createConfWithPrivacy(conf.id, Some(labGroup.id))">
+            <span class="pull-right"><button type="submit" class="btn btn-select privacy-select">Select</button></span>
+        </form>
+    </div>
+</div>
+}
+
+@main("LabGroup List") {
+    @displayLab(lab)
+    @for(labGroup <- labGroups) {
+        @displayLabGroup(labGroup)
+    }
+}
