@@ -100,8 +100,8 @@ object Conference {
     viewableBy.map(_.role) match {
       case Some(Administrator) => SQL("SELECT * FROM Conference WHERE accepted = true").as(conferenceParser *)
       case Some(_)             => {
-        SQL("SELECT * FROM Conference WHERE accepted = true AND (organizedBy = {organizerId} OR private = false)")
-          .on("organizerId" -> viewableBy.get.lab.id)
+        SQL("SELECT * FROM Conference WHERE accepted = true AND (organizedBy = {labId} OR private = false OR forGroup IN (SELECT id_group FROM IndexLabGroup WHERE id_lab = {labId}))")
+          .on("labId" -> viewableBy.get.lab.id)
           .as(conferenceParser *)
       }
       case None                => SQL("SELECT * FROM Conference WHERE accepted = true AND private = false").as(conferenceParser *)
@@ -125,7 +125,7 @@ object Conference {
     val adminQuery = SQL(query)
       .on("filter" -> wideFilter)
 
-    val userQuery = SQL(query + "AND (c.organizedBy = {organizerId} OR c.private = false)")
+    val userQuery = SQL(query + "AND (c.organizedBy = {organizerId} OR c.private = false OR forGroup IN (SELECT id_group FROM IndexLabGroup WHERE id_lab = {labId}))")
       .on("filter" -> wideFilter)
 
     val guestQuery = SQL(query + "AND private = false")
@@ -146,7 +146,7 @@ object Conference {
 
   def findVisibleByLabBetween(lab: Lab, startPeriod: DateTime, endPeriod: DateTime): List[Conference] = DB.withConnection {implicit c =>
     SQL(
-      "SELECT * FROM Conference WHERE organizedBy = {labId} AND accepted = true AND startDate BETWEEN {startPeriod} AND {endPeriod}")
+      "SELECT * FROM Conference WHERE (organizedBy = {labId} OR forGroup IN (SELECT id_group FROM IndexLabGroup WHERE id_lab = {labId}))  AND accepted = true AND startDate BETWEEN {startPeriod} AND {endPeriod}")
       .on("labId" -> lab.id,
           "startPeriod" -> startPeriod,
           "endPeriod" -> endPeriod)
