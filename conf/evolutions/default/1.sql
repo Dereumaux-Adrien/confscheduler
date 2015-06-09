@@ -28,7 +28,7 @@ CREATE TABLE Location (
     roomDesignation VARCHAR(255) NOT NULL,
     floor         VARCHAR(255) NOT NULL,
     streetName    VARCHAR(255) NOT NULL,
-    streetNb      int NOT NULL,
+    streetNb      INT NOT NULL,
     city          VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
 );
@@ -37,15 +37,22 @@ CREATE TABLE Conference (
     id        INT UNSIGNED NOT NULL AUTO_INCREMENT,
     title     VARCHAR(255) NOT NULL,
     abstr     VARCHAR(255) NOT NULL,
-    speaker   bigint NOT NULL REFERENCES Speaker(id),
+    speaker   INT UNSIGNED NOT NULL REFERENCES Speaker(id),
     startDate TIMESTAMP NOT NULL,
     length    bigint NOT NULL, -- The duration of the conference in ms
-    organizedBy      bigint NOT NULL REFERENCES Lab(id),
-    location  bigint NOT NULL REFERENCES Location(id),
+    organizedBy      INT UNSIGNED NOT NULL
+        REFERENCES Lab(id)
+            ON DELETE  RESTRICT,
+    location  INT UNSIGNED NOT NULL
+        REFERENCES Location(id)
+            ON DELETE  RESTRICT,
     accepted  boolean NOT NULL,
     acceptCode VARCHAR(255),
     private   boolean NOT NULL,
-	forGroup  bigint REFERENCES LabGroup(id),     
+	forGroup  INT UNSIGNED
+	    REFERENCES LabGroup(id)
+	        ON DELETE  RESTRICT,
+	logoId  VARCHAR(30) UNIQUE,
     PRIMARY KEY (id)
 );
 
@@ -54,9 +61,11 @@ CREATE TABLE AppUser (
     firstName VARCHAR(255) NOT NULL,
     lastName  VARCHAR(255) NOT NULL,
     email     VARCHAR(255) NOT NULL,
-    lab       bigint NOT NULL REFERENCES Lab(id),
+    lab       INT UNSIGNED NOT NULL
+        REFERENCES Lab(id)
+            ON DELETE  RESTRICT,
     hashedPass VARCHAR(255) NOT NULL,
-    role      int NOT NULL,
+    role      INT NOT NULL,
     rememberMeToken VARCHAR(255),
     PRIMARY KEY (id)
 );

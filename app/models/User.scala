@@ -196,6 +196,16 @@ object User {
     }
   }
 
+  def isLastAdmin(user: Option[User]): Boolean = DB.withConnection {implicit c =>
+    if(user.isDefined && user.get.role == Administrator){
+      val count = SQL("SELECT count(*) FROM AppUser WHERE role = 0").as(scalar[Long].single)
+      if(count <= 1){
+        true
+      }
+    }
+    false
+  }
+
   def fromSimpleUser(user: SimpleUser): Option[User] = {
     val newUserRole = user.newUserRole match {
       case "Administrator" => Administrator

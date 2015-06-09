@@ -94,16 +94,26 @@ object Lab {
   }
 
   def destroy(lab: Lab):Boolean = DB.withConnection {implicit c =>
-    try {
-      SQL("DELETE FROM Lab WHERE id = {id}")
-        .on("id" -> lab.id)
-        .executeUpdate()
-      true
-    } catch {
-      case e: SQLException
-        if e.getMessage.contains("update or delete on table \"lab\" violates foreign key constraint \"conference_organizedby_fkey\" on table \"conference\"") |
-           e.getMessage.contains("update or delete on table \"lab\" violates foreign key constraint \"appuser_lab_fkey\" on table \"appuser\"")
-        => Logger.warn(e.getMessage); false
+    var count = SQL("SELECT count(*) FROM AppUser WHERE lab = {id}").on("id" -> lab.id).as(scalar[Long].single)
+    if(count>0){
+      false
+    }else{
+      count = SQL("SELECT count(*) FROM Conference WHERE organizedBy = {id}").on("id" -> lab.id).as(scalar[Long].single)
+      if(count>0){
+        false
+      }else{
+        try {
+          SQL("DELETE FROM Lab WHERE id = {id}")
+            .on("id" -> lab.id)
+            .executeUpdate()
+          true
+        } catch {
+          case e: SQLException
+            if e.getMessage.contains("update or delete on table \"lab\" violates foreign key constraint \"conference_organizedby_fkey\" on table \"conference\"") |
+              e.getMessage.contains("update or delete on table \"lab\" violates foreign key constraint \"appuser_lab_fkey\" on table \"appuser\"")
+          => Logger.warn(e.getMessage); false
+        }
+      }
     }
   }
 

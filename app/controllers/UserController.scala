@@ -68,11 +68,16 @@ object UserController extends Controller {
   def delete(id: Long) = AuthorizedWith(u => u.role == Administrator | u.role == Moderator) {implicit request => Future {
     def destroyUser = {
       val toDestroy = User.findById(id)
-      toDestroy match {
-        case Some(u) => u.destroy; Redirect(routes.UserController.list(None)).flashing(("success", "User" + u.firstName + " " + u.lastName + " deleted"))
-        case None    =>
-          Logger.error("Tried to delete user " + id + " which doesn't exist")
-          Redirect(routes.UserController.list(None)).flashing(("error", "User with id " + id + " doesn't exist"))
+      if(User.isLastAdmin(toDestroy)){
+        toDestroy match {
+          case Some(u) => u.destroy; Redirect(routes.UserController.list(None)).flashing(("success", "User" + u.firstName + " " + u.lastName + " deleted"))
+          case None    =>
+            Logger.error("Tried to delete user " + id + " which doesn't exist")
+            Redirect(routes.UserController.list(None)).flashing(("error", "User with id " + id + " doesn't exist"))
+        }
+      }else{
+        Logger.error("Tried to delete user " + id + " which is the last administrator")
+        Redirect(routes.UserController.list(None)).flashing(("error", "User with id " + id + " is the last administrator and can't be deleted"))
       }
     }
     authorizedUser.role match {
