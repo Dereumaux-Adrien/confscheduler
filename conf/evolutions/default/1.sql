@@ -65,7 +65,7 @@ CREATE TABLE AppUser (
         REFERENCES Lab(id)
             ON DELETE  RESTRICT,
     hashedPass VARCHAR(255) NOT NULL,
-    role      INT NOT NULL,
+    role      int NOT NULL,
     rememberMeToken VARCHAR(255),
     PRIMARY KEY (id)
 );
