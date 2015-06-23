@@ -17,12 +17,14 @@ import play.api.data.Forms._
 import play.api.data.format.Formatter
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-import play.api.mvc.{AnyContent, Controller, Result}
+import play.api.mvc._
 import play.libs.Akka
 import play.api.Play.current
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import logo.Logo
+import play.api.libs.Files.TemporaryFile
 
 object ConferenceController extends Controller {
   val isoFormatter = ISODateTimeFormat.date()
@@ -88,6 +90,20 @@ object ConferenceController extends Controller {
         l => l.locationId != -1 
         || List(l.instituteName, l.roomDesignation, l.floor, l.streetName, l.streetNb, l.city).forall(_.isDefined)),
       "private" -> boolean)(SimpleConference.apply)(SimpleConference.unapply)
+  }
+
+  def logo(id: Long) = ForcedAuthentication{implicit request => Future {
+    Lab.findById(id).flatMap(_.logoId) match {
+      case Some(logoId) => Ok.sendFile(Logo.find(logoId))
+      case _            => Redirect(routes.LabController.list(None)).flashing(("error", "Couldn't find the logo for this conf"))
+    }
+  }}
+
+  def LogoInvalid(form: Form[SimpleConference]) = ForcedAuthentication { implicit request =>
+    Future {
+      val formWithErrors = conferenceForm.bindFromRequest.withError("fileError", "The logo must be a JPEG or a PNG under 4Mb in size")
+      BadRequest(views.html.confViews.addConf(formWithErrors, Lab.listVisible(request.user.get), isoFormatter.print(DateTime.now()))(request, Administrator))
+    }
   }
 
   implicit val conferenceEventWrites: Writes[ConferenceEvent] = (
@@ -291,5 +307,9 @@ object ConferenceController extends Controller {
     if(moderators.isEmpty) Logger.warn("The lab " + c.organizedBy.name + " doesn't have any moderator! Seminar can't be accepted")
     else                   moderators.map(mod => mailer ! SendMail(mod.email, "[ConfScheduler] A new seminar needs to be moderated",
                                                                      views.html.email.confModeration(c, acceptURL, refuseURL).body))
+  }
+
+  def downloadCSV = Action {
+    Ok.sendFile(Conference.exportAllConfToCSV)
   }
 }

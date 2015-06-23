@@ -11,6 +11,8 @@ import anorm._
 import helpers.AnormExtension._
 import play.api.Play.current
 import play.api.libs.Crypto
+import com.github.tototoshi.csv.CSVWriter
+import java.io.File
 
 case class Conference (
     id         : Long,
@@ -24,7 +26,8 @@ case class Conference (
     accepted   : Boolean,
     acceptCode : Option[String],
     priv       : Boolean,
-    forGroup   : Option[LabGroup]=None
+    forGroup   : Option[LabGroup] = None,
+    logoId     : Option[String] = None
 ) {
   val formatter = DateTimeFormat.forPattern("YYYY-MM-dd hh:mm")
   val isoFormatter = ISODateTimeFormat.dateTime()
@@ -40,10 +43,10 @@ case class Conference (
   def displayDate: String = "was " + formatter.print(startDate)
 
   def asAccepted: Conference =
-    Conference(id, title, abstr, speaker, startDate, length, organizedBy, location, accepted = true, None, priv, forGroup)
+    Conference(id, title, abstr, speaker, startDate, length, organizedBy, location, accepted = true, None, priv, forGroup, logoId)
 
   def withId(newId: Long): Conference =
-    Conference(newId, title, abstr, speaker, startDate, length, organizedBy, location, accepted, acceptCode, priv, forGroup)
+    Conference(newId, title, abstr, speaker, startDate, length, organizedBy, location, accepted, acceptCode, priv, forGroup, logoId)
 
   def isInFuture: Boolean = startDate > DateTime.now
 
@@ -263,7 +266,7 @@ object Conference {
     }
   }
 
-  def fromSimpleConference(conf: SimpleConference, groupId: Option[Long] = None): Conference = {
+  def fromSimpleConference(conf: SimpleConference, groupId: Option[Long] = None, logoId: Option[String] = None): Conference = {
     val speaker =
       if(conf.speaker.speakerId != -1) Speaker.findById(conf.speaker.speakerId).get
       else {
@@ -279,7 +282,25 @@ object Conference {
       }
 
     Conference(-1, conf.title, conf.abstr, speaker, conf.date + conf.time,
-      conf.length, Lab.findById(conf.organizerId).get, location, accepted = false, Some(Crypto.generateToken), priv = conf.priv, None)
+      conf.length, Lab.findById(conf.organizerId).get, location, accepted = false, Some(Crypto.generateToken), priv = conf.priv, None, logoId)
+  }
+
+  def exportAllConfToCSV : File = {
+    val file = new File("Conferences_export_"+DateTime.now+".csv")
+    val writer = CSVWriter.open(file)
+    writer.writeRow(List("id", "organizedBy", "priv", "title", "speaker", "abstr", "startDate", "accepted", "forGroup"))
+    for(conf <- listAll){
+      if(conf.forGroup.isDefined){
+        writer.writeRow(List(conf.id,conf.organizedBy.name,conf.priv, conf.title, conf.speaker.fullName, conf.abstr, conf.startDate, conf.accepted, conf.forGroup))
+      }else{
+        writer.writeRow(List(conf.id,conf.organizedBy.name,conf.priv, conf.title, conf.speaker.fullName, conf.abstr, conf.startDate, conf.accepted))
+      }
+    }
+
+    writer.close()
+
+    file
+
   }
 }
 

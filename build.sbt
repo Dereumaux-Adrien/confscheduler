@@ -16,5 +16,6 @@ libraryDependencies ++= Seq(
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
   "org.apache.commons" % "commons-email" % "1.3.3",
   "com.sksamuel.scrimage" %% "scrimage-core" % "1.4.1",
-  "mysql" % "mysql-connector-java" % "5.1.27"
+  "mysql" % "mysql-connector-java" % "5.1.27",
+  "com.github.tototoshi" %% "scala-csv" % "1.2.1"
 )
