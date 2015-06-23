@@ -6,6 +6,7 @@
     }
     @if(role == Moderator || role == Administrator) {
         @utils.activeLi("Accept Seminars", routes.ConferenceController.allowList)
+        @utils.activeLi("Download Seminars" , routes.ConferenceController.downloadCSV)
     }
     @if(role == Moderator) {
         <hr>

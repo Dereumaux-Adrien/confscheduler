@@ -286,7 +286,7 @@ object Conference {
   }
 
   def exportAllConfToCSV : File = {
-    val file = new File("Conferences_export_"+DateTime.now+".csv")
+    val file = new File("/temp/Conferences_export_"+DateTime.now+".csv")
     val writer = CSVWriter.open(file)
     writer.writeRow(List("id", "organizedBy", "priv", "title", "speaker", "abstr", "startDate", "accepted", "forGroup"))
     for(conf <- listAll){
