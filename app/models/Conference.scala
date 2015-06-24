@@ -15,19 +15,19 @@ import com.github.tototoshi.csv.CSVWriter
 import java.io.{FilenameFilter, File}
 
 case class Conference (
-    id         : Long,
-    title      : String,
-    abstr      : String,
-    speaker    : Speaker,
-    startDate  : DateTime,
-    length     : Duration,
-    organizedBy: Lab,
-    location   : Location,
-    accepted   : Boolean,
-    acceptCode : Option[String],
-    priv       : Boolean,
-    forGroup   : Option[LabGroup] = None,
-    logoId     : Option[String] = None
+    id             : Long,
+    var title      : String,
+    var abstr      : String,
+    var speaker    : Speaker,
+    var startDate  : DateTime,
+    var length     : Duration,
+    var organizedBy: Lab,
+    var location   : Location,
+    var accepted   : Boolean,
+    var acceptCode : Option[String],
+    var priv       : Boolean,
+    var forGroup   : Option[LabGroup] = None,
+    var logoId     : Option[String] = None
 ) {
   val formatter = DateTimeFormat.forPattern("YYYY-MM-dd hh:mm")
   val isoFormatter = ISODateTimeFormat.dateTime()
@@ -293,8 +293,13 @@ object Conference {
   }
 
   def exportAllConfToCSV(labId : Option[Long] = None) : File = {
+    val dir = new File("temporary_files");
+    if(!dir.exists){
+      dir.mkdirs();
+    }
+
     if(labId.isDefined){
-      val file = new File("Conferences_export_Lab_"+labId.get+"_"+DateTime.now+".csv")
+      val file = new File(dir.getPath+File.separator+"Conferences_export_Lab_"+labId.get+".csv")
 
       val writer = CSVWriter.open(file)
 
@@ -312,7 +317,7 @@ object Conference {
 
       file
     }else{
-      val file = new File("Conferences_export_all_"+DateTime.now+".csv")
+      val file = new File(dir.getPath+File.separator+"Conferences_export_all.csv")
 
       val writer = CSVWriter.open(file)
 
