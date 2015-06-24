@@ -292,15 +292,15 @@ object Conference {
       conf.length, Lab.findById(conf.organizerId).get, location, accepted = false, Some(Crypto.generateToken), priv = conf.priv, None, logoId)
   }
 
-  def exportAllConfToCSV(lab : Option[Long] = None) : File = {
-    if(lab.isDefined){
-      val file = new File("Conferences_export_Lab_"+lab.get+"_"+DateTime.now+".csv")
+  def exportAllConfToCSV(labId : Option[Long] = None) : File = {
+    if(labId.isDefined){
+      val file = new File("Conferences_export_Lab_"+labId.get+"_"+DateTime.now+".csv")
 
       val writer = CSVWriter.open(file)
 
       writer.writeRow(List("id", "organizedBy", "priv", "title", "speaker", "abstr", "startDate", "accepted", "forGroup"))
 
-      for(conf <- listOrganizedBy(lab.get)){
+      for(conf <- listOrganizedBy(labId.get)){
         if(conf.forGroup.isDefined){
           writer.writeRow(List(conf.id,conf.organizedBy.name,conf.priv, conf.title, conf.speaker.fullName, conf.abstr, conf.startDate, conf.accepted, conf.forGroup))
         }else{

@@ -323,12 +323,12 @@ object ConferenceController extends Controller {
     }
   }
 
-  def downloadCSVForLab (lab : Long) = ForcedAuthentication {implicit request =>
+  def downloadCSVForLab (labId : Long) = ForcedAuthentication {implicit request =>
     Future {
       val user = request.user.get
       user.role match {
         case Administrator=> {
-          Ok.sendFile(Conference.exportAllConfToCSV(Some(lab)))
+          Ok.sendFile(Conference.exportAllConfToCSV(Some(labId)))
         }
       }
     }

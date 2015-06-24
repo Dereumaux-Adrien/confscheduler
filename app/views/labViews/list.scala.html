@@ -1,7 +1,7 @@
 @(labs: List[Lab])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 
 @displayLab(lab: Lab) = {
-    <div class="listing lab-listing">
+    <div class="listing lab listing">
         @if(lab.logoId.isDefined) {
             <img height="100" src="@routes.LabController.logo(lab.id).url">
         }
@@ -10,6 +10,9 @@
             @lab.name
             <form method="POST" action="@routes.LabController.delete(lab.id)">
                 <span class="pull-right"><button type="submit" class="btn btn-danger user-delete">Delete</button></span>
+            </form>
+            <form method="GET" action="@routes.ConferenceController.downloadCSVForLab(lab.id)">
+                <span class="pull-right"><button type="submit" class="btn btn-default user-delete">Download Seminars</button></span>
             </form>
         </div>
     </div>
