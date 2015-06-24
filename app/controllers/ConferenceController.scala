@@ -309,7 +309,28 @@ object ConferenceController extends Controller {
                                                                      views.html.email.confModeration(c, acceptURL, refuseURL).body))
   }
 
-  def downloadCSV = Action {
-    Ok.sendFile(Conference.exportAllConfToCSV)
+  def downloadCSV = ForcedAuthentication {implicit request =>
+    Future {
+      val user = request.user.get
+      user.role match {
+        case Administrator=> {
+          Ok.sendFile(Conference.exportAllConfToCSV())
+        }
+        case Moderator => {
+          Ok.sendFile(Conference.exportAllConfToCSV(Option(user.lab.id)))
+        }
+      }
+    }
+  }
+
+  def downloadCSVForLab (lab : Long) = ForcedAuthentication {implicit request =>
+    Future {
+      val user = request.user.get
+      user.role match {
+        case Administrator=> {
+          Ok.sendFile(Conference.exportAllConfToCSV(Some(lab)))
+        }
+      }
+    }
   }
 }

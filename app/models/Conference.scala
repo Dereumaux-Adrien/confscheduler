@@ -12,7 +12,7 @@ import helpers.AnormExtension._
 import play.api.Play.current
 import play.api.libs.Crypto
 import com.github.tototoshi.csv.CSVWriter
-import java.io.File
+import java.io.{FilenameFilter, File}
 
 case class Conference (
     id         : Long,
@@ -156,6 +156,13 @@ object Conference {
       .as(conferenceParser *)
   }
 
+  def listOrganizedBy(lab: Long): List[Conference] = DB.withConnection {implicit c =>
+    SQL(
+      "SELECT * FROM Conference WHERE organizedBy = {labId}")
+      .on("labId" -> lab)
+      .as(conferenceParser *)
+  }
+
   def findPublicBetween(startPeriod: DateTime, endPeriod: DateTime): List[Conference] = DB.withConnection {implicit c =>
     SQL(
       "SELECT * FROM Conference WHERE accepted = true AND private = false AND startDate BETWEEN {startPeriod} AND {endPeriod}")
@@ -285,24 +292,44 @@ object Conference {
       conf.length, Lab.findById(conf.organizerId).get, location, accepted = false, Some(Crypto.generateToken), priv = conf.priv, None, logoId)
   }
 
-  def exportAllConfToCSV : File = {
-    val file = new File("Conferences_export_"+DateTime.now+".csv")
+  def exportAllConfToCSV(lab : Option[Long] = None) : File = {
+    if(lab.isDefined){
+      val file = new File("Conferences_export_Lab_"+lab.get+"_"+DateTime.now+".csv")
 
-    val writer = CSVWriter.open(file)
+      val writer = CSVWriter.open(file)
 
-    writer.writeRow(List("id", "organizedBy", "priv", "title", "speaker", "abstr", "startDate", "accepted", "forGroup"))
+      writer.writeRow(List("id", "organizedBy", "priv", "title", "speaker", "abstr", "startDate", "accepted", "forGroup"))
 
-    for(conf <- listAll){
-      if(conf.forGroup.isDefined){
-        writer.writeRow(List(conf.id,conf.organizedBy.name,conf.priv, conf.title, conf.speaker.fullName, conf.abstr, conf.startDate, conf.accepted, conf.forGroup))
-      }else{
-        writer.writeRow(List(conf.id,conf.organizedBy.name,conf.priv, conf.title, conf.speaker.fullName, conf.abstr, conf.startDate, conf.accepted))
+      for(conf <- listOrganizedBy(lab.get)){
+        if(conf.forGroup.isDefined){
+          writer.writeRow(List(conf.id,conf.organizedBy.name,conf.priv, conf.title, conf.speaker.fullName, conf.abstr, conf.startDate, conf.accepted, conf.forGroup))
+        }else{
+          writer.writeRow(List(conf.id,conf.organizedBy.name,conf.priv, conf.title, conf.speaker.fullName, conf.abstr, conf.startDate, conf.accepted))
+        }
       }
+
+      writer.close()
+
+      file
+    }else{
+      val file = new File("Conferences_export_all_"+DateTime.now+".csv")
+
+      val writer = CSVWriter.open(file)
+
+      writer.writeRow(List("id", "organizedBy", "priv", "title", "speaker", "abstr", "startDate", "accepted", "forGroup"))
+
+      for(conf <- listAll){
+        if(conf.forGroup.isDefined){
+          writer.writeRow(List(conf.id,conf.organizedBy.name,conf.priv, conf.title, conf.speaker.fullName, conf.abstr, conf.startDate, conf.accepted, conf.forGroup))
+        }else{
+          writer.writeRow(List(conf.id,conf.organizedBy.name,conf.priv, conf.title, conf.speaker.fullName, conf.abstr, conf.startDate, conf.accepted))
+        }
+      }
+
+      writer.close()
+
+      file
     }
-
-    writer.close()
-
-    file
 
   }
 }

@@ -13,14 +13,15 @@ GET         /conf/allow             controllers.ConferenceController.allowList
 GET         /conf/upcoming          controllers.ConferenceController.listUpcomingConfs(filter: Option[String])
 GET         /conf/all               controllers.ConferenceController.listConfs(filter: Option[String])
 GET         /conf/selectPrivacy/:confId     controllers.ConferenceController.privacySelection(confId: Long)
-POST        /conf/:confId/addWithPrivacy        controllers.ConferenceController.createConfWithPrivacy(confId: Long, groupId: Option[Long])
+POST        /conf/:confId/addWithPrivacy    controllers.ConferenceController.createConfWithPrivacy(confId: Long, groupId: Option[Long])
+GET         /conf/downloadCSV               controllers.ConferenceController.downloadCSV
+GET         /conf/downloadCSVForLab/:id     controllers.ConferenceController.downloadCSVForLab(id : Long)
 GET         /conf/:id               controllers.ConferenceController.viewConf(id: Long)
 POST        /conf/:id/allow         controllers.ConferenceController.acceptAuth(id: Long)
 GET         /conf/:id/allow         controllers.ConferenceController.accept(id: Long, token: Option[String])
 POST        /conf/:id/refuse        controllers.ConferenceController.refuseAuth(id: Long)
 GET         /conf/:id/refuse        controllers.ConferenceController.refuse(id: Long, token: Option[String])
 POST        /conf/:id/delete        controllers.ConferenceController.delete(id: Long)
-GET         /conf/download/CSV      controllers.ConferenceController.downloadCSV
 
 GET         /calendar               controllers.ConferenceController.calendar
 
