@@ -241,7 +241,7 @@ object ConferenceController extends Controller {
       var conf = Conference.findById(confId).get
       if(groupId.isDefined){
         conf.forGroup = LabGroup.findById(groupId.get)
-        Conference.updateForGroup(conf)
+        conf.save
       }
       user.role match {
         case Administrator | Moderator => {

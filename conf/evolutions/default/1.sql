@@ -33,6 +33,20 @@ CREATE TABLE Location (
     PRIMARY KEY (id)
 );
 
+CREATE TABLE AppUser (
+    id        INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    firstName VARCHAR(255) NOT NULL,
+    lastName  VARCHAR(255) NOT NULL,
+    email     VARCHAR(255) NOT NULL,
+    lab       INT UNSIGNED NOT NULL
+        REFERENCES Lab(id)
+            ON DELETE  RESTRICT,
+    hashedPass VARCHAR(255) NOT NULL,
+    role      int NOT NULL,
+    rememberMeToken VARCHAR(255),
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE Conference (
     id        INT UNSIGNED NOT NULL AUTO_INCREMENT,
     title     VARCHAR(255) NOT NULL,
@@ -40,7 +54,7 @@ CREATE TABLE Conference (
     speaker   INT UNSIGNED NOT NULL REFERENCES Speaker(id),
     startDate TIMESTAMP NOT NULL,
     length    bigint NOT NULL, -- The duration of the conference in ms
-    organizedBy      INT UNSIGNED NOT NULL
+    organizedBy INT UNSIGNED NOT NULL
         REFERENCES Lab(id)
             ON DELETE  RESTRICT,
     location  INT UNSIGNED NOT NULL
@@ -53,20 +67,9 @@ CREATE TABLE Conference (
 	    REFERENCES LabGroup(id)
 	        ON DELETE  RESTRICT,
 	logoId  VARCHAR(30) UNIQUE,
-    PRIMARY KEY (id)
-);
-
-CREATE TABLE AppUser (
-    id        INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    firstName VARCHAR(255) NOT NULL,
-    lastName  VARCHAR(255) NOT NULL,
-    email     VARCHAR(255) NOT NULL,
-    lab       INT UNSIGNED NOT NULL
-        REFERENCES Lab(id)
-            ON DELETE  RESTRICT,
-    hashedPass VARCHAR(255) NOT NULL,
-    role      int NOT NULL,
-    rememberMeToken VARCHAR(255),
+    createdBy INT UNSIGNED DEFAULT NULL
+        REFERENCES AppUser(id)
+            ON DELETE CASCADE,
     PRIMARY KEY (id)
 );
 

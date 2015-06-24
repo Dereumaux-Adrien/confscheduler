@@ -27,7 +27,8 @@ case class Conference (
     var acceptCode : Option[String],
     var priv       : Boolean,
     var forGroup   : Option[LabGroup] = None,
-    var logoId     : Option[String] = None
+    var logoId     : Option[String] = None,
+    var createdBy  : Option[User] = None
 ) {
   val formatter = DateTimeFormat.forPattern("YYYY-MM-dd hh:mm")
   val isoFormatter = ISODateTimeFormat.dateTime()
@@ -43,10 +44,10 @@ case class Conference (
   def displayDate: String = "was " + formatter.print(startDate)
 
   def asAccepted: Conference =
-    Conference(id, title, abstr, speaker, startDate, length, organizedBy, location, accepted = true, None, priv, forGroup, logoId)
+    Conference(id, title, abstr, speaker, startDate, length, organizedBy, location, accepted = true, None, priv, forGroup, logoId, createdBy)
 
   def withId(newId: Long): Conference =
-    Conference(newId, title, abstr, speaker, startDate, length, organizedBy, location, accepted, acceptCode, priv, forGroup, logoId)
+    Conference(newId, title, abstr, speaker, startDate, length, organizedBy, location, accepted, acceptCode, priv, forGroup, logoId, createdBy)
 
   def isInFuture: Boolean = startDate > DateTime.now
 
@@ -70,14 +71,14 @@ object Conference {
   val isoFormatter = ISODateTimeFormat.dateTime()
 
   val insertQuery = SQL("""
-      INSERT INTO Conference(title, abstr, speaker, startDate, length, organizedBy, location, accepted, acceptCode, private)
-      VALUES ({title}, {abstr}, {speaker}, {startDate}, {length}, {organizedBy}, {location}, {accepted}, {acceptCode}, {private})
+      INSERT INTO Conference(title, abstr, speaker, startDate, length, organizedBy, location, accepted, acceptCode, private, forGroup, logoId, createdBy)
+      VALUES ({title}, {abstr}, {speaker}, {startDate}, {length}, {organizedBy}, {location}, {accepted}, {acceptCode}, {private}, {forGroup}, {logoId}, {createdBy})
   """)
 
   val updateQuery = SQL("""
       UPDATE Conference
       SET title = {title}, abstr = {abstr}, speaker = {speaker}, startDate = {startDate},
-        length = {length}, organizedBy = {organizedBy}, location = {location}, accepted = {accepted}, acceptCode = {acceptCode}, private = {private}
+        length = {length}, organizedBy = {organizedBy}, location = {location}, accepted = {accepted}, acceptCode = {acceptCode}, private = {private}, forGroup = {forGroup}, logoId = {logoId}, createdBy = {createdBy}
       WHERE id = {id}
   """)
 
@@ -185,7 +186,10 @@ object Conference {
         "location"    -> conf.location.id,
         "accepted" -> conf.accepted,
         "acceptCode" -> conf.acceptCode,
-        "private" -> conf.priv
+        "private" -> conf.priv,
+        if(conf.forGroup.isDefined){"forGroup" -> conf.forGroup.get.id}else{"forGroup" -> None},
+        if(conf.logoId.isDefined){"logoId" -> conf.logoId.get}else{"logoId" -> None},
+        if(conf.createdBy.isDefined){"createdBy" -> conf.createdBy.get.id}else{"createdBy" -> None}
       ).executeUpdate()
       Option(conf)
     } else {
@@ -199,7 +203,10 @@ object Conference {
         "location" -> conf.location.id,
         "accepted" -> conf.accepted,
         "acceptCode" -> conf.acceptCode,
-        "private" -> conf.priv
+        "private" -> conf.priv,
+        if(conf.forGroup.isDefined){"forGroup" -> conf.forGroup.get.id}else{"forGroup" -> None},
+        if(conf.logoId.isDefined){"logoId" -> conf.logoId.get}else{"logoId" -> None},
+        if(conf.createdBy.isDefined){"createdBy" -> conf.createdBy.get.id}else{"createdBy" -> None}
       ).executeInsert()
       newId.map(conf.withId)
     }
@@ -230,16 +237,6 @@ object Conference {
   def count: Long = DB.withConnection{implicit c =>
     SQL("SELECT count(*) FROM Conference")
       .as(scalar[Long].single)
-  }
-
-  def updateForGroup(conf: Conference): Option[Conference] = DB.withConnection { implicit c =>
-    SQL("""
-      UPDATE Conference
-      SET forGroup = {forGroup}
-      WHERE id = {id}
-        """).on("id" -> conf.id, "forGroup" -> conf.forGroup.get.id).executeUpdate()
-    Option(conf)
-
   }
 
   def between(start: DateTime, end: DateTime) = DB.withConnection { implicit c =>
@@ -289,7 +286,7 @@ object Conference {
       }
 
     Conference(-1, conf.title, conf.abstr, speaker, conf.date + conf.time,
-      conf.length, Lab.findById(conf.organizerId).get, location, accepted = false, Some(Crypto.generateToken), priv = conf.priv, None, logoId)
+      conf.length, Lab.findById(conf.organizerId).get, location, accepted = false, Some(Crypto.generateToken), priv = conf.priv, None, logoId, None)
   }
 
   def exportAllConfToCSV(labId : Option[Long] = None) : File = {
