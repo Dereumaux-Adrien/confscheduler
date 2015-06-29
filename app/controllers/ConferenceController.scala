@@ -178,9 +178,11 @@ object ConferenceController extends Controller {
     val conf = Conference.findById(id)
 
     def redirectRouteOk(c: Conference) = {
+      sendValidationMail(c, true)
       c.asAccepted.save
       Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "Seminar " + c.title + " successfully accepted"))
     }
+
     def redirectRouteRefuse = Redirect(routes.ConferenceController.allowList()).flashing(("error", "You tried to allow an unknown seminar"))
 
     conf.fold ({
@@ -198,6 +200,7 @@ object ConferenceController extends Controller {
     val conf = Conference.findById(id)
 
     def redirectRouteOk(c: Conference) = {
+      sendValidationMail(c, false)
       c.destroy
       Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("success", "Seminar successfully refused"))
     }
@@ -266,15 +269,16 @@ object ConferenceController extends Controller {
 
   private def createConfWithUser(conf: SimpleConference, user: User): Result = {
 
-    val newConf = Conference.fromSimpleConference(conf)
-    var newId = newConf.save.get.id
+    val newId = Conference.fromSimpleConference(conf, None, Some(user)).save.get.id
+
+    val newConf = Conference.findById(newId).get
 
     if(newConf.priv){
       Redirect(routes.ConferenceController.privacySelection(newId))
     }else{
       user.role match {
         case Administrator | Moderator => {
-          newId = newConf.asAccepted.save.get.id
+          newConf.asAccepted.save
           Redirect(routes.ConferenceController.viewConf(newId))
         }
         case Contributor               => {
@@ -290,6 +294,15 @@ object ConferenceController extends Controller {
           }
         }
       }
+    }
+  }
+
+  private def sendValidationMail(c: Conference, accepted: Boolean) = {
+    val mailer = Akka.system.actorOf(Props[Mailer])
+
+    if(c.createdBy.isDefined){
+      mailer ! SendMail(c.createdBy.get.email, if(accepted){"[ConfScheduler] Your seminar has been accepted"}else{"[ConfScheduler] Your seminar has been refused"},
+        views.html.email.confAcceptation(c, accepted).body)
     }
   }
 

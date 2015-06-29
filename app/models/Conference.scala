@@ -15,7 +15,7 @@ import com.github.tototoshi.csv.CSVWriter
 import java.io.{FilenameFilter, File}
 
 case class Conference (
-    id             : Long,
+    var id         : Long,
     var title      : String,
     var abstr      : String,
     var speaker    : Speaker,
@@ -44,7 +44,7 @@ case class Conference (
   def displayDate: String = "was " + formatter.print(startDate)
 
   def asAccepted: Conference =
-    Conference(id, title, abstr, speaker, startDate, length, organizedBy, location, accepted = true, None, priv, forGroup, logoId, createdBy)
+    Conference(id, title, abstr, speaker, startDate, length, organizedBy, location, accepted = true, None, priv, forGroup, logoId, createdBy = None)
 
   def withId(newId: Long): Conference =
     Conference(newId, title, abstr, speaker, startDate, length, organizedBy, location, accepted, acceptCode, priv, forGroup, logoId, createdBy)
@@ -270,7 +270,7 @@ object Conference {
     }
   }
 
-  def fromSimpleConference(conf: SimpleConference, groupId: Option[Long] = None, logoId: Option[String] = None): Conference = {
+  def fromSimpleConference(conf: SimpleConference, logoId: Option[String] = None, createdBy: Option[User] = None): Conference = {
     val speaker =
       if(conf.speaker.speakerId != -1) Speaker.findById(conf.speaker.speakerId).get
       else {
@@ -286,7 +286,7 @@ object Conference {
       }
 
     Conference(-1, conf.title, conf.abstr, speaker, conf.date + conf.time,
-      conf.length, Lab.findById(conf.organizerId).get, location, accepted = false, Some(Crypto.generateToken), priv = conf.priv, None, logoId, None)
+      conf.length, Lab.findById(conf.organizerId).get, location, accepted = false, Some(Crypto.generateToken), priv = conf.priv, None, logoId, createdBy)
   }
 
   def exportAllConfToCSV(labId : Option[Long] = None) : File = {
