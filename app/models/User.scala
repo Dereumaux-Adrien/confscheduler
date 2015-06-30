@@ -206,7 +206,7 @@ object User {
           false
         }
       }
-      case _                   =>false
+      case _             => false
     }
   }
 
