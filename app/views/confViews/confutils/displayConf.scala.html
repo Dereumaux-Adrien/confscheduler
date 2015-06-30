@@ -15,9 +15,16 @@
             }
         </div>
     </div>
+
     @if(canEdit){
-        <form method="POST" class="conference-buttons" action="@routes.ConferenceController.delete(conf.id)">
-            <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
+        <button role="button" data-trigger="focus" class="btn btn-delete btn-danger conference-buttons">Delete</button>
+        <script>
+            $('.btn-delete').popover({
+                placement:"top",
+                html:'true',
+                title:'<span class="text-info"><strong>Sure?</strong></span>',
+                content:'<form method="POST" action="@routes.ConferenceController.delete(conf.id)"><button type="submit" class="btn btn-danger">Yes</button></form>'
+            });
+        </script>
     }
 </div>
