@@ -5,9 +5,15 @@
     @for(user <- users) {
         <div class="user-listing">
             @user.firstName @user.lastName
-            <form method="POST" action="@routes.UserController.delete(user.id)">
-                <span class="pull-right"><button type="submit" class="btn btn-danger user-delete">Delete</button></span>
-            </form>
+            <span class="pull-right"><button role="button" data-trigger="focus" class="btn btn-delete btn-danger user-delete">Delete</button></span>
+            <script>
+                $('.btn-delete').popover({
+                    placement:"top",
+                    html:'true',
+                    title:'<span class="text-info"><strong>Sure?</strong></span>',
+                    content:'<form method="POST" action="@routes.UserController.delete(user.id)"><button type="submit" class="btn btn-danger">Yes</button></form>'
+                });
+            </script>
             <span class="lab">@user.lab.name</span>
         </div>
     }
