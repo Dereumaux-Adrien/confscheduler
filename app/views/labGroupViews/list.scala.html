@@ -1,19 +1,27 @@
 @(labGroups: List[LabGroup])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 
 @displayLabGroup(labGroup: LabGroup) = {
-    <div class="listing labGroup-listing">
-        <div class="content">
-            <h4>@labGroup.name</h4>
-            <form method="POST" action="@routes.LabGroupController.delete(labGroup.id)">
-                <span class="pull-right"><button type="submit" class="btn btn-danger labGroup-delete">Delete</button></span>
-            </form>
-            <form method="GET" action="@routes.LabGroupController.listLabOfGroup(labGroup.id, None)">
-                <span class="pull-right"><button type="submit" class="btn btn-default lab-list">List Lab</button></span>
-            </form>
-            <form method="GET" action="@routes.LabGroupController.listLabToAdd(labGroup.id, None)">
-                <span class="pull-right"><button type="submit" class="btn btn-success lab-add">Add Lab</button></span>
-            </form>
-        </div>
+    <div class="user-listing">
+            @labGroup.name
+            <span class="pull-right"><button role="button" data-trigger="focus" class="btn btn-delete btn-danger margin-left: 15px;margin-top: -4px;padding: 2px 5px;">Delete</button></span>
+            <script>
+                $('.btn-delete').popover({
+                    placement:"top",
+                    html:'true',
+                    title:'<span class="text-info"><strong>Sure?</strong></span>',
+                    content:'<form method="POST" action="@routes.LabGroupController.delete(labGroup.id)"><button type="submit" class="btn btn-danger">Yes</button></form>'
+                });
+            </script>
+            <span class="pull-right">
+                <form method="GET" action="@routes.LabGroupController.listLabOfGroup(labGroup.id, None)">
+                    <button type="submit" class="btn btn-default margin-left: 15px;margin-top: -4px;padding: 2px 5px;">List Lab</button>
+                </form>
+            </span>
+            <span class="pull-right">
+                <form method="GET" action="@routes.LabGroupController.listLabToAdd(labGroup.id, None)">
+                    <button type="submit" class="btn btn-success margin-left: 15px;margin-top: -4px;padding: 2px 5px;">Add Lab</button>
+                </form>
+            </span>
     </div>
 }
 
