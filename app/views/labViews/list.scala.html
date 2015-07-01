@@ -8,12 +8,25 @@
         <div class="content">
             <h4>@lab.acronym</h4>
             @lab.name
-            <form method="POST" action="@routes.LabController.delete(lab.id)">
-                <span class="pull-right"><button type="submit" class="btn btn-danger user-delete">Delete</button></span>
-            </form>
-            <form method="GET" action="@routes.ConferenceController.downloadCSVForLab(lab.id)">
-                <span class="pull-right"><button type="submit" class="btn btn-default user-delete">Download Seminars</button></span>
-            </form>
+            @*<form method="POST" action="@routes.LabController.delete(lab.id)">
+                <button type="submit" class="btn btn-danger user-delete">Delete</button>
+            </form>*@
+            <span class="pull-right"><button role="button" data-trigger="focus" class="btn btn-delete btn-danger btn-lab">Delete</button></span>
+
+            <script>
+                $('.btn-delete').popover({
+                    container: 'body',
+                    placement:"top",
+                    html:'true',
+                    title:'<span class="text-info"><strong>Sure?</strong></span>',
+                    content:'<form method="POST" action="@routes.LabController.delete(lab.id)"><button type="submit" class="btn btn-danger">Yes</button></form>'
+                });
+            </script>
+            <span class="pull-right">
+                <form method="GET" action="@routes.ConferenceController.downloadCSVForLab(lab.id)">
+                    <button type="submit" class="btn btn-default btn-lab">Download Seminars</button>
+                </form>
+            </span>
         </div>
     </div>
 }
