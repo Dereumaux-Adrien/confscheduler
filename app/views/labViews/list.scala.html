@@ -1,7 +1,7 @@
 @(labs: List[Lab])(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
 
 @displayLab(lab: Lab) = {
-    <div class="listing lab listing">
+    <div class="listing">
         @if(lab.logoId.isDefined) {
             <img height="100" src="@routes.LabController.logo(lab.id).url">
         }
