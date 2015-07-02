@@ -164,6 +164,21 @@ object ConferenceController extends Controller {
     Future(Ok(views.html.confViews.addConf(conferenceForm, Lab.listVisible(request.user.get), isoFormatter.print(DateTime.now()))(request, authenticatedUserRole.get)))
   }
 
+  def modifyConf(id: Long) = ForcedAuthentication {
+    implicit request => {
+      val conf = Conference.findById(id)
+      if(conf.isDefined){
+        if(request.user.get.canAllowConf(conf.get.id)){
+          Future(Ok(views.html.confViews.modifyConf(conferenceForm, conf.get, Lab.listVisible(request.user.get), isoFormatter.print(DateTime.now()))(request, authenticatedUserRole.get)))
+        }else{
+          Future(Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You don't have the rights to modify this seminar")))
+        }
+      }else{
+        Future(Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You tried to modify an unknown seminar")))
+      }
+    }
+  }
+
   def create() = ForcedAuthentication { implicit request =>
     Future {
       val form= conferenceForm.bindFromRequest()
@@ -171,6 +186,30 @@ object ConferenceController extends Controller {
         formWithErrors => BadRequest(views.html.confViews.addConf(formWithErrors, Lab.listVisible(request.user.get), isoFormatter.print(DateTime.now()))(request, authenticatedUserRole.get)),
         conf           => createConfWithUser(conf, request.user.get)
       )
+    }
+  }
+
+  def reCreate(confId: Long) = ForcedAuthentication { implicit request =>
+    Future {
+      val form= conferenceForm.bindFromRequest()
+      form.fold(
+        formWithErrors => BadRequest(views.html.confViews.modifyConf(formWithErrors, Conference.findById(confId).get, Lab.listVisible(request.user.get), isoFormatter.print(DateTime.now()))(request, authenticatedUserRole.get)),
+        conf           => reCreateConf(Conference.findById(confId).get, conf, request.user.get)
+      )
+    }
+  }
+
+  private def reCreateConf(oldConf: Conference, conf: SimpleConference, user: User): Result = {
+
+    Conference.modifyFromSimpleConference(oldConf, conf, None, Some(user))
+
+    val id = oldConf.save.get.id
+
+    if(oldConf.priv){
+      Redirect(routes.ConferenceController.privacySelection(id))
+    }else{
+      oldConf.asAccepted.save
+      Redirect(routes.ConferenceController.viewConf(id))
     }
   }
 
@@ -298,9 +337,8 @@ object ConferenceController extends Controller {
   }
 
   private def sendValidationMail(c: Conference, accepted: Boolean) = {
-    val mailer = Akka.system.actorOf(Props[Mailer])
-
     if(c.createdBy.isDefined){
+      val mailer = Akka.system.actorOf(Props[Mailer])
       mailer ! SendMail(c.createdBy.get.email, if(accepted){"[ConfScheduler] Your seminar has been accepted"}else{"[ConfScheduler] Your seminar has been refused"},
         views.html.email.confAcceptation(c, accepted).body)
     }

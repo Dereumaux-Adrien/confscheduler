@@ -21,6 +21,8 @@ POST        /conf/:id/allow         controllers.ConferenceController.acceptAuth(
 GET         /conf/:id/allow         controllers.ConferenceController.accept(id: Long, token: Option[String])
 POST        /conf/:id/refuse        controllers.ConferenceController.refuseAuth(id: Long)
 GET         /conf/:id/refuse        controllers.ConferenceController.refuse(id: Long, token: Option[String])
+GET         /conf/:id/modify        controllers.ConferenceController.modifyConf(id: Long)
+POST        /conf/:id/modify        controllers.ConferenceController.reCreate(id: Long)
 POST        /conf/:id/delete        controllers.ConferenceController.delete(id: Long)
 
 GET         /calendar               controllers.ConferenceController.calendar

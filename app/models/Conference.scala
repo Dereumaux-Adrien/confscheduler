@@ -289,6 +289,36 @@ object Conference {
       conf.length, Lab.findById(conf.organizerId).get, location, accepted = false, Some(Crypto.generateToken), priv = conf.priv, None, logoId, createdBy)
   }
 
+  def modifyFromSimpleConference(oldConf: Conference, conf: SimpleConference, logoId: Option[String] = None, createdBy: Option[User] = None){
+    val speaker =
+      if(conf.speaker.speakerId != -1) Speaker.findById(conf.speaker.speakerId).get
+      else {
+        Speaker(-1, conf.speaker.firstName.get, conf.speaker.lastName.get, conf.speaker.speakerTitle.get,
+          conf.speaker.team.get, conf.speaker.organisation.get, conf.speaker.email.get).save.get
+      }
+
+    val location =
+      if(conf.location.locationId != -1) Location.findById(conf.location.locationId).get
+      else {
+        Location(-1, conf.location.instituteName.get, conf.location.buildingName, conf.location.roomDesignation.get, conf.location.floor.get,
+          conf.location.streetName.get, conf.location.streetNb.get, conf.location.city.get).save.get
+      }
+
+    oldConf.title = conf.title
+    oldConf.abstr = conf.abstr
+    oldConf.speaker = speaker
+    oldConf.startDate = conf.date + conf.time
+    oldConf.length = conf.length
+    oldConf.organizedBy = Lab.findById(conf.organizerId).get
+    oldConf.location = location
+    oldConf.accepted = false
+    oldConf.acceptCode = Some(Crypto.generateToken)
+    oldConf.priv = conf.priv
+    oldConf.forGroup = None
+    oldConf.logoId = logoId
+    oldConf.createdBy = createdBy
+  }
+
   def exportAllConfToCSV(labId : Option[Long] = None) : File = {
     val dir = new File("temporary_files");
     if(!dir.exists){

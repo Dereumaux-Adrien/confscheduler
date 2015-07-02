@@ -1,0 +1,98 @@
+@(conferenceForm: Form[ConferenceController.SimpleConference], conf: Conference, visibleLabs: List[Lab], today: String)(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
+@import utils._
+
+@main("Modify the seminar") {
+    <script src='@routes.Assets.at("javascripts/conferenceForm.js")' type="text/javascript"></script>
+    <div class="alert alert-danger" role="alert">
+        Warning: You need to select again every option
+    </div>
+    @helper.form(routes.ConferenceController.reCreate(conf.id), 'class -> "form-horizontal") {
+        <input type="hidden" id="timezoneOffset" name="timezoneOffset">
+        @bootstrapErrors(conferenceForm.errors, "seminar")
+        <div class="form-group">
+            <label for="title" class="col-sm-2 control-label">Title</label>
+            <div class="col-sm-9">
+                <textarea class="form-control" id="title" name="title">@conferenceForm("title").value.getOrElse(conf.title)</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="abstract" class="col-sm-2 control-label">Abstract</label>
+            <div class="col-sm-9">
+                <textarea class="form-control" id="abstract" name="abstract">@conferenceForm("abstract").value.getOrElse(conf.abstr)</textarea>
+            </div>
+        </div>
+
+        <!-- Speaker selection or adding -->
+        @if(conferenceForm("speaker.id").value.exists(_ == "-1")) {
+            @bootstrapSelect(conferenceForm("speaker.id"), Speaker.listAll.map(s => (s.id.toString, s.firstName + " " + s.lastName)) :+ ("-1", "New Speaker"), "Speaker")
+        } else {
+            @bootstrapSelect(conferenceForm("speaker.id"), Speaker.listAll.map(s => (s.id.toString, s.firstName + " " + s.lastName)), "Speaker")
+        }
+        <div class="form-group">
+            <div class="col-sm-2"></div>
+            <div class="realign-with-fields">
+                Or <button id="toggleNewSpeaker" type=button class="btn btn-default" data-toggle="new-speaker" data-target="#new-speaker">
+                        Add new speaker
+                   </button>
+            </div>
+        </div>
+        <div class="new-speaker" id="new-speaker">
+            @bootstrapSelect(conferenceForm("speaker.speakerTitle"), List("Dr", "Pr", "Ms", "Mr").map(t => (t, t)), size = 2, label="Title")
+            @bootstrapInput(conferenceForm("speaker.firstName"), "First name")
+            @bootstrapInput(conferenceForm("speaker.lastName"), "Last name")
+            @bootstrapInput(conferenceForm("speaker.email"), "Email")
+            @bootstrapInput(conferenceForm("speaker.team"), "Team")
+            @bootstrapInput(conferenceForm("speaker.organisation"), "Organisation")
+        </div>
+
+        <!-- Location selection or adding -->
+        @if(conferenceForm("location").value.exists(_ == "-1")) {
+            @bootstrapSelect(conferenceForm("location.id"), Location.listAll.map(l => (l.id.toString, l.instituteName + " - " + l.roomDesignation)) :+ ("-1", "New Location"), "Location")
+        } else {
+            @bootstrapSelect(conferenceForm("location.id"), Location.listAll.map(l => (l.id.toString, l.instituteName + " - " + l.roomDesignation)), "Location")
+        }
+        <div class="form-group">
+            <div class="col-sm-2"></div>
+            <div class="realign-with-fields">
+                Or <button id="toggleNewLocation" type=button class="btn btn-default" data-toggle="new-location" data-target="#new-location">
+                    Add new location
+                </button>
+            </div>
+        </div>
+        <div class="new-speaker" id="new-location">
+            @bootstrapInput(conferenceForm("location.city"), "City")
+            @bootstrapInput(conferenceForm("location.streetName"), "Street Name")
+            @bootstrapInput(conferenceForm("location.streetNb"), "Street N°", size = 2)
+            @bootstrapInput(conferenceForm("location.instituteName"), label="Institute Name")
+            @bootstrapInput(conferenceForm("location.buildingName"), "Building Name")
+            @bootstrapInput(conferenceForm("location.floor"), "Floor")
+            @bootstrapInput(conferenceForm("location.roomDesignation"), "Room Designation")
+        </div>
+
+        <div class="form-group">
+            <label for="datepicker" class="col-sm-2 control-label">Date *</label>
+            <div class="col-sm-2">
+                <input type="text" class="form-control" id="datepicker" name="date" value='@conferenceForm("date").value.getOrElse(today)'>
+            </div>
+            <label for="timepicker" class="col-sm-1 control-label">Time *</label>
+            <div class="col-sm-2">
+                <input id="timepicker" type="text" name="time" class="form-control time-input" value='@conferenceForm("time").value.getOrElse("9:00")'>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="length" class="col-sm-2 control-label">Length *</label>
+            <div class="col-sm-2">
+                <input type="text" class="form-control time-input" id="length" name="length" value='@conferenceForm("length").value.getOrElse("0:45")'>
+            </div>
+        </div>
+        <span style="@if(userRole != Administrator) {display:none}">
+            @bootstrapSelect(conferenceForm("organizer"), visibleLabs.map(l => (l.id.toString, l.name)))
+        </span>
+        <span>
+            @bootstrapSelect(conferenceForm("private"), List(("false", "No"),("true", "Yes")), size = 2)
+        </span>
+        <p>Select the logo of the new lab (must be either a JPEG or a PNG, under 4MB):</p>
+        <input type="file" name="logo">
+        @bootstrapSubmit()
+    }
+}

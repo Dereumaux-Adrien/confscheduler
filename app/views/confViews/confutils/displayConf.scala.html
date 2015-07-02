@@ -14,18 +14,24 @@
             <img height="70" src="@routes.LabController.logo(conf.organizedBy.id).url">
             }
         </div>
-    </div>
 
-    @if(canEdit){
-        <button role="button" data-trigger="focus" class="btn btn-delete btn-danger conference-buttons">Delete</button>
-        <script>
-            $('.btn-delete').popover({
-                container: 'body',
-                placement:"top",
-                html:'true',
-                title:'<span class="text-info"><strong>Sure?</strong></span>',
-                content:'<form method="POST" action="@routes.ConferenceController.delete(conf.id)"><button type="submit" class="btn btn-danger">Yes</button></form>'
-            });
-        </script>
-    }
+
+        @if(canEdit){
+            <div class="conference-buttons">
+                <form method="GET" action="@routes.ConferenceController.modifyConf(conf.id)">
+                    <button type="submit" class="btn btn-warning">Modify</button>
+                </form>
+                <button role="button" data-trigger="focus" class="btn btn-delete btn-danger">Delete</button>
+                <script>
+                    $('.btn-delete').popover({
+                        container: 'body',
+                        placement:"top",
+                        html:'true',
+                        title:'<span class="text-info"><strong>Sure?</strong></span>',
+                        content:'<form method="POST" action="@routes.ConferenceController.delete(conf.id)"><button type="submit" class="btn btn-danger">Yes</button></form>'
+                    });
+                </script>
+            </div>
+        }
+    </div>
 </div>

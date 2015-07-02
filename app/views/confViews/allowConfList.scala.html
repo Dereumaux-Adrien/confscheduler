@@ -5,6 +5,9 @@
         <h4>@conf.title <span class="speaker-name">@conf.speaker.fullName</span><span class="time-to-conf"> in @conf.dateDisplayFormat</span></h4>
         <p>@conf.abstr</p>
         <div class="conference-buttons">
+            <form method="GET" action="@routes.ConferenceController.modifyConf(conf.id)">
+                <button type="submit" class="btn btn-warning">Modify</button>
+            </form>
             <form method="POST" action="@routes.ConferenceController.accept(conf.id, None)">
                 <button type="submit" class="btn btn-success">Accept</button>
             </form>
