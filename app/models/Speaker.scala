@@ -93,6 +93,10 @@ object Speaker {
     SQL("DELETE FROM Speaker;").executeUpdate()
   }
 
+  def destroyUnused() = DB.withConnection { implicit c =>
+    SQL("DELETE FROM Speaker WHERE id NOT IN (SELECT speaker FROM Conference);").executeUpdate()
+  }
+
   private val speakerParser: RowParser[Speaker] = {
       get[Long]("id") ~
       get[String]("firstName") ~

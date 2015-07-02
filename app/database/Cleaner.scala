@@ -1,7 +1,7 @@
 package database
 
 import akka.actor.{Props, Actor}
-import models.Conference
+import models.{Location, Speaker, Conference}
 import helpers.DateTimeUtils
 import play.api.libs.concurrent.Akka
 import play.api.Play.current
@@ -20,6 +20,8 @@ class Cleaner extends Actor {
   override def receive = {
     case Clean(tenYearPeriod) => {
       Conference.destroyAfterTenYearPeriod();
+      Speaker.destroyUnused()
+      Location.destroyUnused()
 
       Akka.system.scheduler.scheduleOnce(DateTimeUtils.findNextYear(1), Akka.system.actorOf(Props[Cleaner]), TenYearPeriod)
     }

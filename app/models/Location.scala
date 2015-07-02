@@ -62,6 +62,10 @@ object Location {
     SQL("DELETE FROM Location").executeUpdate()
   }
 
+  def destroyUnused() = DB.withConnection { implicit c =>
+    SQL("DELETE FROM Location WHERE id NOT IN (SELECT location FROM Conference);").executeUpdate()
+  }
+
   def count: Long = DB.withConnection{implicit c =>
     SQL("SELECT count(*) FROM Location")
       .as(scalar[Long].single)
