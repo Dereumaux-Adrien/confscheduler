@@ -1,6 +1,6 @@
 package controllers
 
-import models.{Lab, Administrator, LabGroup}
+import models._
 import play.api.data.Form
 import play.api.data.Forms._
 import MySecurity.Authorization._
@@ -9,7 +9,9 @@ import MySecurity.Authentication._
 import scala.Some
 import play.api.mvc._
 import scala.concurrent.ExecutionContext.Implicits.global
-import play.api.libs.Files.TemporaryFile
+import scala.Some
+import play.api.mvc.Result
+import MySecurity.Authentication.MyAuthenticatedRequest
 
 /**
  * Created by adrien on 5/18/15.
@@ -23,14 +25,16 @@ object LabGroupController extends Controller {
     )(SimpleLabGroup.apply)(SimpleLabGroup.unapply)
   }
 
+  def authenticatedUserRole(implicit request: MyAuthenticatedRequest[AnyContent]): Option[UserRole] = request.user.map(_.role)
+
   def create = MyAuthenticated(parse.multipartFormData) { implicit request => {
     request.user.map(_.role) match {
-      case Some(Administrator) => AddNewLabGroup
+      case Some(Administrator) => addNewLabGroup
       case _                   => Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You do not have the rights to create a new labGroup."))
     }
   }}
 
-  def AddNewLabGroup()(implicit request: Request[Any]) = {
+  def addNewLabGroup()(implicit request: Request[Any]) = {
     labGroupForm.bindFromRequest.fold(
       formWithErrors => BadRequest(views.html.labGroupViews.newLabGroup(formWithErrors)(request, Administrator)),
       newLabGroup         => {
@@ -46,6 +50,41 @@ object LabGroupController extends Controller {
   }}
 
   def successfullAddition(labGroupName: String) = Redirect(routes.LabGroupController.list(None)).flashing(("success", "Successfully created new labGroup: " + labGroupName))
+
+  def modify(id: Long) = ForcedAuthentication {
+    implicit request => {
+      val group = LabGroup.findById(id)
+      if(group.isDefined){
+        if(request.user.get.role == Administrator){
+          Future(Ok(views.html.labGroupViews.modifyLabGroup(labGroupForm, group.get)(request, authenticatedUserRole.get)))
+        }else{
+          Future(Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You don't have the rights to modify groups")))
+        }
+      }else{
+        Future(Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You tried to modify an unknown group")))
+      }
+    }
+  }
+
+  def reCreate(groupId: Long) = ForcedAuthentication { implicit request =>
+    Future {
+      val form= labGroupForm.bindFromRequest()
+      form.fold(
+        formWithErrors => BadRequest(views.html.labGroupViews.modifyLabGroup(formWithErrors, LabGroup.findById(groupId).get)(request, authenticatedUserRole.get)),
+        group           => reCreateLabGroup(LabGroup.findById(groupId).get, group, request.user.get)
+      )
+    }
+  }
+
+  private def reCreateLabGroup(oldGroup: LabGroup, group: SimpleLabGroup, user: User): Result = {
+    if(user.role == Administrator){
+      LabGroup.modifyFromSimpleLabGroup(oldGroup, group)
+      oldGroup.save
+      Redirect(routes.LabGroupController.list(None))
+    }else{
+      Redirect(routes.ConferenceController.listConfs(None))
+    }
+  }
 
   def list(filter: Option[String]) = AuthorizedWith(_.role == Administrator) { implicit request => Future {
     if(filter.isDefined) {

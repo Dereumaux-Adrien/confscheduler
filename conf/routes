@@ -21,7 +21,7 @@ POST        /conf/:id/allow         controllers.ConferenceController.acceptAuth(
 GET         /conf/:id/allow         controllers.ConferenceController.accept(id: Long, token: Option[String])
 POST        /conf/:id/refuse        controllers.ConferenceController.refuseAuth(id: Long)
 GET         /conf/:id/refuse        controllers.ConferenceController.refuse(id: Long, token: Option[String])
-GET         /conf/:id/modify        controllers.ConferenceController.modifyConf(id: Long)
+GET         /conf/:id/modify        controllers.ConferenceController.modify(id: Long)
 POST        /conf/:id/modify        controllers.ConferenceController.reCreate(id: Long)
 POST        /conf/:id/delete        controllers.ConferenceController.delete(id: Long)
 
@@ -40,11 +40,13 @@ GET         /lab/:id/logo           controllers.LabController.logo(id: Long)
 
 GET         /labGroup/new           controllers.LabGroupController.newLabGroup
 POST        /labGroup/new           controllers.LabGroupController.create
-GET         /labGroup/:id/addLab    controllers.LabGroupController.listLabToAdd(id: Long, filter: Option[String])
-GET         /labGroup/:id/removeLab controllers.LabGroupController.listLabOfGroup(id: Long, filter: Option[String])
-POST        /labGroup/addLab        controllers.LabGroupController.addLab(idLabGroup: Long, idLab: Long)
-POST        /labGroup/removeLab     controllers.LabGroupController.removeLab(idLabGroup: Long, idLab: Long)
 GET         /labGroup/all           controllers.LabGroupController.list(filter: Option[String])
+GET         /labGroup/:id/addLab    controllers.LabGroupController.listLabToAdd(id: Long, filter: Option[String])
+POST        /labGroup/addLab        controllers.LabGroupController.addLab(idLabGroup: Long, idLab: Long)
+GET         /labGroup/:id/removeLab controllers.LabGroupController.listLabOfGroup(id: Long, filter: Option[String])
+POST        /labGroup/removeLab     controllers.LabGroupController.removeLab(idLabGroup: Long, idLab: Long)
+GET         /labGroup/:id/modify    controllers.LabGroupController.modify(id: Long)
+POST        /labGroup/:id/modify    controllers.LabGroupController.reCreate(id: Long)
 POST        /labGroup/:id/delete    controllers.LabGroupController.delete(id: Long)
 
 GET         /rss                    controllers.RSSFeedController.index

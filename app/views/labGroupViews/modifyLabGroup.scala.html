@@ -1,0 +1,16 @@
+@(labGroupForm: Form[LabGroupController.SimpleLabGroup], group: LabGroup)(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
+@import views.html.helper._
+@import utils._
+
+@main("Modify Lab Group") {
+    @helper.form(routes.LabGroupController.reCreate(group.id), 'class -> "form-horizontal", 'enctype -> "multipart/form-data") {
+        @bootstrapErrors(labGroupForm.errors, "labGroup")
+        <div class="form-group">
+            <label for="name" class="col-sm-2 control-label">Name</label>
+            <div class="col-sm-5">
+                <textarea class="form-control" id="name" name="name">@labGroupForm("name").value.getOrElse(group.name)</textarea>
+            </div>
+        </div>
+        @bootstrapSubmit()
+    }
+}

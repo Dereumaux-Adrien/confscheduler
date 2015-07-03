@@ -15,7 +15,7 @@ import com.github.tototoshi.csv.CSVWriter
 import java.io.{FilenameFilter, File}
 
 case class Conference (
-    var id         : Long,
+    id         : Long,
     var title      : String,
     var abstr      : String,
     var speaker    : Speaker,

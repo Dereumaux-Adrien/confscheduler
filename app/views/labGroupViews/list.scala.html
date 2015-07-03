@@ -16,6 +16,11 @@
                 });
             </script>
             <span class="pull-right">
+                <form method="GET" action="@routes.LabGroupController.modify(labGroup.id)">
+                    <button type="submit" class="btn btn-warning">Modify</button>
+                </form>
+            </span>
+            <span class="pull-right">
                 <form method="GET" action="@routes.LabGroupController.listLabOfGroup(labGroup.id, None)">
                     <button type="submit" class="btn btn-default margin-left: 15px;margin-top: -4px;padding: 2px 5px;">List Lab</button>
                 </form>

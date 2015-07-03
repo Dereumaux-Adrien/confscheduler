@@ -164,7 +164,7 @@ object ConferenceController extends Controller {
     Future(Ok(views.html.confViews.addConf(conferenceForm, Lab.listVisible(request.user.get), isoFormatter.print(DateTime.now()))(request, authenticatedUserRole.get)))
   }
 
-  def modifyConf(id: Long) = ForcedAuthentication {
+  def modify(id: Long) = ForcedAuthentication {
     implicit request => {
       val conf = Conference.findById(id)
       if(conf.isDefined){
@@ -201,16 +201,22 @@ object ConferenceController extends Controller {
 
   private def reCreateConf(oldConf: Conference, conf: SimpleConference, user: User): Result = {
 
-    Conference.modifyFromSimpleConference(oldConf, conf, None, Some(user))
+    if(user.canAllowConf(oldConf.id)){
+      Conference.modifyFromSimpleConference(oldConf, conf, None, Some(user))
 
-    val id = oldConf.save.get.id
+      val id = oldConf.save.get.id
 
-    if(oldConf.priv){
-      Redirect(routes.ConferenceController.privacySelection(id))
+      if(oldConf.priv){
+        Redirect(routes.ConferenceController.privacySelection(id))
+      }else{
+        oldConf.asAccepted.save
+        Redirect(routes.ConferenceController.viewConf(id))
+      }
     }else{
-      oldConf.asAccepted.save
-      Redirect(routes.ConferenceController.viewConf(id))
+      Redirect(routes.ConferenceController.listUpcomingConfs(None))
     }
+
+
   }
 
   def accept(id: Long, token: Option[String]) = MyAuthenticated { implicit request =>

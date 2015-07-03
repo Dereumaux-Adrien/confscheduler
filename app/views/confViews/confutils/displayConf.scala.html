@@ -18,7 +18,7 @@
 
         @if(canEdit){
             <div class="conference-buttons">
-                <form method="GET" action="@routes.ConferenceController.modifyConf(conf.id)">
+                <form method="GET" action="@routes.ConferenceController.modify(conf.id)">
                     <button type="submit" class="btn btn-warning">Modify</button>
                 </form>
                 <button role="button" data-trigger="focus" class="btn btn-delete btn-danger">Delete</button>

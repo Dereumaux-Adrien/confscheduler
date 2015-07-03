@@ -12,7 +12,7 @@ import play.api.Play.current
 
 case class LabGroup (
   id     : Long,
-  name   : String
+  var name   : String
 ) {
   def destroy() = LabGroup.destroy(this)
 
@@ -49,6 +49,10 @@ object LabGroup {
 
   def fromSimpleLabGroup(labGroup: SimpleLabGroup): Option[LabGroup] = {
     Option(LabGroup(-1, labGroup.name))
+  }
+
+  def modifyFromSimpleLabGroup(oldGroup: LabGroup, group: SimpleLabGroup){
+    oldGroup.name = group.name
   }
 
   def save(labGroup: LabGroup): Option[LabGroup] = DB.withConnection { implicit c =>
