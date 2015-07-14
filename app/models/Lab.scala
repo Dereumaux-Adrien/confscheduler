@@ -7,13 +7,14 @@ import java.sql.SQLException
 import play.api.Logger
 import play.api.db.DB
 import play.api.Play.current
+import logo.Logo
 
 case class Lab (
   id     : Long,
-  acronym: String,
-  name   : String,
-  email  : String,
-  logoId : Option[String]
+  var acronym: String,
+  var name   : String,
+  var email  : String,
+  var logoId : Option[String]
 ) {
   def destroy() = Lab.destroy(this)
 
@@ -50,6 +51,16 @@ object Lab {
 
   def fromSimpleLab(lab: SimpleLab, logoId: Option[String]): Option[Lab] = {
     Option(Lab(-1, lab.acronym, lab.name, lab.email, logoId))
+  }
+
+  def modifyFromSimpleLab(oldLab:Lab, lab: SimpleLab, logoId: Option[String]){
+    oldLab.acronym = lab.acronym
+    oldLab.name = lab.name
+    oldLab.email = lab.email
+    if(oldLab.logoId.isDefined)
+      Logo.find(oldLab.logoId.get).delete
+    oldLab.logoId = logoId
+
   }
 
   def save(lab: Lab): Option[Lab] = DB.withConnection { implicit c =>

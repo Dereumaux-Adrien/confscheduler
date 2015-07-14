@@ -1,0 +1,33 @@
+@(labForm: Form[LabController.SimpleLab], lab: Lab)(implicit request: play.api.mvc.Request[Any], userRole: UserRole)
+@import views.html.helper._
+@import utils._
+
+@main("Modify Lab") {
+    <div class="alert alert-warning" role="alert">
+        Warning: Don't forget to reselect the Lab Icon
+    </div>
+    @helper.form(routes.LabController.reCreate(lab.id), 'class -> "form-horizontal", 'enctype -> "multipart/form-data") {
+        @bootstrapErrors(labForm.errors, "lab")
+        <div class="form-group">
+            <label for="acronym" class="col-sm-2 control-label">Acronym</label>
+            <div class="col-sm-5">
+                <textarea class="form-control" id="acronym" name="acronym">@labForm("acronym").value.getOrElse(lab.acronym)</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-sm-2 control-label">Name</label>
+            <div class="col-sm-5">
+                <textarea class="form-control" id="name" name="name">@labForm("name").value.getOrElse(lab.name)</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="email" class="col-sm-2 control-label">Title *</label>
+            <div class="col-sm-5">
+                <textarea class="form-control" id="email" name="email">@labForm("email").value.getOrElse(lab.email)</textarea>
+            </div>
+        </div>
+        <p>Select the logo of the new lab (must be either a JPEG or a PNG, under 4MB):</p>
+        <input type="file" name="logo">
+        @bootstrapSubmit()
+    }
+}

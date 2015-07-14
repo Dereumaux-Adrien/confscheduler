@@ -289,7 +289,7 @@ object Conference {
       conf.length, Lab.findById(conf.organizerId).get, location, accepted = false, Some(Crypto.generateToken), priv = conf.priv, None, logoId, createdBy)
   }
 
-  def modifyFromSimpleConference(oldConf: Conference, conf: SimpleConference, logoId: Option[String] = None, createdBy: Option[User] = None){
+  def modifyFromSimpleConference(oldConf: Conference, conf: SimpleConference, logoId: Option[String] = None){
     val speaker =
       if(conf.speaker.speakerId != -1) Speaker.findById(conf.speaker.speakerId).get
       else {
@@ -316,7 +316,6 @@ object Conference {
     oldConf.priv = conf.priv
     oldConf.forGroup = None
     oldConf.logoId = logoId
-    oldConf.createdBy = createdBy
   }
 
   def exportAllConfToCSV(labId : Option[Long] = None) : File = {

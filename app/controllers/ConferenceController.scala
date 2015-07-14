@@ -202,7 +202,7 @@ object ConferenceController extends Controller {
   private def reCreateConf(oldConf: Conference, conf: SimpleConference, user: User): Result = {
 
     if(user.canAllowConf(oldConf.id)){
-      Conference.modifyFromSimpleConference(oldConf, conf, None, Some(user))
+      Conference.modifyFromSimpleConference(oldConf, conf, None)
 
       val id = oldConf.save.get.id
 

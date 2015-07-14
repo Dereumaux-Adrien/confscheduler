@@ -20,6 +20,10 @@
                 });
             </script>
             <span class="pull-right">
+                <form method="GET" action="@routes.LabController.modify(lab.id)">
+                    <button type="submit" class="btn btn-warning">Modify</button>
+                </form></span>
+            <span class="pull-right">
                 <form method="GET" action="@routes.ConferenceController.downloadCSVForLab(lab.id)">
                     <button type="submit" class="btn btn-default btn-lab">Download Seminars</button>
                 </form>

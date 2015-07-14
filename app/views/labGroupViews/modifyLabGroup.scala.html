@@ -3,7 +3,7 @@
 @import utils._
 
 @main("Modify Lab Group") {
-    @helper.form(routes.LabGroupController.reCreate(group.id), 'class -> "form-horizontal", 'enctype -> "multipart/form-data") {
+    @helper.form(routes.LabGroupController.reCreate(group.id)) {
         @bootstrapErrors(labGroupForm.errors, "labGroup")
         <div class="form-group">
             <label for="name" class="col-sm-2 control-label">Name</label>

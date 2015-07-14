@@ -5,7 +5,7 @@ import java.io.File
 import MySecurity.Authentication._
 import MySecurity.Authorization._
 import logo.Logo
-import models.{Administrator, Lab}
+import models.{User, UserRole, Administrator, Lab}
 import play.api.Play
 import play.api.data.Form
 import play.api.data.Forms._
@@ -28,6 +28,8 @@ object LabController extends Controller {
     )(SimpleLab.apply)(SimpleLab.unapply)
   }
 
+  def authenticatedUserRole(implicit request: MyAuthenticatedRequest[AnyContent]): Option[UserRole] = request.user.map(_.role)
+
   def logo(id: Long) = ForcedAuthentication{implicit request => Future {
       Lab.findById(id).flatMap(_.logoId) match {
         case Some(logoId) => Ok.sendFile(Logo.find(logoId))
@@ -38,6 +40,21 @@ object LabController extends Controller {
   def newLab: Action[AnyContent] = AuthorizedWith(_.role == Administrator) { implicit request => Future {
       Ok(views.html.labViews.newLab(labForm)(request, request.user.get.role))
   }}
+
+  def modify(id: Long) = ForcedAuthentication {
+    implicit request => {
+      val lab = Lab.findById(id)
+      if(lab.isDefined){
+        if(request.user.get.role == Administrator){
+          Future(Ok(views.html.labViews.modifyLab(labForm, lab.get)(request, authenticatedUserRole.get)))
+        }else{
+          Future(Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You don't have the rights to modify a lab")))
+        }
+      }else{
+        Future(Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You tried to modify an unknown lab")))
+      }
+    }
+  }
 
   def create = MyAuthenticated(parse.multipartFormData) { implicit request => {
     request.user.map(_.role) match {
@@ -84,6 +101,58 @@ object LabController extends Controller {
       case Some(tempFile) => Logo(tempFile) match {
         case Some(smallLogo) => AddNewLabWithLogo(form, smallLogo)
         case _               => LogoInvalid(form)
+      }
+    }
+  }
+
+  def reCreate(labId: Long) = MyAuthenticated(parse.multipartFormData) { implicit request => {
+      request.user.map(_.role) match {
+        case Some(Administrator) => {
+          val form = labForm.bindFromRequest
+          request.body.file("logo") match {
+            case None => {
+              form.fold(
+                formWithErrors => BadRequest(views.html.labViews.modifyLab(formWithErrors, Lab.findById(labId).get)(request, Administrator)),
+                lab           => {
+                  val user = request.user.get
+                  if(user.role == Administrator){
+                    val oldLab =Lab.findById(labId).get
+                    Lab.modifyFromSimpleLab(oldLab, lab, None)
+                    oldLab.save
+
+                    Redirect(routes.LabController.list(None))
+                  }else{
+                    Redirect(routes.ConferenceController.listUpcomingConfs(None))
+                  }
+                }
+              )
+            }
+            case Some(tempFile) => Logo(tempFile) match {
+              case Some(smallLogo) => {
+                val form= labForm.bindFromRequest()
+                val logo = smallLogo
+                form.fold(
+                  formWithErrors => BadRequest(views.html.labViews.modifyLab(formWithErrors, Lab.findById(labId).get)(request, Administrator)),
+                  lab           => {
+                    val user = request.user.get
+                    if(user.role == Administrator){
+                      val oldLab =Lab.findById(labId).get
+                      logo.save
+                      Lab.modifyFromSimpleLab(oldLab, lab, Some(logo.logoId))
+                      oldLab.save
+
+                      Redirect(routes.LabController.list(None))
+                    }else{
+                      Redirect(routes.ConferenceController.listUpcomingConfs(None))
+                    }
+                  }
+                )
+              }
+              case _               => LogoInvalid(form)
+            }
+          }
+        }
+        case _                   => Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You do not have the rights to modify a lab."))
       }
     }
   }
