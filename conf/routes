@@ -28,9 +28,11 @@ POST        /conf/:id/delete        controllers.ConferenceController.delete(id: 
 GET         /calendar               controllers.ConferenceController.calendar
 
 GET         /user/new               controllers.UserController.newUser(type: Option[String])
-GET         /user/all               controllers.UserController.list(filter: Option[String])
-POST        /user/:id/delete        controllers.UserController.delete(id: Long)
 POST        /user/new               controllers.UserController.create
+GET         /user/all               controllers.UserController.list(filter: Option[String])
+GET         /user/:id/modify        controllers.UserController.modify(id: Long)
+POST        /user/:id/modify        controllers.UserController.reCreate(id: Long)
+POST        /user/:id/delete        controllers.UserController.delete(id: Long)
 
 GET         /lab/new                controllers.LabController.newLab
 POST        /lab/new                controllers.LabController.create

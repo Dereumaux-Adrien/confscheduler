@@ -34,13 +34,13 @@ case object Guest         extends UserRole {
 
 case class User (
    id: Long,
-   firstName: String,
-   lastName: String,
-   email: String,
-   lab: Lab,
-   hashedPass: String,
-   role:UserRole,
-   rememberMeToken: String
+   var firstName: String,
+   var lastName: String,
+   var email: String,
+   var lab: Lab,
+   var hashedPass: String,
+   var role:UserRole,
+   var rememberMeToken: String
 ){
   def canAllowConf(confId: Long): Boolean = (role == Moderator && Conference.findById(confId).exists(_.organizedBy.id == lab.id)) || role == Administrator
 
@@ -222,6 +222,23 @@ object User {
 
     val newUser = User(-1, user.firstName, user.lastName, user.email, newUserLab, user.password.scrypt, newUserRole, "")
     Option(newUser)
+  }
+
+  def modifyFromSimpleUser(oldUser: User, user: SimpleUser){
+    val newRole = user.newUserRole match {
+      case "Administrator" => Administrator
+      case "Moderator"     => Moderator
+      case "Contributor"   => Contributor
+    }
+
+    val newLab = Lab.findById(user.labId).getOrElse(return None)
+
+    oldUser.firstName = user.firstName
+    oldUser.lastName = user.lastName
+    oldUser.email = user.email
+    oldUser.lab = newLab
+    oldUser.hashedPass = user.password.scrypt
+    oldUser.role = newRole
   }
 
   def seedDB(): Unit = {

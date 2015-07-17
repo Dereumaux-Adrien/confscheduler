@@ -36,6 +36,20 @@ object UserController extends Controller {
     }
   }
 
+  def modify(id: Long) = ForcedAuthentication { implicit request => {
+      val user = User.findById(id)
+      if(user.isDefined){
+        if(request.user.get.role == Administrator || request.user.get.role == Contributor){
+          Future(Ok(views.html.userViews.modifyUser(userForm, user.get, request.user.get)(request, authenticatedUserRole.get)))
+        }else{
+          Future(Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You don't have the rights to modify a user")))
+        }
+      }else{
+        Future(Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You tried to modify an unknown user")))
+      }
+    }
+  }
+
   def create = ForcedAuthentication { implicit request =>
     Future {
       userForm.bindFromRequest.fold(
@@ -49,6 +63,26 @@ object UserController extends Controller {
             Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You do not have the rights to add users"))
         }
       )
+    }
+  }
+
+  def reCreate(id: Long) = ForcedAuthentication { implicit request =>
+    Future {
+      val form= userForm.bindFromRequest()
+      form.fold(
+        formWithErrors => BadRequest(views.html.userViews.modifyUser(formWithErrors, User.findById(id).get, request.user.get)(request, authenticatedUserRole.get)),
+        user           => reCreateUser(User.findById(id).get, user, request.user.get)
+      )
+    }
+  }
+
+  private def reCreateUser(oldUser: User, modifiedUser: SimpleUser, user: User): Result = {
+    if(user.role == Administrator || user.role == Contributor){
+      User.modifyFromSimpleUser(oldUser, modifiedUser)
+      oldUser.save
+      Redirect(routes.UserController.list(None))
+    }else{
+      Redirect(routes.ConferenceController.listConfs(None))
     }
   }
 

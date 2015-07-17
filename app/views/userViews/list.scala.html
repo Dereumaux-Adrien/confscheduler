@@ -15,6 +15,11 @@
                     content:'<form method="POST" action="@routes.UserController.delete(user.id)"><button type="submit" class="btn btn-danger">Yes</button></form>'
                 });
             </script>
+            <span class="pull-right">
+                <form method="POST" action="@routes.UserController.modify(user.id)">
+                    <button role="button" data-trigger="focus" class="btn btn-warning user-delete">Modify</button>
+                </form>
+            </span>
             <span class="lab">@user.lab.name</span>
         </div>
     }
