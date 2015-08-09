@@ -39,7 +39,7 @@ object UserController extends Controller {
   def modify(id: Long) = ForcedAuthentication { implicit request => {
       val user = User.findById(id)
       if(user.isDefined){
-        if(request.user.get.role == Administrator || request.user.get.role == Contributor){
+        if(request.user.get.role == Administrator || request.user.get.role == Moderator){
           Future(Ok(views.html.userViews.modifyUser(userForm, user.get, request.user.get)(request, authenticatedUserRole.get)))
         }else{
           Future(Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You don't have the rights to modify a user")))

@@ -4,7 +4,7 @@
 @main("Add a new seminar") {
     <script src='@routes.Assets.at("javascripts/conferenceForm.js")' type="text/javascript"></script>
 
-    @helper.form(routes.ConferenceController.create, 'class -> "form-horizontal") {
+    @helper.form(routes.ConferenceController.create, 'class -> "form-horizontal", 'enctype -> "multipart/form-data") {
         <input type="hidden" id="timezoneOffset" name="timezoneOffset">
         @bootstrapErrors(conferenceForm.errors, "seminar")
         @bootstrapInput(conferenceForm("title"))

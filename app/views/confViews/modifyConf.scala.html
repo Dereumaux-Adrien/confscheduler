@@ -6,7 +6,7 @@
     <div class="alert alert-danger" role="alert">
         Warning: You need to select again every option
     </div>
-    @helper.form(routes.ConferenceController.reCreate(conf.id), 'class -> "form-horizontal") {
+    @helper.form(routes.ConferenceController.reCreate(conf.id), 'class -> "form-horizontal", 'enctype -> "multipart/form-data") {
         <input type="hidden" id="timezoneOffset" name="timezoneOffset">
         @bootstrapErrors(conferenceForm.errors, "seminar")
         <div class="form-group">

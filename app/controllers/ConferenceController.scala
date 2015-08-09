@@ -22,7 +22,7 @@ import play.libs.Akka
 import play.api.Play.current
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 import logo.Logo
 import play.api.libs.Files.TemporaryFile
 
@@ -92,10 +92,10 @@ object ConferenceController extends Controller {
       "private" -> boolean)(SimpleConference.apply)(SimpleConference.unapply)
   }
 
-  def logo(id: Long) = ForcedAuthentication{implicit request => Future {
-    Lab.findById(id).flatMap(_.logoId) match {
+  def logo(id: Long) = MyAuthenticated{implicit request =>{
+    Conference.findById(id).flatMap(_.logoId) match {
       case Some(logoId) => Ok.sendFile(Logo.find(logoId))
-      case _            => Redirect(routes.LabController.list(None)).flashing(("error", "Couldn't find the logo for this conf"))
+      case _            => Redirect(routes.ConferenceController.listConfs(None)).flashing(("error", "Couldn't find the logo for this conf"))
     }
   }}
 
@@ -179,44 +179,103 @@ object ConferenceController extends Controller {
     }
   }
 
-  def create() = ForcedAuthentication { implicit request =>
-    Future {
-      val form= conferenceForm.bindFromRequest()
-      form.fold(
-        formWithErrors => BadRequest(views.html.confViews.addConf(formWithErrors, Lab.listVisible(request.user.get), isoFormatter.print(DateTime.now()))(request, authenticatedUserRole.get)),
-        conf           => createConfWithUser(conf, request.user.get)
-      )
-    }
-  }
-
-  def reCreate(confId: Long) = ForcedAuthentication { implicit request =>
-    Future {
-      val form= conferenceForm.bindFromRequest()
-      form.fold(
-        formWithErrors => BadRequest(views.html.confViews.modifyConf(formWithErrors, Conference.findById(confId).get, Lab.listVisible(request.user.get), isoFormatter.print(DateTime.now()))(request, authenticatedUserRole.get)),
-        conf           => reCreateConf(Conference.findById(confId).get, conf, request.user.get)
-      )
-    }
-  }
-
-  private def reCreateConf(oldConf: Conference, conf: SimpleConference, user: User): Result = {
-
-    if(user.canAllowConf(oldConf.id)){
-      Conference.modifyFromSimpleConference(oldConf, conf, None)
-
-      val id = oldConf.save.get.id
-
-      if(oldConf.priv){
-        Redirect(routes.ConferenceController.privacySelection(id))
-      }else{
-        oldConf.asAccepted.save
-        Redirect(routes.ConferenceController.viewConf(id))
+  def create() = MyAuthenticated(parse.multipartFormData) { implicit request => {
+    request.user.map(_.role) match {
+      case Some(Administrator) | Some(Moderator) | Some(Contributor) => {
+        val form= conferenceForm.bindFromRequest()
+        form.fold(
+          formWithErrors => BadRequest(views.html.confViews.addConf(formWithErrors, Lab.listVisible(request.user.get), isoFormatter.print(DateTime.now()))(request, request.user.get.role)),
+          conf           => {
+            request.body.file("logo") match {
+              case None => {
+                form.fold(
+                  formWithErrors => BadRequest(views.html.confViews.addConf(formWithErrors, Lab.listVisible(request.user.get), isoFormatter.print(DateTime.now()))(request, request.user.get.role)),
+                  conf           => createConfWithUser(conf, request.user.get)
+                )
+              }
+              case Some(tempFile) => Logo(tempFile) match {
+                case Some(smallLogo) => {
+                  val form= conferenceForm.bindFromRequest()
+                  val logo = smallLogo
+                  form.fold(
+                    formWithErrors => BadRequest(views.html.confViews.addConf(formWithErrors, Lab.listVisible(request.user.get), isoFormatter.print(DateTime.now()))(request, request.user.get.role)),
+                    conf           => {
+                      val saving = logo.save()
+                      Await.result(saving, concurrent.duration.DurationInt(1).second)
+                      createConfWithUser(conf, request.user.get, Some(logo.logoId))
+                    }
+                  )
+                }
+                case _               => Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("fileError", "The logo must be a JPEG or a PNG under 4Mb in size"))
+              }
+            }
+          }
+        )
       }
-    }else{
-      Redirect(routes.ConferenceController.listUpcomingConfs(None))
+      case _                   => Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You do not have the rights to create a conference."))
     }
+  }
+  }
 
-
+  def reCreate(confId: Long) = MyAuthenticated(parse.multipartFormData) { implicit request => {
+    request.user.map(_.role) match {
+      case Some(Administrator) | Some(Moderator) => {
+        val form = conferenceForm.bindFromRequest
+        request.body.file("logo") match {
+          case None => {
+            form.fold(
+              formWithErrors => BadRequest(views.html.confViews.modifyConf(formWithErrors,Conference.findById(confId).get, Lab.listVisible(request.user.get), isoFormatter.print(DateTime.now()))(request, Administrator)),
+              conf           => {
+                val user = request.user.get
+                if(user.role == Administrator || user.role == Moderator){
+                  val oldConf = Conference.findById(confId).get
+                  Conference.modifyFromSimpleConference(oldConf, conf)
+                  oldConf.save
+                  if(oldConf.priv){
+                    Redirect(routes.ConferenceController.privacySelection(confId))
+                  }else{
+                    oldConf.asAccepted.save
+                    Redirect(routes.ConferenceController.viewConf(confId))
+                  }
+                }else{
+                  Redirect(routes.ConferenceController.listUpcomingConfs(None))
+                }
+              }
+            )
+          }
+          case Some(tempFile) => Logo(tempFile) match {
+            case Some(smallLogo) => {
+              val form= conferenceForm.bindFromRequest()
+              val logo = smallLogo
+              form.fold(
+                formWithErrors => BadRequest(views.html.confViews.modifyConf(formWithErrors,Conference.findById(confId).get, Lab.listVisible(request.user.get), isoFormatter.print(DateTime.now()))(request, Administrator)),
+                conf           => {
+                  val user = request.user.get
+                  if(user.role == Administrator || user.role == Moderator){
+                    val oldConf = Conference.findById(confId).get
+                    val saving = logo.save()
+                    Await.result(saving, concurrent.duration.DurationInt(1).second)
+                    Conference.modifyFromSimpleConference(oldConf, conf, Some(logo.logoId))
+                    oldConf.save
+                    if(oldConf.priv){
+                      Redirect(routes.ConferenceController.privacySelection(confId))
+                    }else{
+                      oldConf.asAccepted.save
+                      Redirect(routes.ConferenceController.viewConf(confId))
+                    }
+                  }else{
+                    Redirect(routes.ConferenceController.listUpcomingConfs(None))
+                  }
+                }
+              )
+            }
+            case _               => Redirect(routes.ConferenceController.modify(confId)).flashing(("fileError", "The logo must be a JPEG or a PNG under 4Mb in size"))
+          }
+        }
+      }
+      case _                   => Redirect(routes.ConferenceController.listUpcomingConfs(None)).flashing(("error", "You do not have the rights to modify a conference."))
+    }
+  }
   }
 
   def accept(id: Long, token: Option[String]) = MyAuthenticated { implicit request =>
@@ -312,9 +371,9 @@ object ConferenceController extends Controller {
     }
   }
 
-  private def createConfWithUser(conf: SimpleConference, user: User): Result = {
+  private def createConfWithUser(conf: SimpleConference, user: User, logoId: Option[String] = None): Result = {
 
-    val newId = Conference.fromSimpleConference(conf, None, Some(user)).save.get.id
+    val newId = Conference.fromSimpleConference(conf, logoId, Some(user)).save.get.id
 
     val newConf = Conference.findById(newId).get
 

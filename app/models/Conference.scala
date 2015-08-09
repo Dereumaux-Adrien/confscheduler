@@ -263,10 +263,12 @@ object Conference {
     get[Boolean]("accepted") ~
     get[Option[String]]("acceptCode") ~
     get[Boolean]("private") ~
-    get[Option[Long]]("forGroup") map {
-      case id ~ title ~ abstr ~ speaker ~ startDate ~ length ~ organizedBy ~ location ~ accepted ~ acceptCode ~ priv ~ forGroup =>
+    get[Option[Long]]("forGroup")  ~
+    get[Option[String]]("logoId") ~
+    get[Option[Long]]("createdBy") map {
+      case id ~ title ~ abstr ~ speaker ~ startDate ~ length ~ organizedBy ~ location ~ accepted ~ acceptCode ~ priv ~ forGroup ~ logoId ~ createdBy =>
         Conference(id, title, abstr, Speaker.findById(speaker).get,
-          startDate, new Duration(length), Lab.findById(organizedBy).get, Location.findById(location).get, accepted, acceptCode, priv, LabGroup.findById(forGroup.getOrElse(0)))
+          startDate, new Duration(length), Lab.findById(organizedBy).get, Location.findById(location).get, accepted, acceptCode, priv, LabGroup.findById(forGroup.getOrElse(0)), logoId, User.findById(createdBy.getOrElse(0)))
     }
   }
 

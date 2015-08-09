@@ -16,6 +16,8 @@ import play.api.Play.current
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
+import scala.Some
+import MySecurity.Authentication.MyAuthenticatedRequest
 
 object LabController extends Controller {
   case class SimpleLab(acronym: String, name: String, email: String)
@@ -30,7 +32,7 @@ object LabController extends Controller {
 
   def authenticatedUserRole(implicit request: MyAuthenticatedRequest[AnyContent]): Option[UserRole] = request.user.map(_.role)
 
-  def logo(id: Long) = ForcedAuthentication{implicit request => Future {
+  def logo(id: Long) = MyAuthenticated{implicit request => {
       Lab.findById(id).flatMap(_.logoId) match {
         case Some(logoId) => Ok.sendFile(Logo.find(logoId))
         case _            => Redirect(routes.LabController.list(None)).flashing(("error", "Couldn't find the logo for this lab"))

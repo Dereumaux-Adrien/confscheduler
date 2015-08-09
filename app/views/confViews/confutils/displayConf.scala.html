@@ -1,6 +1,9 @@
 @(conf: Conference, canEdit: Boolean)
 
 <div class="listing">
+    @if(conf.logoId.isDefined) {
+        <img height="100" src="@routes.ConferenceController.logo(conf.id).url">
+    }
     <div class="content">
         <div class="text">
             <h4>@conf.title <span class="speaker-name">@conf.speaker.fullName</span>

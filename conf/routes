@@ -24,6 +24,7 @@ GET         /conf/:id/refuse        controllers.ConferenceController.refuse(id: 
 GET         /conf/:id/modify        controllers.ConferenceController.modify(id: Long)
 POST        /conf/:id/modify        controllers.ConferenceController.reCreate(id: Long)
 POST        /conf/:id/delete        controllers.ConferenceController.delete(id: Long)
+GET         /conf/:id/logo          controllers.ConferenceController.logo(id: Long)
 
 GET         /calendar               controllers.ConferenceController.calendar
 
