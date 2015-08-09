@@ -34,6 +34,16 @@ class DBTest extends Specification {
       Lab.listAll.find(_.name == "Erectus Raging Friends") must beSome
     }
 
+    "be able to save valid LabGroups" in {
+      val validLabGroup = LabGroup(-1, "ERF group")
+      val labGroupCount = LabGroup.count
+
+      validLabGroup.save()
+
+      LabGroup.count mustEqual labGroupCount + 1
+      LabGroup.listAll.find(_.name == "ERF group") must beSome
+    }
+
     "be able to save valid Locations" in {
       val validLoc = Location(-1, "test", Some("test"), "testaswell", "qdfsfg", "qfqsfgsdfg", 4, "qegeg")
       val locCount = Location.count

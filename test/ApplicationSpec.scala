@@ -83,6 +83,14 @@ class ApplicationSpec extends Specification {
       route(FakeRequest(GET, "/boum")) must beNone
     }
 
+    "render the conference add page to a logged user" in {
+      loggedAccess("/conf/new", GET)
+    }
+
+    "render the conference accept page to an admin or moderator" in {
+      modOrBetterAccess("/conf/allow", GET)
+    }
+
     "render the upcoming conferences page" in {
       val upcomingConfs = route(FakeRequest(GET, "/conf/upcoming")).get
       isAccessible(upcomingConfs) must beTrue
@@ -99,9 +107,12 @@ class ApplicationSpec extends Specification {
       contentAsString(calendar) must contain ("""<div id="calendar">""")
     }
 
-    "render the login page" in {
-      val login = route(FakeRequest(GET, "/login")).get
-      isAccessible(login) must beTrue
+    "render the user add page to an admin or moderator" in {
+      modOrBetterAccess("/user/new", GET)
+    }
+
+    "render the user list page to an admin or moderator" in {
+      modOrBetterAccess("/user/all", GET)
     }
 
     "render the new lab page to only an admin" in {
@@ -112,28 +123,17 @@ class ApplicationSpec extends Specification {
       adminOnlyAccess("/lab/all", GET)
     }
 
-    "render the new lab page to only an admin" in {
+    "render the new labGroup page to only an admin" in {
       adminOnlyAccess("/labGroup/new", GET)
     }
 
-    "render the lab list page to only an admin" in {
+    "render the labGroup list page to only an admin" in {
       adminOnlyAccess("/labGroup/all", GET)
     }
 
-    "render the user list page to an admin or moderator" in {
-      modOrBetterAccess("/user/all", GET)
-    }
-
-    "render the user add page to an admin or moderator" in {
-      modOrBetterAccess("/user/new", GET)
-    }
-
-    "render the conference add page to a logged user" in {
-      loggedAccess("/conf/new", GET)
-    }
-
-    "render the conference accept page to an admin or moderator" in {
-      modOrBetterAccess("/conf/allow", GET)
+    "render the login page" in {
+      val login = route(FakeRequest(GET, "/login")).get
+      isAccessible(login) must beTrue
     }
   }
   step {Play.stop()}

@@ -85,6 +85,11 @@ object LabGroup {
       .as(labGroupParser *)
   }
 
+  def count: Long = DB.withConnection{implicit c =>
+    SQL("SELECT count(*) FROM LabGroup")
+      .as(scalar[Long].single)
+  }
+
   private val labGroupParser: RowParser[LabGroup] = {
     get[Long]("id") ~
       get[String]("name") map {
