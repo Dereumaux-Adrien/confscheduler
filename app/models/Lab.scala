@@ -113,6 +113,8 @@ object Lab {
       if(count>0){
         false
       }else{
+        if(lab.logoId.isDefined)
+          Logo.find(lab.logoId.get).delete
         try {
           SQL("DELETE FROM Lab WHERE id = {id}")
             .on("id" -> lab.id)

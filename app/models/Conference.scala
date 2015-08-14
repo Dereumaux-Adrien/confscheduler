@@ -13,6 +13,7 @@ import play.api.Play.current
 import play.api.libs.Crypto
 import com.github.tototoshi.csv.CSVWriter
 import java.io.{FilenameFilter, File}
+import logo.Logo
 
 case class Conference (
     id         : Long,
@@ -214,6 +215,8 @@ object Conference {
 
   def destroy(conference: Conference) = DB.withConnection { implicit c =>
     SQL("DELETE FROM Conference WHERE id = {id}").on("id" -> conference.id).executeUpdate()
+    if(conference.logoId.isDefined)
+      Logo.find(conference.logoId.get).delete
   }
 
   def destroyAll(): Unit = DB.withConnection { implicit c =>
@@ -317,6 +320,8 @@ object Conference {
     oldConf.acceptCode = Some(Crypto.generateToken)
     oldConf.priv = conf.priv
     oldConf.forGroup = None
+    if(oldConf.logoId.isDefined)
+      Logo.find(oldConf.logoId.get).delete
     oldConf.logoId = logoId
   }
 
